@@ -1,4 +1,4 @@
-import '@arcgis/core/assets/esri/themes/light/main.css'; 
+
 
 import  esriConfig  from '@arcgis/core/config';
 
