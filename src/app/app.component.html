@@ -1,0 +1,739 @@
+<div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <!-- Logo del gobierno peruano -->
+                    <img src="assets/log_midagri.png" alt="Logo" width="200" height="auto">
+                    <!-- <div class="logo-section">
+                        <div class="peru-logo">
+                            <span class="peru-text">PERÚ</span>
+                        </div>
+                        <div class="ministry-badge">
+                            MINISTERIO DE<br>DESARROLLO AGRARIO
+                        </div>
+                    </div> -->
+                    
+                    <div class="title-section">
+                        <h1 class="main-title">OBSERVATORIO</h1>
+                        <p class="subtitle">Sistema de Información Geoespacial Agrícola</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+         
+        <!-- Main content -->
+        <div class="main-content">
+
+            
+            <app-consulta-multiple ></app-consulta-multiple>     
+            
+
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-content">
+                    <div class="menu-item active indicator-item">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="20" x2="12" y2="10"></line>
+                                <line x1="18" y1="20" x2="18" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="16"></line>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Indicadores del sector agrario</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- <div class="menu-item gestion-ppa">
+                        <div class="menu-item-content">
+                            <div class="menu-text">
+                                <span class="menu-title gestion-title">Gestión PPA</span>
+                                <p class="menu-subtitle">Padrón de productores agrarios</p>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <!-- <div  class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Padrón de productores agrarios</span>
+                                <p class="menu-subtitle">Registro oficial de productores del sector agropecuario</p>
+                            </div>
+                        </div>
+                    </div> -->
+                    
+                    <div  (click)="mostrarSeccion('sec_indi_01')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14,2 14,8 20,8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10,9 9,9 8,9"></polyline>
+                            </svg>
+                            <div class="menu-text">
+                                <div class="menu-title-row">
+                                    <span class="menu-title">Centros de empadronamiento</span>
+                                    <!-- <span class="menu-badge">21</span> -->
+                                </div>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div (click)="mostrarSeccion('sec_indi_01')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-avance" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"></path>
+                                <path d="M12 5l7 7-7 7"></path>
+                          </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Avance PPA</span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+<br>
+
+                    <div  (click)="mostrarSeccion('sec_indi_03a')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-actividad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="9" y1="6" x2="20" y2="6"></line>
+                                <line x1="9" y1="12" x2="20" y2="12"></line>
+                                <line x1="9" y1="18" x2="20" y2="18"></line>
+                                <circle cx="4" cy="6" r="1"></circle>
+                                <circle cx="4" cy="12" r="1"></circle>
+                                <circle cx="4" cy="18" r="1"></circle>
+                              </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Según tipo de actividad</span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div  (click)="mostrarSeccion('sec_indi_04')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-educa" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <!-- birrete -->
+                            <path d="M2 10l10-5 10 5-10 5-10-5z"></path>
+                            <path d="M12 15v5"></path>
+                            <path d="M12 15l6.16-3.09a2 2 0 0 1 1.84 0L22 13"></path>
+                          </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Según Nivel de Educación alcanzado</span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div  (click)="mostrarSeccion('sec_indi_03')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-region" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <!-- montaña grande -->
+                                <path d="M3 20l7-12 7 12H3z"></path>
+                                <!-- montaña secundaria -->
+                                <path d="M14 20l5-9 5 9h-10z"></path>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Según Región Natural</span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div  (click)="mostrarSeccion('sec_indi_02')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                             <svg class="menu-icon-moneda" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <!-- círculo como moneda -->
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <!-- símbolo de dólar -->
+                                <path d="M12 7v10M9 9c0-1.1 1.3-2 3-2s3 .9 3 2-1.3 2-3 2-3 .9-3 2 1.3 2 3 2 3-.9 3-2"></path>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Según Fuentes de Ingreso</span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div  (click)="mostrarSeccion('sec_indi_05')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-sexo" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <!-- círculo central -->
+                                <circle cx="12" cy="12" r="4"></circle>
+                                <!-- símbolo masculino (flecha) -->
+                                <line x1="15" y1="9" x2="19" y2="5"></line>
+                                <line x1="19" y1="5" x2="19" y2="9"></line>
+                                <line x1="19" y1="5" x2="15" y2="5"></line>
+                                <!-- símbolo femenino (cruz) -->
+                                <line x1="9" y1="15" x2="9" y2="19"></line>
+                                <line x1="7" y1="17" x2="11" y2="17"></line>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Según Género</span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div (click)="mostrarSeccion('sec_indi_06')"  class="menu-item other-option">
+                        <div class="menu-item">
+                            <svg class="menu-icon-organiza" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <!-- nodo raíz -->
+                                <rect x="10" y="2" width="4" height="4"></rect>
+                                <!-- nivel intermedio -->
+                                <rect x="4" y="10" width="4" height="4"></rect>
+                                <rect x="16" y="10" width="4" height="4"></rect>
+                                <!-- nivel inferior -->
+                                <rect x="2" y="18" width="4" height="4"></rect>
+                                <rect x="10" y="18" width="4" height="4"></rect>
+                                <rect x="18" y="18" width="4" height="4"></rect>
+                                <!-- líneas de conexión -->
+                                <line x1="12" y1="6" x2="12" y2="10"></line>
+                                <line x1="12" y1="10" x2="6" y2="10"></line>
+                                <line x1="12" y1="10" x2="18" y2="10"></line>
+                                <line x1="6" y1="14" x2="4" y2="18"></line>
+                                <line x1="6" y1="14" x2="12" y2="18"></line>
+                                <line x1="18" y1="14" x2="20" y2="18"></line>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Según Tipo de Organización </span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+   <br>
+
+
+
+                    <div  (click)="mostrarSeccion('sec_indi_01')"  class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-supagri" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <!-- Filas/parcelas -->
+                                <path d="M2 17 C6 13, 10 13, 14 17" />
+                                <path d="M2 19 C6 15, 10 15, 14 19" />
+                                <path d="M2 21 C6 17, 10 17, 14 21" />
+
+                                <!-- Planta (tallo + hojas) -->
+                                <path d="M11.5 11 v4" />
+                                <path d="M11.5 12.5 C10 11.5, 9 10, 11 9.5" />
+                                <path d="M11.5 12.5 C13 11.5, 14 10, 12 9.5" />
+
+                                <!-- Sol -->
+                                <circle cx="19" cy="5" r="2"></circle>
+                                <line x1="19" y1="2.5" x2="19" y2="1.2"></line>
+                                <line x1="19" y1="8" x2="19" y2="9.3"></line>
+                                <line x1="16.5" y1="5" x2="15.3" y2="5"></line>
+                                <line x1="21.5" y1="5" x2="22.7" y2="5"></line>
+                              </svg>
+                            <div class="menu-text">
+                                <span class="menu-title"> Superficie Agrícola </span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div (click)="mostrarSeccion('sec_indi_01')"  class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-supsemb" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+
+                            <!-- Filas de terreno -->
+                            <path d="M2 19 C6 15, 10 15, 14 19" />
+                            <path d="M2 21 C6 17, 10 17, 14 21" />
+
+                            <!-- Plantas sembradas -->
+                            <!-- Planta 1 -->
+                            <line x1="6" y1="13" x2="6" y2="16" />
+                            <path d="M6 14 C5 13, 4.5 12, 6 11.5" />
+                            <path d="M6 14 C7 13, 7.5 12, 6 11.5" />
+
+                            <!-- Planta 2 -->
+                            <line x1="10" y1="12" x2="10" y2="15" />
+                            <path d="M10 13 C9 12, 8.5 11, 10 10.5" />
+                            <path d="M10 13 C11 12, 11.5 11, 10 10.5" />
+
+                            <!-- Planta 3 -->
+                            <line x1="14" y1="13" x2="14" y2="16" />
+                            <path d="M14 14 C13 13, 12.5 12, 14 11.5" />
+                            <path d="M14 14 C15 13, 15.5 12, 14 11.5" />
+
+                          </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">Superficie Sembrada  </span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div (click)="mostrarSeccion('sec_indi_01')"   class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-tamparce" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+
+                                <!-- Marco de la parcela -->
+                                <rect x="3" y="3" width="18" height="18" rx="1" ry="1" />
+
+                                <!-- Líneas internas para dividir la parcela -->
+                                <line x1="3" y1="9" x2="21" y2="9" />
+                                <line x1="3" y1="15" x2="21" y2="15" />
+                                <line x1="9" y1="3" x2="9" y2="21" />
+                                <line x1="15" y1="3" x2="15" y2="21" />
+
+                              </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">  Tamaño de la Parcela</span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div  (click)="mostrarSeccion('sec_indi_01')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-regimen" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Parcela / lote (cuadrícula) -->
+                                <rect x="1.5" y="3" width="12" height="12" rx="1" ry="1"></rect>
+                                <line x1="1.5" y1="9" x2="13.5" y2="9"></line>
+                                <line x1="7.5" y1="3" x2="7.5" y2="15"></line>
+
+                                <!-- Etiqueta / documento pequeño (derecha abajo) -->
+                                <rect x="15" y="4" width="7" height="9" rx="0.8" ry="0.8"></rect>
+                                <line x1="16" y1="6" x2="20" y2="6"></line>
+                                <line x1="16" y1="8" x2="19" y2="8"></line>
+
+                                <!-- Escudo sobre el documento (protección / régimen) -->
+                                <path d="M18.5 13.5c0 .8-.5 1.5-1.5 2.1-1 .6-1 .9-1 .9s0-.3-1-.9c-1-.6-1.5-1.3-1.5-2.1V11h4z" fill="none"></path>
+                                <!-- Dibujo del escudo con relleno ligero -->
+                                <path d="M18.5 13.5c0 .8-.5 1.5-1.5 2.1-1 .6-1 .9-1 .9s0-.3-1-.9c-1-.6-1.5-1.3-1.5-2.1V11h4z" class="fill-accent" opacity="0.08"></path>
+                                <path d="M18.5 13.5c0 .8-.5 1.5-1.5 2.1-1 .6-1 .9-1 .9s0-.3-1-.9c-1-.6-1.5-1.3-1.5-2.1V11h4z" stroke="currentColor" fill="none"></path>
+
+                                <!-- Marca de verificación en el escudo -->
+                                <path d="M17 12.2l-1 1-1.2-1.2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                              </svg>
+                            <div class="menu-text">
+                                <span class="menu-title">  Régimen Tenencia Tierras</span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+   <br>
+
+
+                    <div (click)="mostrarSeccion('sec_indi_01')"  class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-cultivosprin" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Planta 1 -->
+                                <line x1="6" y1="14" x2="6" y2="19"></line>
+                                <path d="M6 15 C5 14, 4.5 13, 6 12.5"></path>
+                                <path d="M6 15 C7 14, 7.5 13, 6 12.5"></path>
+
+                                <!-- Planta 2 -->
+                                <line x1="12" y1="12" x2="12" y2="19"></line>
+                                <path d="M12 13 C11 12, 10.5 11, 12 10.5"></path>
+                                <path d="M12 13 C13 12, 13.5 11, 12 10.5"></path>
+
+                                <!-- Planta 3 -->
+                                <line x1="18" y1="15" x2="18" y2="19"></line>
+                                <path d="M18 16 C17 15, 16.5 14, 18 13.5"></path>
+                                <path d="M18 16 C19 15, 19.5 14, 18 13.5"></path>
+
+                                <!-- Línea del suelo -->
+                                <line x1="3" y1="19" x2="21" y2="19"></line>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title"> Principales Cultivos </span>
+                                <p class="menu-subtitle">  </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div  (click)="mostrarSeccion('sec_indi_01')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon" viewBox="0 0 24 24">
+                            <!-- Planta central -->
+                            <path d="M12 2 C10 6, 14 10, 12 14 C10 10, 14 6, 12 2"></path>
+                            <!-- Tallo / crecimiento -->
+                            <path d="M12 14 C12 18, 10 20, 10 22 H14 C14 20, 12 18, 12 14"></path>
+                            <!-- Base del suelo -->
+                            <line x1="10" y1="22" x2="14" y2="22"></line>
+                          </svg>
+                            <div class="menu-text">
+                                <span class="menu-title"> Cultivos Transitorios </span>
+                                <p class="menu-subtitle">  </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div (click)="mostrarSeccion('sec_indi_01')"  class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-cultivosperma" viewBox="0 0 24 24">
+                                <!-- Tres plantas más grandes y establecidas -->
+                                <!-- Planta 1 -->
+                                <path d="M6 10 C5 14, 7 16, 6 20"></path>
+                                <path d="M6 20 L5.5 22"></path>
+
+                                <!-- Planta 2 -->
+                                <path d="M12 8 C11 13, 13 16, 12 20"></path>
+                                <path d="M12 20 L11.5 22"></path>
+
+                                <!-- Planta 3 -->
+                                <path d="M18 10 C17 14, 19 16, 18 20"></path>
+                                <path d="M18 20 L17.5 22"></path>
+
+                                <!-- Línea de suelo -->
+                                <line x1="4" y1="22" x2="20" y2="22"></line>
+                              </svg>
+                            <div class="menu-text">
+                                <span class="menu-title"> Cultivos Permanentes </span>
+                                <p class="menu-subtitle"> </p>
+                            </div>
+                        </div>
+                    </div>
+
+   <br>
+
+                    <div  (click)="mostrarSeccion('sec_indi_19')"  class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-fertiabo" viewBox="0 0 24 24">
+                                <!-- Saco de fertilizante -->
+                                <path d="M8 5 L16 5 L14 19 L10 19 Z"></path>
+                                <!-- Etiqueta del saco -->
+                                <line x1="10" y1="10" x2="14" y2="10"></line>
+                                <line x1="10" y1="13" x2="14" y2="13"></line>
+
+                                <!-- Hoja 1 -->
+                                <path d="M12 5 C11 3, 13 3, 12 5"></path>
+                                <!-- Hoja 2 -->
+                                <path d="M13 6 C12 4, 14 4, 13 6"></path>
+
+                                <!-- Base del suelo -->
+                                <line x1="6" y1="19" x2="18" y2="19"></line>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title"> Uso de Fertilizante/Abono </span>
+                                <p class="menu-subtitle"></p>
+                            </div>
+                        </div>
+                    </div>
+
+   <br>
+
+                    <div  (click)="mostrarSeccion('sec_indi_01')"  class="menu-item other-option">
+                        <div class="menu-item-content">
+                           <svg class="menu-icon-bienesreci" viewBox="0 0 24 24">
+                                <!-- Caja / paquete -->
+                                <rect x="6" y="8" width="12" height="10" rx="1" ry="1"></rect>
+                                <!-- Tapa de la caja -->
+                                <line x1="6" y1="8" x2="12" y2="4"></line>
+                                <line x1="12" y1="4" x2="18" y2="8"></line>
+                                <line x1="12" y1="4" x2="12" y2="8"></line>
+                                <!-- Base / suelo -->
+                                <line x1="4" y1="18" x2="20" y2="18"></line>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title"> Bienes recibidos </span>
+                                <p class="menu-subtitle"> </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div (click)="mostrarSeccion('sec_indi_01')" class="menu-item other-option">
+                        <div class="menu-item-content">
+                            <svg class="menu-icon-servreci" viewBox="0 0 24 24">
+                                <!-- Mano abierta -->
+                                <path d="M6 18 C7 16, 8 12, 12 12 C16 12, 17 16, 18 18"></path>
+                                <line x1="6" y1="18" x2="18" y2="18"></line>
+
+                                <!-- Ícono de servicio (estrella) sobre la mano -->
+                                <polygon points="12,7 13,10 16,10 13.5,12 14.5,15 12,13 9.5,15 10.5,12 8,10 11,10" fill="none" stroke="currentColor"></polygon>
+                            </svg>
+                            <div class="menu-text">
+                                <span class="menu-title"> Servicios recibidos </span>
+                                <p class="menu-subtitle"> </p>
+                            </div>
+                        </div>
+                    </div>                                        
+                    
+                    
+                </div>
+            </aside>
+            
+            <!-- Content area -->
+            <div class="content-area">
+                <!-- Left panel - Controls -->
+                <div class="left-panel">
+                    <!-- Geographic Selection -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="icon-container blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3" fill="red"></circle>
+                                    <path d="M12 1v6m0 6v6m6-6H7"></path>
+                                </svg>
+                            </div>
+                            <h3 class="card-title geographic-title">Selección geográfica</h3>
+                        </div>
+                       <!--  
+                        <p class="card-description">
+                            Consulta las estadísticas más recientes del sector agrario
+                        </p>
+                         -->
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label class="form-label">Departamento *</label>
+                                <select (change)="ejecutarConsulta()"  id="cbodptos" class="form-select">
+                                    <option value="00">Dpto</option>
+                                    <!-- <option value="LAMBAYEQUE">Lambayeque</option>
+                                    <option value="LIMA">Lima</option> -->
+                                      <option value="01">AMAZONAS</option>
+                                      <option value="02">ANCASH</option>
+                                      <option value="03">APURIMAC</option>
+                                      <option value="04">AREQUIPA</option>
+                                      <option value="05">AYACUCHO</option>
+                                      <option value="06">CAJAMARCA</option>
+                                      <option value="07">CALLAO</option>
+                                      <option value="08">CUSCO</option>
+                                      <option value="09">HUANCAVELICA</option>
+                                      <option value="10">HUANUCO</option>
+                                      <option value="11">ICA</option>
+                                      <option value="12">JUNIN</option>
+                                      <option value="13">LA LIBERTAD</option>
+                                      <option value="14">LAMBAYEQUE</option>
+                                      <option value="15">LIMA</option>
+                                      <option value="16">LORETO</option>
+                                      <option value="17">MADRE DE DIOS</option>
+                                      <option value="18">MOQUEGUA</option>
+                                      <option value="19">PASCO</option>
+                                      <option value="20">PIURA</option>
+                                      <option value="21">PUNO</option>
+                                      <option value="22">SAN MARTIN</option>
+                                      <option value="23">TACNA</option>
+                                      <option value="24">TUMBES</option>
+                                      <option value="25">UCAYALI</option>
+                                </select>
+                            <!-- </div>
+                            
+                            <div class="form-group"> -->
+                                <label class="form-label">Provincia *</label>
+                                <select id="cboProvs" class="form-select">
+                                    
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_19')"  id="sec_indi_19" class="card">
+                        <div class="data-cards">
+                            <div style="display: none !important;"><app-grafico></app-grafico></div>
+                            
+                        </div>
+
+                        <div class="data-cards">
+                            
+                            <app-indice-fertilizante></app-indice-fertilizante>
+                        </div>
+
+                        
+                    </div>
+
+
+
+                    
+
+                    <div  *ngIf="esVisible('sec_indi_01')"  id="sec_indi_01" class="card">
+                        <div class="data-cards">
+                            <div style="display: none !important;"><app-grafico></app-grafico></div>
+                            
+                        </div>
+
+                        <div class="data-cards">
+                            
+                            <app-indice-centros-empadronamiento></app-indice-centros-empadronamiento>
+                        </div>
+
+                        
+                    </div>
+
+
+                    <div  *ngIf="esVisible('sec_indi_02')"  id="sec_indi_02" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-fuente-ingreso></app-indice-fuente-ingreso>
+                        </div>
+                    </div>
+
+
+                    <div  *ngIf="esVisible('sec_indi_03')"  id="sec_indi_03" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-segun-region-natural></app-indice-segun-region-natural>
+                        </div>
+                    </div>
+
+
+                    <div  *ngIf="esVisible('sec_indi_04')"  id="sec_indi_04" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-nivel-estudio></app-indice-nivel-estudio>
+                        </div>
+                    </div>
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_05')"  id="sec_indi_05" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-genero></app-indice-genero>
+                        </div>
+                    </div>
+
+
+                    <div  *ngIf="esVisible('sec_indi_06')"  id="sec_indi_06" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-tipoorg></app-indice-tipoorg>
+                        </div>
+                    </div>
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_03a')"  id="sec_indi_03a" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-tipo-activ></app-indice-tipo-activ>
+                        </div>
+                    </div>
+
+
+
+                    
+
+
+
+
+
+                    
+
+
+                    <!-- Data Cards -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="icon-container orange">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="20" x2="12" y2="10"></line>
+                                    <line x1="18" y1="20" x2="18" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="16"></line>
+                                </svg>
+                            </div>
+                            <h3 class="card-title data-title">Datos</h3>
+                        </div>
+                        
+                        <p class="card-description">
+                            Consulta las estadísticas más recientes del sector agrario
+                        </p>
+
+
+
+                        
+                        <div class="data-cards">
+                            
+                            <app-sumatorias></app-sumatorias>
+
+                            
+                        </div>
+
+
+                    </div>
+
+
+                    
+                </div>
+                
+                <!-- Right panel - Map -->
+                <div class="right-panel">
+                    <div id="mapaDiv" class="map-container">
+                        
+                        
+                        <!-- DNI Search floating -->
+                        <div class="dni-search">
+                            <div class="dni-search-header">
+                                <p class="dni-search-title">Búsqueda por DNI</p>
+                                <p class="dni-search-subtitle">Encuentra tu productor</p>
+                            </div>
+                            <div class="dni-search-form">
+                                <input type="text" placeholder="Ingrese N° de DNI" id="txtdni" class="dni-input">
+                                <button   (click)="ejecutarConsultadni()" class="dni-button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.35-4.35"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div style="display:none;" class="map-legend">
+                            <h4 class="legend-title">Leyenda</h4>
+                            <div class="legend-item">
+                                <div class="legend-color"></div>
+                                <span class="legend-text">Zonas agrícolas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
