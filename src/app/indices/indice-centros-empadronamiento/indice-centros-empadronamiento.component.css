@@ -1,0 +1,42 @@
+.indice-centros {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+#container-centros {
+  width: 100%;
+  max-width: 900px;
+}
+
+.tabla-wrapper {
+  width: 100%;
+  max-width: 600px;
+  overflow-x: auto;
+}
+
+.tabla-centros {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 14px;
+}
+
+.tabla-centros thead {
+  background-color: #f2f2f2;
+}
+
+.tabla-centros th, 
+.tabla-centros td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.tabla-centros tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.tabla-centros tr:hover {
+  background-color: #f1f1f1;
+}
