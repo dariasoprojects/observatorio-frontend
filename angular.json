@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/apollo-ng/browser",
+            "outputPath": "dist/apollo-ng",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": ["zone.js"],
@@ -81,9 +81,9 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/apollo-ng",
+            "outputPath": "dist/angularweb",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": ["zone.js"],
