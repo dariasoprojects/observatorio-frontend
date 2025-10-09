@@ -275,9 +275,9 @@ export class Mapa {
   async iniciar(): Promise<string> {
     try {
 
-      this.capaParcelasPadron = new MapImageLayer({
-        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Map/MapServer/",
-        title:"Parcelas Productores"
+      this.capaParcelasPadron = new MapImageLayer({        
+          url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/",
+        title: "Parcelas Productores"
       }); 
 
 
