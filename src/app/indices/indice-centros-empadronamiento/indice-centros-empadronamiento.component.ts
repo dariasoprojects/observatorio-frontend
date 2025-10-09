@@ -18,10 +18,10 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   valores: number[] = [];
   chart!: Highcharts.Chart;
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Capa_Observatorio/MapServer/0";
+  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/1";
 
   ngOnInit() {
-    // 🔹 Cargar datos desde el servicio
+    //  Cargar datos desde el servicio
     this.cargarDatos();
   }
 
@@ -49,12 +49,12 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   private async cargarDatos() {
     const q = new Query({
       where: "1=1",
-      outFields: ["reg"], // requerido cuando agrupas por reg
-      groupByFieldsForStatistics: ["reg"],
+      outFields: ["REG"], // requerido cuando agrupas por reg
+      groupByFieldsForStatistics: ["REG"],
       outStatistics: [
         {
           statisticType: "count",
-          onStatisticField: "reg",   // puede ser cualquier campo, solo cuenta filas
+          onStatisticField: "REG",   // puede ser cualquier campo, solo cuenta filas
           outStatisticFieldName: "conteo"
         }
       ],
@@ -65,16 +65,16 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
       const response = await query.executeQueryJSON(this.url, q);
 
       if (response.features.length > 0) {
-        // 🔹 Mapear resultados de las estadísticas
-        const categorias = response.features.map(f => f.attributes.reg || "No definido");
+        //  Mapear resultados de las estadísticas
+        const categorias = response.features.map(f => f.attributes.REG || "No definido");
         const valores = response.features.map(f => f.attributes.conteo);
 
         this.actualizarDatos(categorias, valores);
       } else {
-        console.warn("⚠️ No se devolvieron datos del servicio.");
+        console.warn("No se devolvieron datos del servicio.");
       }
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS", err);
+      console.error(" Error al consultar ArcGIS", err);
     }
   }
 
@@ -85,8 +85,8 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
  
      const q = new Query({
       where:  `reg = '${ubigeo}'`,
-      outFields: ["prov"], // requerido cuando agrupas por reg
-      groupByFieldsForStatistics: ["prov"],
+      outFields: ["PROV"], // requerido cuando agrupas por reg
+      groupByFieldsForStatistics: ["PROV"],
       outStatistics: [
         {
           statisticType: "count",
@@ -101,16 +101,16 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
       const response = await query.executeQueryJSON(this.url, q);
 
       if (response.features.length > 0) {
-        // 🔹 Mapear resultados de las estadísticas
+        //  Mapear resultados de las estadísticas
         const categorias = response.features.map(f => f.attributes.prov || "No definido");
         const valores = response.features.map(f => f.attributes.conteo);
 
         this.actualizarDatos(categorias, valores);
       } else {
-        console.warn("⚠️ No se devolvieron datos del servicio.");
+        console.warn(" No se devolvieron datos del servicio.");
       }
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS", err);
+      console.error(" Error al consultar ArcGIS", err);
     }
 
 

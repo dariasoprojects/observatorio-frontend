@@ -20,7 +20,7 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
 
   tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
 
-  // ✅ Nueva URL sin tilde en los campos
+  // Nueva URL sin tilde en los campos
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Capa_Observatorio/MapServer/2";
 
   ngOnInit() {
@@ -68,10 +68,10 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
 
         this.actualizarDatos(categorias, valores);
       } else {
-        console.warn("⚠️ No se devolvieron datos del servicio.");
+        console.warn(" No se devolvieron datos del servicio.");
       }
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS", err);
+      console.error(" Error al consultar ArcGIS", err);
     }
   }
 
@@ -99,7 +99,7 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
         this.actualizarDatos(categorias, valores);
       }
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS (Departamental)", err);
+      console.error(" Error al consultar ArcGIS (Departamental)", err);
     }
   }
 
@@ -127,7 +127,7 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
         this.actualizarDatos(categorias, valores);
       }
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS (Provincial)", err);
+      console.error(" Error al consultar ArcGIS (Provincial)", err);
     }
   }
 

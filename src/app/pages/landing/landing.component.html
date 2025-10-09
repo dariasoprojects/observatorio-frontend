@@ -1,0 +1,76 @@
+<div class="landing-container">
+  <!-- CABECERA -->
+  <header class="header">
+    <div class="logo-slogan">
+      <!-- <img src="assets/logo_midagri.png" alt="Logo" class="logo"> -->
+      <img src="assets/logo_midagri_portada.png" alt="Logo" class="logo">
+      <div class="slogan">
+        <h1>OBSERVATORIO</h1>
+        <p>Información del Padron de Productores Agrarios</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content">
+    <!-- IZQUIERDA -->
+    <section class="left-section">
+      <div class="banner">
+        <span>Accede al Padrón de <br>Productores Agrarios</span>       
+      </div>
+      <span class="subtitle">Consulta, analiza y sigue la poducción agraria con información<br> actualizada en tiempo real </span>
+
+      <div class="video-container">
+        <video width="500" height="300" controls poster="assets/img/poster.jpg">
+          <source src="assets/video/demo.mp4" type="video/mp4">
+          Tu navegador no soporta video HTML5.
+        </video>
+      </div>
+
+      <div class="buttons">
+        <button [routerLink]="['/visor']" class="btn-primary">Ingresar al Observatorio -></button>
+        <button (click)="reproducirVideo()" class="btn-secondary">Reproducir Video</button>
+      </div>
+    </section>
+
+    <!-- DERECHA -->
+    <section class="right-section">
+
+
+      <div class="data-panel">
+        <tr>
+          <td>
+          <svg class="menu-icon-stats" viewBox="0 0 24 24" stroke-width="2" fill="none" width="48" height="48">
+            <!-- barras de colores -->
+            <path d="M4 20v-4" stroke="#4f8ef7" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M9 20v-8" stroke="#4CAF50" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M14 20v-6" stroke="#FF9800" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M19 20v-10" stroke="#F44336" stroke-linecap="round" stroke-linejoin="round"></path>
+
+            <!-- línea de tendencia -->
+            <path d="M3 12l4-3 5 2 4-4 5 3" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </td>
+        <td>
+          <span class="banner2">Datos</span>
+        </td>
+        </tr>
+        <span class="subtitle">Consulta las estadísticas mas recientes del sector agragrio </span>
+        <div class="data-boxes">
+          <div class="data-box">
+            <span class="value">12,340</span>
+            <span class="label">Productores</span>
+          </div>
+          <div class="data-box">
+            <span class="value">8,920</span>
+            <span class="label">Parcelas</span>
+          </div>
+          <div class="data-box">
+            <span class="value">45,800 ha</span>
+            <span class="label">Hectáreas</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

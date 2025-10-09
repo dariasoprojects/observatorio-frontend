@@ -90,9 +90,9 @@ export class ConsultaMultipleComponent implements OnInit {
   resultados: any[] = [];
 
 
-  private urlCSV = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Capa_Observatorio/MapServer/1";
+  private urlCSV = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/3";
 
-  urlShape = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Capa_Observatorio/MapServer/0";
+  urlShape = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
 
   constructor(private comm: MapCommService) {}  // <-- solo para inyectar
 
@@ -116,16 +116,16 @@ export class ConsultaMultipleComponent implements OnInit {
       this.categoriasCombo = Array.from(
         new Map(
           this.configuracion.map(d => [
-            d.idcategoria,
-            { id: d.idcategoria, nombre: d.categoria }
+            d.IDCATEGORIA,
+            { id: d.IDCATEGORIA, nombre: d.CATEGORIA }
           ])
         ).values()
       );
 
-      console.log("📌 Categorías:", this.categoriasCombo);
+      console.log("Categorías:", this.categoriasCombo);
 
     } catch (err) {
-      console.error("❌ Error cargando CSV", err);
+      console.error("Error cargando CSV", err);
     }
   }
 
@@ -149,12 +149,12 @@ export class ConsultaMultipleComponent implements OnInit {
     const q = new Query({
       where: this.whereFinal || '1=1', // tu string acumulado de filtros
       outFields: [
-        "FID","tdoc","genero","edad","ecivil","grado","torg","orgn","leng",
-        "cmh","supa","npar","tenp","ubig","ncul","sbre","srie","anim",
-        "tcpr","tmpr","uthr","cfle","tflr","cfth","cftm","cfph","cfpm",
-        "bsrv","serv","sexr","tmex","erfn","email","tel","cel","smrt",
-        "comu","cnat","ccmp","corg","parti","umed","fing","prie","uscf",
-        "upcf","ufab","rfna","tca"
+        "OBJECTID", "TDOC", "GENERO", "EDAD", "ECIVIL", "GRADO", "TORG", "ORGN", "LENG",
+        "CMH", "SUPA", "NPAR", "TENP", "UBIG", "NCUL", "SBRE", "SRIE", "ANIM",
+        "TCPR", "TMPR", "UTHR", "CFLE", "TFLR", "CFTH", "CFTM", "CFPH", "CFPM",
+        "BSRV", "SERV", "SEXR", "TMEX", "ERFN", "EMAIL", "TEL", "CEL", "SMRT",
+        "COMU", "CNAT", "CCMP", "CORG", "PARTI", "UMED", "FING", "PRIE", "USCF",
+        "UPCF", "UFAB", "RFNA", "TCA"
       ],
       returnGeometry: true
     });
@@ -167,9 +167,9 @@ export class ConsultaMultipleComponent implements OnInit {
         const atributosLegibles: { [key: string]: string | number } = {};
 
         Object.keys(attr).forEach(campo => {
-          const conf = this.configuracion.find(c => c.campo_busqueda === campo && c.idvalor === attr[campo]);
+          const conf = this.configuracion.find(c => c.CAMPO_BUSQUEDA === campo && c.IDVALOR === attr[campo]);
           if (conf) {
-            atributosLegibles[campo] = conf.valor;
+            atributosLegibles[campo] = conf.VALOR;
           } 
           else if (this.camposLegibles[campo] && this.camposLegibles[campo][attr[campo]] !== undefined) {
             atributosLegibles[campo] = this.camposLegibles[campo][attr[campo]];
@@ -181,13 +181,13 @@ export class ConsultaMultipleComponent implements OnInit {
 
 
         return {
-          fid: attr.FID,
+          fid: attr.OBJECTID,
           attributes: atributosLegibles,
           geometry: f.geometry
         };
       });
 
-      console.log("✅ Resultados mapeados:", this.resultados);
+      console.log("Resultados mapeados:", this.resultados);
 
     } catch (err) {
       console.error("Error ejecutando query", err);
@@ -205,13 +205,12 @@ export class ConsultaMultipleComponent implements OnInit {
     const q = new Query({
       where: this.whereFinal,
       outFields: [
-        "FID", // <--- agregar
-        "tdoc","genero","edad","ecivil","grado","torg","orgn","leng",
-        "cmh","supa","npar","tenp","ubig","ncul","sbre","srie","anim",
-        "tcpr","tmpr","uthr","cfle","tflr","cfth","cftm","cfph","cfpm",
-        "bsrv","serv","sexr","tmex","erfn","email","tel","cel","smrt",
-        "comu","cnat","ccmp","corg","parti","umed","fing","prie","uscf",
-        "upcf","ufab","rfna","tca"
+        "OBJECTID", "TDOC", "GENERO", "EDAD", "ECIVIL", "GRADO", "TORG", "ORGN", "LENG",
+        "CMH", "SUPA", "NPAR", "TENP", "UBIG", "NCUL", "SBRE", "SRIE", "ANIM",
+        "TCPR", "TMPR", "UTHR", "CFLE", "TFLR", "CFTH", "CFTM", "CFPH", "CFPM",
+        "BSRV", "SERV", "SEXR", "TMEX", "ERFN", "EMAIL", "TEL", "CEL", "SMRT",
+        "COMU", "CNAT", "CCMP", "CORG", "PARTI", "UMED", "FING", "PRIE", "USCF",
+        "UPCF", "UFAB", "RFNA", "TCA"
       ], 
       returnGeometry: true // necesitamos geometría para zoom
     });
@@ -334,11 +333,11 @@ export class ConsultaMultipleComponent implements OnInit {
     console.log("this.configuracion->", this.configuracion);
 
     // const filtrados = this.configuracion.filter(
-    //   d => d.idcategoria === this.categoriaSeleccionada
+    //   d => d.IDCATEGORIA === this.categoriaSeleccionada
     // );
 
     const filtrados = this.configuracion.filter(
-      d => d.idcategoria === Number(this.categoriaSeleccionada)
+      d => d.IDCATEGORIA === Number(this.categoriaSeleccionada)
     );
 
     console.log("filtrados - >", filtrados);
@@ -346,17 +345,17 @@ export class ConsultaMultipleComponent implements OnInit {
     this.variablesCombo = Array.from(
       new Map(
         filtrados.map(d => [
-          d.campo_busqueda,
+          d.CAMPO_BUSQUEDA,
           {
-            id: d.campo_busqueda,       // usamos campo_busqueda como id
-            campo_busqueda: d.campo_busqueda,
-            variable: d.variable        // nombre a mostrar
+            id: d.CAMPO_BUSQUEDA,       // usamos campo_busqueda como id
+            campo_busqueda: d.CAMPO_BUSQUEDA,
+            variable: d.VARIABLE        // nombre a mostrar
           }
         ])
       ).values()
     );
 
-    console.log("📌 Variables:", this.variablesCombo);
+    console.log(" Variables:", this.variablesCombo);
 
     this.variableSeleccionada = '';
     this.valoresCombo = [];
@@ -367,15 +366,15 @@ export class ConsultaMultipleComponent implements OnInit {
     // buscamos la variable seleccionada dentro de la configuracion
     const variable = this.configuracion.find(
       d =>
-        d.idcategoria == this.categoriaSeleccionada &&
-        d.campo_busqueda == this.variableSeleccionada
+        d.IDCATEGORIA == this.categoriaSeleccionada &&
+        d.CAMPO_BUSQUEDA == this.variableSeleccionada
     );
 
-    console.log("🔎 Variable seleccionada:", variable);
+    console.log("Variable seleccionada:", variable);
 
     // según tipoentrada definimos las condiciones
     if (variable) {
-      switch (variable.tipoentrada) {
+      switch (variable.TIPOENTRADA) {
         case 2:
           this.condicionesCombo = [
             { id: "=", nombre: "Igual a" },
@@ -407,17 +406,17 @@ export class ConsultaMultipleComponent implements OnInit {
     // luego cargas los valores como ya tenías
     const filtrados = this.configuracion.filter(
       d =>
-        d.idcategoria == this.categoriaSeleccionada &&
-        d.campo_busqueda == this.variableSeleccionada
+        d.IDCATEGORIA     == this.categoriaSeleccionada &&
+        d.CAMPO_BUSQUEDA  == this.variableSeleccionada
     );
 
     this.valoresCombo = Array.from(
       new Map(
-        filtrados.map(d => [d.idvalor, { idvalor: d.idvalor, valor: d.valor }])
+        filtrados.map(d => [d.IDVALOR, { idvalor: d.IDVALOR, valor: d.VALOR }])
       ).values()
     );
 
-    console.log("✅ valoresCombo:", this.valoresCombo);
+    console.log("valoresCombo:", this.valoresCombo);
 
     this.valorSeleccionado = '';
   }
