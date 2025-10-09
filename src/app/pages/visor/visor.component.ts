@@ -200,6 +200,37 @@ export class VisorComponent implements OnInit {
   }
 
 
+
+  ejecutarConsultaProv(): void {
+    // Captura el valor seleccionado del <select>
+    const selectElement = <HTMLSelectElement>document.getElementById('cboProvs');
+    const provincia = selectElement.value;
+    
+    //este se debe anular
+    const provincia2 = this.getNombreDepartamento (provincia);
+
+  
+
+    if (provincia) {
+      // Llama a la función queryByDepartamento con el valor seleccionado
+      this.mapa.queryByProvincia(provincia)
+        .then(() => console.log(`Consulta realizada para el departamento: ${provincia}`))
+        .catch(err => console.error('Error al realizar la consulta:', err));
+
+      //this.mapa.obtenerProvinciasPorDepartamento(provincia);
+      //this.sumatoriasComponent.cargarDatosByDpto(provincia);
+
+      //this.indiceCentrosEmpadronamiento.cargarDatosByDpto(provincia2);
+    } else {
+      console.log('Por favor, selecciona un departamento.');
+    }
+    
+  }
+
+
+  
+
+
   ejecutarConsultaProv_mapPerdida(): void {
     // Captura el valor seleccionado del <select>
     const selectElement = <HTMLSelectElement>document.getElementById('cboProvs');
