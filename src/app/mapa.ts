@@ -1,10 +1,7 @@
 import '@arcgis/core/assets/esri/themes/light/main.css'; 
-
 import  esriConfig  from '@arcgis/core/config';
-
 import OAuthInfo from '@arcgis/core/identity/OAuthInfo';
 import IdentityManager from '@arcgis/core/identity/IdentityManager';
-
 import Basemap from "@arcgis/core/Basemap";
 import Legend  from '@arcgis/core/widgets/Legend';
 import Map from "@arcgis/core/Map";
@@ -12,31 +9,21 @@ import MapView from "@arcgis/core/views/MapView";
 import SceneView from "@arcgis/core/views/SceneView";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
-
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import Extent from "@arcgis/core/geometry/Extent";
 import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
-
 import Color from "@arcgis/core/Color";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-
-//simport { AuthService } from './auth.service';
 import { HttpClientModule } from '@angular/common/http';
 import Sketch from '@arcgis/core/widgets/Sketch';
 import Polygon from '@arcgis/core/geometry/Polygon';
 import Graphic from '@arcgis/core/Graphic';
 import Popup from "@arcgis/core/widgets/Popup";
-
-//import IdentifyTask from "@arcgis/core/tasks/IdentifyTask";
-//import IdentifyParameters from "@arcgis/core/tasks/support/IdentifyParameters";
-
 import DistanceMeasurement2D from "@arcgis/core/widgets/DistanceMeasurement2D";
 import AreaMeasurement2D from "@arcgis/core/widgets/AreaMeasurement2D";
-
 import Print from "@arcgis/core/widgets/Print";
-
 import { MapCommService } from './services/map-comm.service';
 
 
@@ -46,9 +33,8 @@ interface Provincia {
 }
 
 
-
-
 export class Mapa {
+
   private mapView: MapView | null = null;
   private map: Map | null = null;
   private divId: string;
@@ -56,29 +42,21 @@ export class Mapa {
   private simpleFillSymbol: SimpleFillSymbol | null = null;
   private capaMapServer: MapImageLayer | null = null;
   private capaClusterAlertas: MapImageLayer | null = null;
-
   private capaJuntausuario: MapImageLayer | null = null;
   private capaComiteRiego: MapImageLayer | null = null;
   private capaAntenasCelular: MapImageLayer | null = null;
-
   private capaParcelasPadron: MapImageLayer | null = null;
-
   private rasterBosqueAmazonico: MapImageLayer | null = null;
   private rasterBosqueSeco: MapImageLayer | null = null;
   private legendContainer!: HTMLDivElement;
   private tocContainer!: HTMLDivElement;
-
   private identifyActive = false;
   private sketsch: Sketch | null = null;
   private drawActive = false;
-
   private medirWidget: DistanceMeasurement2D | null = null;
   private medirAreaWidget: AreaMeasurement2D | null = null;
-
   private currentView!: MapView | SceneView;
-
   private printWidget: Print | null = null;
-
   private highlightLayer: GraphicsLayer | null = null;
  
   
@@ -280,7 +258,6 @@ export class Mapa {
         title: "Parcelas Productores"
       }); 
 
-
       this.capaMapServer = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/SectoresEstadisticos/MapServer/",
       });
@@ -293,7 +270,6 @@ export class Mapa {
       this.capaClusterAlertas = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Microcuencas/MapServer/",
       });
-
 
       this.capaJuntausuario = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/",
@@ -312,7 +288,6 @@ export class Mapa {
         basemap: "hybrid",
         layers: [this.capaParcelasPadron, this.rasterBosqueAmazonico, this.capaMapServer, this.capaClusterAlertas , this.capaJuntausuario,this.capaComiteRiego,this.capaAntenasCelular , this.resultsLayer!],
       });
-
       
       this.mapView = new MapView({
         container: this.divId,
@@ -337,11 +312,8 @@ export class Mapa {
       this.mapView.ui.add(this.tocContainer, 'bottom-right');
            
       await this.mapView.when();
-      this.agregarBotones();
-      //this.generarTOCConLeyenda(this.tocContainer);
+      this.agregarBotones();      
 
-
-      //this.setModoMapa(1);
 
       console.log("Mapa inicializado");
       return Promise.resolve("Mapa cargado con éxito 2.0");
@@ -552,8 +524,8 @@ export class Mapa {
       basemapMenu.style.background = "white";
       basemapMenu.style.padding = "5px";
       basemapMenu.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
-      basemapMenu.style.pointerEvents = "auto";  // 🔑 evita que clics pasen al mapa
-      basemapMenu.style.zIndex = "9999";         // 🔑 asegura que quede encima
+      basemapMenu.style.pointerEvents = "auto";  // evita que clics pasen al mapa
+      basemapMenu.style.zIndex = "9999";         //  asegura que quede encima
 
       // Lista de basemaps
       const basemaps = [
@@ -585,13 +557,11 @@ export class Mapa {
         basemapMenu.style.display = basemapMenu.style.display === "none" ? "block" : "none";
       };
 
-      // 🔹 Contenedor general (botón + menú)
+      // Contenedor general (botón + menú)
       const basemapContainer = document.createElement("div");
       basemapContainer.style.position = "relative";
       basemapContainer.appendChild(basemapBtn);
       basemapContainer.appendChild(basemapMenu);
-
-
 
 
 
@@ -631,8 +601,6 @@ export class Mapa {
       };
 
 
-
-
       // Botón de impresión
       const multiQyBtn = document.createElement("div");
       multiQyBtn.className = "esri-widget esri-widget--button esri-interactive";
@@ -652,10 +620,6 @@ export class Mapa {
           miDiv.style.display = "none";  // ocultar
         }
       };
-
-
-
-
 
 
       if (this.mapView) {        

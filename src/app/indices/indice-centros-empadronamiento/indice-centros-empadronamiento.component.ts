@@ -54,7 +54,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
       outStatistics: [
         {
           statisticType: "count",
-          onStatisticField: "REG",   // puede ser cualquier campo, solo cuenta filas
+          onStatisticField: "reg",   // puede ser cualquier campo, solo cuenta filas
           outStatisticFieldName: "conteo"
         }
       ],
@@ -66,7 +66,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
       if (response.features.length > 0) {
         //  Mapear resultados de las estadísticas
-        const categorias = response.features.map(f => f.attributes.REG || "No definido");
+        const categorias = response.features.map(f => f.attributes.reg || "No definido");
         const valores = response.features.map(f => f.attributes.conteo);
 
         this.actualizarDatos(categorias, valores);
