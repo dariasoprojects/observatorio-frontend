@@ -22,10 +22,10 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
   public nroParcelas: string = '';
   public totHectareas: string = '';
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Capa_Observatorio/MapServer/1";
+  private url = "https://gis.bosques.gob.pe/server/rest/services/mapa_pruebadata22_MIL1/MapServer/3";
 
   ngOnInit() {
-    // 🔹 Cargar datos desde el servicio
+    // Cargar datos desde el servicio
     this.cargarDatos();
   }
 
@@ -130,7 +130,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
           
 
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS", err);
+      console.error(" Error al consultar ArcGIS", err);
     }
   }
 
@@ -210,7 +210,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         this.totHectareas = this.metrosCuadradosAHa(sumaHectareas).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS", err);
+      console.error(" Error al consultar ArcGIS", err);
     }
   }
 
@@ -237,16 +237,16 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
   //     const response = await query.executeQueryJSON(this.url, q);
 
   //     if (response.features.length > 0) {
-  //       // 🔹 Mapear resultados de las estadísticas
+  //       // Mapear resultados de las estadísticas
   //       const categorias = response.features.map(f => f.attributes.prov || "No definido");
   //       const valores = response.features.map(f => f.attributes.conteo);
 
   //       this.actualizarDatos(categorias, valores);
   //     } else {
-  //       console.warn("⚠️ No se devolvieron datos del servicio.");
+  //       console.warn(" No se devolvieron datos del servicio.");
   //     }
   //   } catch (err) {
-  //     console.error("❌ Error al consultar ArcGIS", err);
+  //     console.error("Error al consultar ArcGIS", err);
   //   }
   // }
 
