@@ -25,10 +25,9 @@
               { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/images", "output": "/assets/esri/images" }
             ],
             "styles": [
-                "src/styles.css",
-                "src/assets/esri/themes/light/main.css"
-              ]
-              ,
+              "src/styles.css",
+              "src/assets/esri/themes/light/main.css"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -72,7 +71,79 @@
           }
         }
       }
+    },
+
+    "apollo-ng": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apollo-ng",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": ["zone.js"],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "/assets" },
+              { "glob": "**/*", "input": "public" },
+              { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/fonts", "output": "/assets/esri/fonts" },
+              { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/images", "output": "/assets/esri/images" }
+            ],
+            "styles": [
+              "src/styles.css",
+              "src/assets/esri/themes/light/main.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                { "type": "initial", "maximumWarning": "10mb", "maximumError": "12MB" },
+                { "type": "anyComponentStyle", "maximumWarning": "10kB", "maximumError": "15kB" }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false,
+              "baseHref": "/"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": { "buildTarget": "apollo-ng:build:production" },
+            "development": { "buildTarget": "apollo-ng:build:development" }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": { "builder": "@angular-devkit/build-angular:extract-i18n" },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "/assets" },
+              { "glob": "**/*", "input": "public" }
+            ],
+            "styles": ["src/styles.css"],
+            "scripts": []
+          }
+        }
+      }
     }
   },
-  "cli": { "analytics": false }
+  "cli": { "analytics": false },
+  "defaultProject": "apollo-ng"
 }
