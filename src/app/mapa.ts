@@ -571,37 +571,42 @@ export class Mapa {
       printBtn.innerHTML = '<span class="esri-icon-printer" title="Imprimir Mapa"></span>';
       printBtn.style.margin = "5px";
 
+
+      if (!this.mapView) return;
+
+      // Crear un div flotante para el widget
+      const printDiv = document.createElement("div");
+      printDiv.style.position = "absolute";
+      printDiv.style.display = "none";
+      printDiv.style.top = "50px";
+      printDiv.style.left = "50%";
+      printDiv.style.transform = "translateX(-50%)";
+      printDiv.style.background = "white";
+      printDiv.style.padding = "10px";
+      printDiv.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+      printDiv.style.zIndex = "9999";
+
+      // Crear el Print widget si no existe
+      if (!this.printWidget) {
+        this.printWidget = new Print({
+          view: this.mapView,
+          printServiceUrl: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+        });
+      }
+
+      // Asignar el div como contenedor del widget
+      this.printWidget.container = printDiv;
+
+      // Agregar el div al body
+      document.body.appendChild(printDiv);
+
+
       printBtn.onclick = () => {
-        if (!this.mapView) return;
-
-        // Crear un div flotante para el widget
-        const printDiv = document.createElement("div");
-        printDiv.style.position = "absolute";
-        printDiv.style.top = "50px";
-        printDiv.style.left = "50%";
-        printDiv.style.transform = "translateX(-50%)";
-        printDiv.style.background = "white";
-        printDiv.style.padding = "10px";
-        printDiv.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
-        printDiv.style.zIndex = "9999";
-
-        // Crear el Print widget si no existe
-        if (!this.printWidget) {
-          this.printWidget = new Print({
-            view: this.mapView,
-            printServiceUrl: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
-          });
-        }
-
-        // Asignar el div como contenedor del widget
-        this.printWidget.container = printDiv;
-
-        // Agregar el div al body
-        document.body.appendChild(printDiv);
+        printDiv.style.display = printDiv.style.display === "none" ? "block" : "none";        
       };
 
 
-      // Botón de impresión
+      // Botón Multi
       const multiQyBtn = document.createElement("div");
       multiQyBtn.className = "esri-widget esri-widget--button esri-interactive";
       multiQyBtn.innerHTML = '<span class="esri-icon-filter" title="Imprimir Mapa"></span>';

@@ -22,7 +22,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
   public nroParcelas: string = '';
   public totHectareas: string = '';
 
-  private url = "https://gis.bosques.gob.pe/server/rest/services/mapa_pruebadata22_MIL1/MapServer/3";
+  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
 
   ngOnInit() {
     // Cargar datos desde el servicio
@@ -52,15 +52,15 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
 
   private async cargarDatos() {
     try {
-        // 1️⃣ Conteo de registros únicos por txt_nrodoc
+        // Conteo de registros únicos por txt_nrodoc
         const qConteo = new Query({
           where: "1=1",
-          outFields: ["nombres", "apellidopa"],          // campos para agrupar
-          groupByFieldsForStatistics: ["nombres", "apellidopa"],
+          outFields: ["NOMBRES", "APELLIDOPA "],          // campos para agrupar
+          groupByFieldsForStatistics: ["NOMBRES", "APELLIDOPA "],
           outStatistics: [
             {
               statisticType: "count",                   // conteo de registros por grupo
-              onStatisticField: "objectid",             // cualquier campo no nulo
+              onStatisticField: "OBJECTID ",             // cualquier campo no nulo
               outStatisticFieldName: "conteo_registros"
             }
           ],
@@ -78,13 +78,17 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         console.log("Conteo de registros únicos por nombres y apellidopa:", conteoRegistros);
         this.nroProductores = conteoRegistros.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
+        
+
+
+
         const qConteoSimple = new Query({
           where: "1=1",                // tu condición
-          outFields: ["objectid"],      // solo necesitas un campo no nulo
+          outFields: ["OBJECTID"],      // solo necesitas un campo no nulo
           outStatistics: [
             {
               statisticType: "count",   // conteo simple
-              onStatisticField: "objectid",
+              onStatisticField: "OBJECTID",
               outStatisticFieldName: "conteo_total"
             }
           ],
@@ -93,22 +97,28 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
 
         const resConteoSimple = await query.executeQueryJSON(this.url, qConteoSimple);
 
+        console.log("resConteoSimple", resConteoSimple); 
+
         let conteoTotal = 0;
         if (resConteoSimple.features.length > 0) {
-          conteoTotal = resConteoSimple.features[0].attributes.conteo_total || 0;
+          conteoTotal = resConteoSimple.features[0].attributes.CONTEO_TOTAL || 0;
         }
 
         console.log("Conteo total de registros:", conteoTotal);
 
         this.nroParcelas = conteoTotal.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
+        
+
+        //SUMAR AREAS
+
         const qSuma = new Query({
           where: "1=1",  // condición que necesites
-          outFields: ["area_ut_cu_num"], 
+          outFields: ["AREA_UT_CU_NUM"], 
           outStatistics: [
             {
               statisticType: "sum",           // sumatoria
-              onStatisticField: "area_ut_cu_num",
+              onStatisticField: "AREA_UT_CU_NUM",
               outStatisticFieldName: "suma_hectareas"
             }
           ],
@@ -119,7 +129,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
 
         let sumaHectareas = 0;
         if (resSuma.features.length > 0) {
-          sumaHectareas = resSuma.features[0].attributes.suma_hectareas || 0;
+          sumaHectareas = resSuma.features[0].attributes.SUMA_HECTAREAS || 0;
         }
 
         console.log("Suma total de hectáreas:", this.metrosCuadradosAHa(sumaHectareas));
@@ -140,17 +150,17 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
   public async cargarDatosByDpto(depCodigo: string) {
     try {
         // armo el filtro: solo los ubigeos que empiezan con los 2 dígitos del departamento
-        const whereFiltro = `ubigeo3 LIKE '${depCodigo}%'`;
+        const whereFiltro = `UBIGEO3  LIKE '${depCodigo}%'`;
 
         // 1️⃣ Conteo de registros únicos por nombres + apellidopa
         const qConteo = new Query({
           where: whereFiltro,
-          outFields: ["nombres", "apellidopa"],          
-          groupByFieldsForStatistics: ["nombres", "apellidopa"],
+          outFields: ["NOMBRES", "APELLIDOPA"],          
+          groupByFieldsForStatistics: ["NOMBRES", "APELLIDOPA"],
           outStatistics: [
             {
               statisticType: "count",
-              onStatisticField: "objectid",
+              onStatisticField: "OBJECTID ",
               outStatisticFieldName: "conteo_registros"
             }
           ],
@@ -169,11 +179,11 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         // 2️⃣ Conteo simple
         const qConteoSimple = new Query({
           where: whereFiltro,
-          outFields: ["objectid"],
+          outFields: ["OBJECTID"],
           outStatistics: [
             {
               statisticType: "count",
-              onStatisticField: "objectid",
+              onStatisticField: "OBJECTID",
               outStatisticFieldName: "conteo_total"
             }
           ],
@@ -183,18 +193,18 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         const resConteoSimple = await query.executeQueryJSON(this.url, qConteoSimple);
         let conteoTotal = 0;
         if (resConteoSimple.features.length > 0) {
-          conteoTotal = resConteoSimple.features[0].attributes.conteo_total || 0;
+          conteoTotal = resConteoSimple.features[0].attributes.CONTEO_TOTAL || 0;
         }
         this.nroParcelas = conteoTotal.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-        // 3️⃣ Suma hectáreas
+        // Suma hectáreas
         const qSuma = new Query({
           where: whereFiltro,
-          outFields: ["area_ut_cu_num"], 
+          outFields: ["AREA_UT_CU_NUM"], 
           outStatistics: [
             {
               statisticType: "sum",
-              onStatisticField: "area_ut_cu_num",
+              onStatisticField: "AREA_UT_CU_NUM",
               outStatisticFieldName: "suma_hectareas"
             }
           ],
@@ -204,7 +214,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         const resSuma = await query.executeQueryJSON(this.url, qSuma);
         let sumaHectareas = 0;
         if (resSuma.features.length > 0) {
-          sumaHectareas = resSuma.features[0].attributes.suma_hectareas || 0;
+          sumaHectareas = resSuma.features[0].attributes.SUMA_HECTAREAS || 0;
         }
 
         this.totHectareas = this.metrosCuadradosAHa(sumaHectareas).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

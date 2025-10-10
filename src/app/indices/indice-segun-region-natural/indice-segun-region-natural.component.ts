@@ -20,8 +20,8 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
 
   tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
 
-  // ✅ Nueva URL sin tilde en los campos
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Capa_Observatorio/MapServer/2";
+  //  Nueva URL sin tilde en los campos
+  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
   ngOnInit() {
     this.cargarDatos(); // Nacional por defecto
@@ -46,8 +46,8 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
 
   private async cargarDatos() {
     const q = new Query({
-      where: "indice = 'REGNAT' AND capa = 1",
-      outFields: ["ddescr", "productores", "hectarea", "parcelas"],
+      where: "INDICE = 'REGNAT' AND CAPA = 1",
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -56,10 +56,10 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
 
       if (response.features.length > 0) {
         this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.ddescr,
-          productores: f.attributes.productores,
-          hectarea: f.attributes.hectarea,
-          parcelas: f.attributes.parcelas
+          ddescr: f.attributes.DDESCR,
+          productores: f.attributes.PRODUCTORES,
+          hectarea: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS
         }));
 
         // Pie chart solo con productores
@@ -68,17 +68,17 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
 
         this.actualizarDatos(categorias, valores);
       } else {
-        console.warn("⚠️ No se devolvieron datos del servicio.");
+        console.warn(" No se devolvieron datos del servicio.");
       }
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS", err);
+      console.error(" Error al consultar ArcGIS", err);
     }
   }
 
   public async cargarDatosByDpto(ubigeo: string) {
     const q = new Query({
-      where: `indice = 'REGNAT' AND capa = 2 AND ubigeo = ${ubigeo}`,
-      outFields: ["ddescr", "productores", "hectarea", "parcelas"],
+      where: `INDICE = 'REGNAT' AND CAPA = 2 AND UBIGEO = ${ubigeo}`,
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -87,10 +87,10 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
 
       if (response.features.length > 0) {
         this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.ddescr,
-          productores: f.attributes.productores,
-          hectarea: f.attributes.hectarea,
-          parcelas: f.attributes.parcelas
+          ddescr: f.attributes.DDESCR,
+          productores: f.attributes.PRODUCTORES,
+          hectarea: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS
         }));
 
         const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
@@ -99,14 +99,14 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
         this.actualizarDatos(categorias, valores);
       }
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS (Departamental)", err);
+      console.error(" Error al consultar ArcGIS (Departamental)", err);
     }
   }
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `indice = 'REGNAT' AND capa = 3 AND ubigeo = ${ubigeo}`,
-      outFields: ["ddescr", "productores", "hectarea", "parcelas"],
+      where: `INDICE = 'REGNAT' AND CAPA = 3 AND UBIGEO = ${ubigeo}`,
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -115,10 +115,10 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
 
       if (response.features.length > 0) {
         this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.ddescr,
-          productores: f.attributes.productores,
-          hectarea: f.attributes.hectarea,
-          parcelas: f.attributes.parcelas
+          ddescr: f.attributes.DDESCR,
+          productores: f.attributes.PRODUCTORES,
+          hectarea: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS
         }));
 
         const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
@@ -127,7 +127,7 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
         this.actualizarDatos(categorias, valores);
       }
     } catch (err) {
-      console.error("❌ Error al consultar ArcGIS (Provincial)", err);
+      console.error(" Error al consultar ArcGIS (Provincial)", err);
     }
   }
 

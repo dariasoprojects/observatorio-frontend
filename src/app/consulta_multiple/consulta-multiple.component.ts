@@ -422,7 +422,14 @@ export class ConsultaMultipleComponent implements OnInit {
   }
 
 
+  closeVentana(){
 
+        const miDiv = document.getElementById("divDragConsultaMulti");
+        if (!miDiv) return;
+       
+        miDiv.style.display = "none";        
+
+  }
 
 
 

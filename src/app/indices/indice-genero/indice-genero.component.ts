@@ -21,7 +21,7 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
   tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
 
   // URL 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Capa_Observatorio/MapServer/2";
+  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
   ngOnInit() {
     this.cargarDatos(); // Nacional por defecto
@@ -46,8 +46,8 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
   private async cargarDatos() {
     const q = new Query({
-      where: "indice = 'GEN' AND capa = 1",
-      outFields: ["ddescr", "productores", "hectarea", "parcelas"],
+      where: "INDICE = 'GEN' AND CAPA = 1",
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -56,10 +56,10 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
       if (response.features.length > 0) {
         this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.ddescr,
-          productores: f.attributes.productores,
-          hectarea: f.attributes.hectarea,
-          parcelas: f.attributes.parcelas
+          ddescr: f.attributes.DDESCR,
+          productores: f.attributes.PRODUCTORES,
+          hectarea: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS
         }));
 
         // Pie chart solo con productores
@@ -77,8 +77,8 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
   public async cargarDatosByDpto(ubigeo: string) {
     const q = new Query({
-      where: `indice = 'GEN' AND capa = 2 AND ubigeo = ${ubigeo}`,
-      outFields: ["ddescr", "productores", "hectarea", "parcelas"],
+      where: `INDICE = 'GEN' AND CAPA = 2 AND UBIGEO = ${ubigeo}`,
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -87,10 +87,10 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
       if (response.features.length > 0) {
         this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.ddescr,
-          productores: f.attributes.productores,
-          hectarea: f.attributes.hectarea,
-          parcelas: f.attributes.parcelas
+          ddescr: f.attributes.DDESCR,
+          productores: f.attributes.PRODUCTORES,
+          hectarea: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS
         }));
 
         const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
@@ -105,8 +105,8 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `indice = 'GEN' AND capa = 3 AND ubigeo = ${ubigeo}`,
-      outFields: ["ddescr", "productores", "hectarea", "parcelas"],
+      where: `INDICE = 'GEN' AND CAPA = 3 AND UBIGEO = ${ubigeo}`,
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -115,10 +115,10 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
       if (response.features.length > 0) {
         this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.ddescr,
-          productores: f.attributes.productores,
-          hectarea: f.attributes.hectarea,
-          parcelas: f.attributes.parcelas
+          ddescr: f.attributes.DDESCR,
+          productores: f.attributes.PRODUCTORES,
+          hectarea: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS
         }));
 
         const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
