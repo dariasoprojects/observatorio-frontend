@@ -30,7 +30,7 @@
 
 .map-consulmulti{
     position: absolute;
-    bottom: 300px;
+    top: 300px;
     left: 500px;
     background-color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(8px);
