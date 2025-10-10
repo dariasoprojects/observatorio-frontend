@@ -54,7 +54,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
       outStatistics: [
         {
           statisticType: "count",
-          onStatisticField: "reg",   // puede ser cualquier campo, solo cuenta filas
+          onStatisticField: "REG",   // puede ser cualquier campo, solo cuenta filas
           outStatisticFieldName: "conteo"
         }
       ],
@@ -64,10 +64,12 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
     try {
       const response = await query.executeQueryJSON(this.url, q);
 
+      console.log("response empradonra",response);
+
       if (response.features.length > 0) {
         //  Mapear resultados de las estadísticas
-        const categorias = response.features.map(f => f.attributes.reg || "No definido");
-        const valores = response.features.map(f => f.attributes.conteo);
+        const categorias = response.features.map(f => f.attributes.REG || "No definido");
+        const valores = response.features.map(f => f.attributes.CONTEO);
 
         this.actualizarDatos(categorias, valores);
       } else {
