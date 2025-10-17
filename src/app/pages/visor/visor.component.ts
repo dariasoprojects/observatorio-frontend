@@ -15,6 +15,14 @@ import { IndiceNivelEstudioComponent  } from '../../indices/indice-nivel-estudio
 import { IndiceGeneroComponent  } from '../../indices/indice-genero/indice-genero.component';
 import { IndiceTipoOrgComponent  } from '../../indices/indice-segun-tipo-organiza/indice-segun-tipo-organiza.component';
 import { IndiceTipoActividadComponent  } from '../../indices/indice-segun-tipo-actividad/indice-segun-tipo-actividad.component';
+import { IndiceSuperfiAgriComponent  } from '../../indices/indice_superficie_agricola/indice-superficie-agricola.component';
+import { IndiceSuperfiSembComponent  } from '../../indices/indice_superficie_sembrada/indice-superficie-sembrada.component';
+import { IndiceTamanioParceComponent  } from '../../indices/indice_tamanio_parcela/indice-tamanio-parcela.component';
+
+
+
+
+
 import { IndiceFertilizanteComponent  } from '../../indices/indice_uso_fertilizante/indice-fertilizante.component';
 
 import { SumatoriasComponent  } from '../../sumatorias/sumatorias.component';
@@ -32,7 +40,8 @@ import { MapCommService } from '../../services/map-comm.service';
   styleUrls: ['./visor.component.css'],
   imports: [CommonModule , GraficoComponent, IndiceCentrosEmpadronamientoComponent, IndiceFuenteIngresoComponent,
   IndiceSegunRegionNaturalComponent,IndiceNivelEstudioComponent,IndiceGeneroComponent, IndiceTipoOrgComponent,
-  IndiceTipoActividadComponent, IndiceFertilizanteComponent, SumatoriasComponent, ConsultaMultipleComponent]
+  IndiceTipoActividadComponent, IndiceSuperfiAgriComponent,IndiceSuperfiSembComponent,IndiceTamanioParceComponent, 
+  IndiceFertilizanteComponent, SumatoriasComponent, ConsultaMultipleComponent]
 })
 export class VisorComponent implements OnInit {
 
@@ -77,6 +86,17 @@ export class VisorComponent implements OnInit {
   @ViewChild(IndiceTipoOrgComponent) indiceTipoOrgComponent!: IndiceTipoOrgComponent;
 
   @ViewChild(IndiceTipoActividadComponent) indiceTipoActividadComponent!: IndiceTipoActividadComponent;
+
+  @ViewChild(IndiceSuperfiAgriComponent) indiceSuperfiAgriComponent!: IndiceSuperfiAgriComponent;
+
+  @ViewChild(IndiceSuperfiSembComponent) indiceSuperfiSembComponent!: IndiceSuperfiSembComponent;
+
+  @ViewChild(IndiceTamanioParceComponent) indiceTamanioParceComponent!: IndiceTamanioParceComponent;
+
+  
+
+
+  
 
   @ViewChild(IndiceFertilizanteComponent) indiceFertilizanteComponent!: IndiceFertilizanteComponent;
 
@@ -172,7 +192,7 @@ export class VisorComponent implements OnInit {
   }
   
   
-  ejecutarConsulta(): void {
+  async ejecutarConsulta(): Promise<void> {
     // Captura el valor seleccionado del <select>
     const selectElement = <HTMLSelectElement>document.getElementById('cbodptos');
     const departamento = selectElement.value;
@@ -181,7 +201,7 @@ export class VisorComponent implements OnInit {
     const departamento2 = this.getNombreDepartamento (departamento);
 
     //alert(departamento);
-    //alert(departamento2);
+    //alert(departamento);
 
     if (departamento) {
       // Llama a la función queryByDepartamento con el valor seleccionado
@@ -192,7 +212,98 @@ export class VisorComponent implements OnInit {
       this.mapa.obtenerProvinciasPorDepartamento(departamento);
       this.sumatoriasComponent.cargarDatosByDpto(departamento);
 
-      this.indiceCentrosEmpadronamiento.cargarDatosByDpto(departamento2);
+      try {
+        await this.indiceCentrosEmpadronamiento.cargarDatosByDpto(departamento2);
+        console.log(' Centros cargados');
+      } catch (err) {
+        console.warn(' Error en indiceCentrosEmpadronamiento:', err);
+      }
+
+      
+
+      try {
+        await this.indiceNivelEstudioComponent.cargarDatosByDpto(departamento);
+        console.log(' Nivel de estudio cargado');
+      } catch (err) {
+        console.warn(' Error en indiceNivelEstudioComponent:', err);
+      }
+
+
+
+      try {
+        await this.indiceSegunRegionNaturalComponent.cargarDatosByDpto(departamento);
+        console.log(' Nivel de estudio cargado');
+      } catch (err) {
+        console.warn(' Error en indiceNivelEstudioComponent:', err);
+      }
+
+
+      try {
+        await this.indiceFuenteIngresoComponent.cargarDatosByDpto(departamento);
+        console.log(' Nivel de estudio cargado');
+      } catch (err) {
+        console.warn(' Error en indiceNivelEstudioComponent:', err);
+      }
+
+
+      try {
+        await this.indiceGeneroComponent.cargarDatosByDpto(departamento);
+        console.log(' Nivel de estudio cargado');
+      } catch (err) {
+        console.warn(' Error en indiceNivelEstudioComponent:', err);
+      }
+
+
+
+      try {
+        await this.indiceTipoOrgComponent.cargarDatosByDpto(departamento);
+        console.log(' Nivel de estudio cargado');
+      } catch (err) {
+        console.warn(' Error en indiceNivelEstudioComponent:', err);
+      }
+
+
+
+      try {
+        await this.indiceSuperfiAgriComponent.cargarDatosByDpto(departamento);
+        console.log(' Nivel de estudio cargado');
+      } catch (err) {
+        console.warn(' Error en indiceNivelEstudioComponent:', err);
+      }
+
+
+
+
+
+      try {
+        await this.indiceSuperfiSembComponent.cargarDatosByDpto(departamento);
+        console.log(' Nivel de estudio cargado');
+      } catch (err) {
+        console.warn(' Error en indiceNivelEstudioComponent:', err);
+      }
+
+
+
+       try {
+        await this.indiceTamanioParceComponent.cargarDatosByDpto(departamento);
+        console.log(' Nivel de estudio cargado');
+      } catch (err) {
+        console.warn(' Error en indiceNivelEstudioComponent:', err);
+      }
+
+
+
+
+
+
+      
+
+
+      
+
+
+      
+
     } else {
       console.log('Por favor, selecciona un departamento.');
     }
@@ -202,12 +313,15 @@ export class VisorComponent implements OnInit {
 
 
   ejecutarConsultaProv(): void {
+
+
     // Captura el valor seleccionado del <select>
     const selectElement = <HTMLSelectElement>document.getElementById('cboProvs');
     const provincia = selectElement.value;
+    const provincia2 = selectElement.options[selectElement.selectedIndex].text;
     
     //este se debe anular
-    const provincia2 = this.getNombreDepartamento (provincia);
+    //const provincia2 = this.getNombreDepartamento (provincia);
 
   
 
@@ -216,11 +330,10 @@ export class VisorComponent implements OnInit {
       this.mapa.queryByProvincia(provincia)
         .then(() => console.log(`Consulta realizada para el departamento: ${provincia}`))
         .catch(err => console.error('Error al realizar la consulta:', err));
+      
+      this.sumatoriasComponent.cargarDatosByProv(provincia);
 
-      //this.mapa.obtenerProvinciasPorDepartamento(provincia);
-      //this.sumatoriasComponent.cargarDatosByDpto(provincia);
-
-      //this.indiceCentrosEmpadronamiento.cargarDatosByDpto(provincia2);
+      this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);
     } else {
       console.log('Por favor, selecciona un departamento.');
     }

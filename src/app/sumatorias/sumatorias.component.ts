@@ -226,6 +226,85 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
 
 
 
+  public async cargarDatosByProv(depCodigo: string) {
+    try {
+        // armo el filtro: solo los ubigeos que empiezan con los 2 dígitos del departamento
+        const whereFiltro = `UBIGEO3  LIKE '${depCodigo}%'`;
+
+        // 1️⃣ Conteo de registros únicos por nombres + apellidopa
+        const qConteo = new Query({
+          where: whereFiltro,
+          outFields: ["NOMBRES", "APELLIDOPA"],          
+          groupByFieldsForStatistics: ["NOMBRES", "APELLIDOPA"],
+          outStatistics: [
+            {
+              statisticType: "count",
+              onStatisticField: "OBJECTID ",
+              outStatisticFieldName: "conteo_registros"
+            }
+          ],
+          returnGeometry: false
+        });
+
+        const resConteo = await query.executeQueryJSON(this.url, qConteo);
+
+        let conteoRegistros = 0;
+        if (resConteo.features.length > 0) {
+          conteoRegistros = resConteo.features.length;
+        }
+
+        this.nroProductores = conteoRegistros.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+        // 2️⃣ Conteo simple
+        const qConteoSimple = new Query({
+          where: whereFiltro,
+          outFields: ["OBJECTID"],
+          outStatistics: [
+            {
+              statisticType: "count",
+              onStatisticField: "OBJECTID",
+              outStatisticFieldName: "conteo_total"
+            }
+          ],
+          returnGeometry: false
+        });
+
+        const resConteoSimple = await query.executeQueryJSON(this.url, qConteoSimple);
+        let conteoTotal = 0;
+        if (resConteoSimple.features.length > 0) {
+          conteoTotal = resConteoSimple.features[0].attributes.CONTEO_TOTAL || 0;
+        }
+        this.nroParcelas = conteoTotal.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+        // Suma hectáreas
+        const qSuma = new Query({
+          where: whereFiltro,
+          outFields: ["AREA_UT_CU_NUM"], 
+          outStatistics: [
+            {
+              statisticType: "sum",
+              onStatisticField: "AREA_UT_CU_NUM",
+              outStatisticFieldName: "suma_hectareas"
+            }
+          ],
+          returnGeometry: false
+        });
+
+        const resSuma = await query.executeQueryJSON(this.url, qSuma);
+        let sumaHectareas = 0;
+        if (resSuma.features.length > 0) {
+          sumaHectareas = resSuma.features[0].attributes.SUMA_HECTAREAS || 0;
+        }
+
+        this.totHectareas = this.metrosCuadradosAHa(sumaHectareas).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    } catch (err) {
+      console.error(" Error al consultar ArcGIS", err);
+    }
+  }
+
+
+
 
   // public async cargarDatosByDpto(ubigeo: string) {
 

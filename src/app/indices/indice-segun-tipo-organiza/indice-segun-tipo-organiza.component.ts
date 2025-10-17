@@ -46,7 +46,7 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
 
   private async cargarDatos() {
     const q = new Query({
-      where: "INDICE = 'GEN' AND CAPA = 1",
+      where: "INDICE = 'TIPORG' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
@@ -77,7 +77,7 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
 
   public async cargarDatosByDpto(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'GEN' AND CAPA = 2 AND UBIGEO = ${ubigeo}`,
+      where: `INDICE = 'TIPORG' AND CAPA = 2 AND UBIGEO = '${ubigeo}'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
@@ -105,7 +105,7 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'GEN' AND CAPA = 3 AND UBIGEO = ${ubigeo}`,
+      where: `INDICE = 'TIPORG' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
