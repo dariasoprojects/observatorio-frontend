@@ -1,0 +1,25 @@
+<div class="indice-supsemb">
+  <!-- Contenedor del gráfico -->
+  <div id="container-supsemb"></div>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-supsemb">
+      <thead>
+        <tr>
+          <th>Regiones</th>
+          <th>Área Total (ha.)</th>
+          <th>Área Sembrada (ha.)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td>{{ fila.hectarea }}</td>
+          <td>{{ fila.parcelas }}</td>
+          
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

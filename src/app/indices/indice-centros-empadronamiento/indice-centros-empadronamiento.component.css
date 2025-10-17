@@ -40,3 +40,17 @@
 .tabla-centros tr:hover {
   background-color: #f1f1f1;
 }
+
+.btn-exportar {
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+.btn-exportar:hover {
+  background-color: #1565c0;
+}
