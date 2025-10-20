@@ -76,8 +76,10 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
   }
 
   public async cargarDatosByDpto(ubigeo: string) {
+
+    
     const q = new Query({
-      where: `INDICE = 'NIVEST' AND CAPA = 2 AND UBIGEO = ${ubigeo}`,
+      where: `INDICE = 'NIVEST' AND CAPA = 2 AND UBIGEO = '${ubigeo}'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
@@ -105,7 +107,7 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'NIVEST' AND CAPA = 3 AND UBIGEO = ${ubigeo}`,
+      where: `INDICE = 'NIVEST' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });

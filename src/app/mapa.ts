@@ -36,6 +36,7 @@ export class Mapa {
 
   private mapView: MapView | null = null;
   private map: Map | null = null;
+  private capaCluster!: FeatureLayer;
   private divId: string;
   private resultsLayer: GraphicsLayer | null = null;
   private simpleFillSymbol: SimpleFillSymbol | null = null;
@@ -69,7 +70,44 @@ export class Mapa {
     });
 
 
+    this.comm.filterRequest$.subscribe(reg => {
+      if (reg) {
+        console.log('Filtrando cluster por REG:', reg);
+        this.filtrarClusterPorReg(reg);
+      } else {
+        console.log('Desactivando todo');
+        this.desactivarCluster();
+      }
+    });
+
+
   }
+
+
+
+
+  filtrarClusterPorReg(reg: string | null) {
+    if (!this.capaCluster) return;
+
+    if (reg) {
+      this.capaCluster.definitionExpression = `REG = '${reg}'`;
+      this.capaCluster.visible = true;
+      console.log('Mostrando cluster para REG:', reg);
+    } else {
+      this.capaCluster.visible = false;
+      console.log('Ocultando cluster');
+    }
+
+  }
+
+  desactivarCluster() {
+    // Aquí limpias la capa o remueves el cluster del mapa
+    if (this.capaCluster) {
+      this.capaCluster.visible = false;        // Oculta la capa
+      this.capaCluster.definitionExpression = ""; // Limpia filtro
+    }
+  }
+
 
 
   setSubLayerVisibility(layer: MapImageLayer, visibleIds: number[]): void {
@@ -282,6 +320,44 @@ export class Mapa {
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Antenas/MapServer/",
       });
 
+
+      this.capaCluster = new FeatureLayer({
+        url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/1',
+        outFields: ['*'],
+        visible: false,
+        featureReduction: {
+          type: 'cluster',
+          clusterRadius: '100px',
+          labelsVisible: true, // mostrar número
+          labelingInfo: [
+            {
+              deconflictionStrategy: "none",
+              labelExpressionInfo: { expression: "$feature.cluster_count" }, // número de puntos en el cluster
+              labelPlacement: "center-center", // centrar el label
+              symbol: {
+                type: "text",
+                color: "white",
+                font: {
+                  size: 14,
+                  weight: "bold",
+                  family: "Arial"
+                },
+                haloColor: "black", // opcional, para mejor visibilidad
+                haloSize: 1
+              }
+            }
+          ]
+        },
+        popupTemplate: {
+          title: 'Centro: {REG}',
+          content: 'Cantidad de registros agrupados por cluster.'
+        }
+      });
+
+
+    
+
+
       
       this.map = new Map({
         basemap: "hybrid",
@@ -295,6 +371,9 @@ export class Mapa {
         zoom: 6,
         popup: new Popup() 
       });
+
+
+      this.map.add(this.capaCluster);
 
       this.legendContainer = document.createElement('div');
       this.legendContainer.classList.add('esri-widget', 'esri-widget--panel');
@@ -589,7 +668,7 @@ export class Mapa {
       if (!this.printWidget) {
         this.printWidget = new Print({
           view: this.mapView,
-          printServiceUrl: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+          printServiceUrl: "https://gis.bosques.gob.pe/server/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
         });
       }
 

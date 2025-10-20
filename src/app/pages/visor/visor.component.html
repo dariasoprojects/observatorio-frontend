@@ -231,7 +231,7 @@
 
 
 
-                    <div  (click)="mostrarSeccion('sec_indi_01')"  class="menu-item other-option">
+                    <div  (click)="mostrarSeccion('sec_indi_supagri')"  class="menu-item other-option">
                         <div class="menu-item-content">
                             <svg class="menu-icon-supagri" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <!-- Filas/parcelas -->
@@ -259,7 +259,7 @@
                     </div>
 
 
-                    <div (click)="mostrarSeccion('sec_indi_01')"  class="menu-item other-option">
+                    <div (click)="mostrarSeccion('sec_indi_supsemb')"  class="menu-item other-option">
                         <div class="menu-item-content">
                             <svg class="menu-icon-supsemb" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
 
@@ -292,7 +292,7 @@
                     </div>
 
 
-                    <div (click)="mostrarSeccion('sec_indi_01')"   class="menu-item other-option">
+                    <div (click)="mostrarSeccion('sec_indi_tamparce')"   class="menu-item other-option">
                         <div class="menu-item-content">
                             <svg class="menu-icon-tamparce" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
 
@@ -680,6 +680,38 @@
                         <div class="data-cards">
                             
                             <app-indice-tipo-activ></app-indice-tipo-activ>
+                        </div>
+                    </div>
+
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_supagri')"  id="sec_indi_supagri" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-supagri></app-indice-supagri>
+                        </div>
+                    </div>
+
+
+
+                     <div  *ngIf="esVisible('sec_indi_supsemb')"  id="sec_indi_supsemb" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-supsemb></app-indice-supsemb>
+                        </div>
+                    </div>
+
+
+
+
+                     <div  *ngIf="esVisible('sec_indi_tamparce')"  id="sec_indi_tamparce" class="card">                        
+
+                        <div class="data-cards">
+                            
+                            <app-indice-tamparce></app-indice-tamparce>
                         </div>
                     </div>
 
