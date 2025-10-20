@@ -668,7 +668,7 @@ export class Mapa {
       if (!this.printWidget) {
         this.printWidget = new Print({
           view: this.mapView,
-          printServiceUrl: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+          printServiceUrl: "https://gis.bosques.gob.pe/server/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
         });
       }
 
