@@ -40,11 +40,12 @@ export class UbigeoService {
           nomDist: a.NOMBDIST
         };
       });
+      
 
       this.cargado = true;
-      console.log('✅ Ubigeos cargados:', this.cache.length);
+      console.log(' Ubigeos cargados:', this.cache.length);
     } catch (err) {
-      console.error('❌ Error cargando tabla de ubigeos:', err);
+      console.error(' Error cargando tabla de ubigeos:', err);
     }
   }
 

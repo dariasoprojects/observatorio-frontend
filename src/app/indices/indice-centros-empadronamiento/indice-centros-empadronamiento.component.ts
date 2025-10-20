@@ -158,7 +158,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
   public async cargarDatosByDpto(ubigeo: string) {
 
-       alert("ddxxxx DEPE : "+ubigeo);
+    //alert("ddxxxx DEPE : "+ubigeo);
  
      const q = new Query({
       where:  `reg = '${ubigeo}'`,

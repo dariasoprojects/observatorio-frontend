@@ -55,8 +55,8 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         // Conteo de registros únicos por txt_nrodoc
         const qConteo = new Query({
           where: "1=1",
-          outFields: ["NOMBRES", "APELLIDOPA "],          // campos para agrupar
-          groupByFieldsForStatistics: ["NOMBRES", "APELLIDOPA "],
+          outFields: ["NOMBRES", "APELLIDOPA"],          // campos para agrupar
+          groupByFieldsForStatistics: ["NOMBRES", "APELLIDOPA"],
           outStatistics: [
             {
               statisticType: "count",                   // conteo de registros por grupo
