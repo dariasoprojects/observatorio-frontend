@@ -1,8 +1,8 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { Mapa } from '../../mapa'; 
+import { Mapa } from '../../mapa';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
@@ -29,19 +29,20 @@ import { SumatoriasComponent  } from '../../sumatorias/sumatorias.component';
 import { ConsultaMultipleComponent  } from '../../consulta_multiple/consulta-multiple.component';
 
 import { MapCommService } from '../../services/map-comm.service';
+import {SidebarComponent} from './components/sidebar/sidebar.component';
 
 
 
 
 @Component({
-  standalone: true, 
+  standalone: true,
   selector: 'app-visor',
   templateUrl: './visor.component.html',
   styleUrls: ['./visor.component.css'],
-  imports: [CommonModule , GraficoComponent, IndiceCentrosEmpadronamientoComponent, IndiceFuenteIngresoComponent,
-  IndiceSegunRegionNaturalComponent,IndiceNivelEstudioComponent,IndiceGeneroComponent, IndiceTipoOrgComponent,
-  IndiceTipoActividadComponent, IndiceSuperfiAgriComponent,IndiceSuperfiSembComponent,IndiceTamanioParceComponent, 
-  IndiceFertilizanteComponent, SumatoriasComponent, ConsultaMultipleComponent]
+  imports: [CommonModule, GraficoComponent, IndiceCentrosEmpadronamientoComponent, IndiceFuenteIngresoComponent,
+    IndiceSegunRegionNaturalComponent, IndiceNivelEstudioComponent, IndiceGeneroComponent, IndiceTipoOrgComponent,
+    IndiceTipoActividadComponent, IndiceSuperfiAgriComponent, IndiceSuperfiSembComponent, IndiceTamanioParceComponent,
+    IndiceFertilizanteComponent, SumatoriasComponent, ConsultaMultipleComponent, SidebarComponent]
 })
 export class VisorComponent implements OnInit {
 
@@ -50,7 +51,7 @@ export class VisorComponent implements OnInit {
 
   mapa: Mapa;
 
-  categoriasTerritoriales: any[] = [];  
+  categoriasTerritoriales: any[] = [];
 
   selectedFile: File | null = null;
 
@@ -93,10 +94,10 @@ export class VisorComponent implements OnInit {
 
   @ViewChild(IndiceTamanioParceComponent) indiceTamanioParceComponent!: IndiceTamanioParceComponent;
 
-  
 
 
-  
+
+
 
   @ViewChild(IndiceFertilizanteComponent) indiceFertilizanteComponent!: IndiceFertilizanteComponent;
 
@@ -108,26 +109,27 @@ export class VisorComponent implements OnInit {
   constructor(private http: HttpClient, private comm: MapCommService) {
     //this.comm = new MapCommService();
 
-    this.mapa = new Mapa('mapaDiv', this.comm);    
+    this.mapa = new Mapa('mapaDiv', this.comm);
   }
-  
 
-  ngOnInit(): void {    
-   
+
+  ngOnInit(): void {
+
     this.mapa.iniciar()
       .then(res => {
-        console.log(res);  
+        console.log(res);
         console.log("Mapa iniciado con éxito, realizando más acciones...");
       })
       .catch(err => {
         console.error("Error al iniciar el mapa:", err);  // Manejo del error
       });
-   
+
 
   }
 
 
   mostrarSeccion(id: string) {
+
     // dar click en el mismo botón, se oculta
     if (this.seccionActiva === id) {
       this.seccionActiva = null;
@@ -150,8 +152,8 @@ export class VisorComponent implements OnInit {
   }
 
 
-  zoomInicial(): void {    
-      this.mapa.resetZoom();            
+  zoomInicial(): void {
+      this.mapa.resetZoom();
   }
 
 
@@ -186,17 +188,17 @@ export class VisorComponent implements OnInit {
       "25": "Ucayali"
     };
 
-    const ubigeoStr = ubigeo.toString().padStart(2, "0"); 
-    const clave = ubigeoStr.substring(0, 2);             
+    const ubigeoStr = ubigeo.toString().padStart(2, "0");
+    const clave = ubigeoStr.substring(0, 2);
     return (departamentos[clave] || "Desconocido").toUpperCase();
   }
-  
-  
+
+
   async ejecutarConsulta(): Promise<void> {
     // Captura el valor seleccionado del <select>
     const selectElement = <HTMLSelectElement>document.getElementById('cbodptos');
     const departamento = selectElement.value;
-    
+
     //este se debe anular
     const departamento2 = this.getNombreDepartamento (departamento);
 
@@ -219,7 +221,7 @@ export class VisorComponent implements OnInit {
         console.warn(' Error en indiceCentrosEmpadronamiento:', err);
       }
 
-      
+
 
       try {
         await this.indiceNivelEstudioComponent.cargarDatosByDpto(departamento);
@@ -296,18 +298,18 @@ export class VisorComponent implements OnInit {
 
 
 
-      
 
 
-      
 
 
-      
+
+
+
 
     } else {
       console.log('Por favor, selecciona un departamento.');
     }
-    
+
   }
 
 
@@ -319,36 +321,36 @@ export class VisorComponent implements OnInit {
     const selectElement = <HTMLSelectElement>document.getElementById('cboProvs');
     const provincia = selectElement.value;
     const provincia2 = selectElement.options[selectElement.selectedIndex].text;
-    
+
     //este se debe anular
     //const provincia2 = this.getNombreDepartamento (provincia);
 
-  
+
 
     if (provincia) {
       // Llama a la función queryByDepartamento con el valor seleccionado
       this.mapa.queryByProvincia(provincia)
         .then(() => console.log(`Consulta realizada para el departamento: ${provincia}`))
         .catch(err => console.error('Error al realizar la consulta:', err));
-      
+
       this.sumatoriasComponent.cargarDatosByProv(provincia);
 
       this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);
     } else {
       console.log('Por favor, selecciona un departamento.');
     }
-    
+
   }
 
 
-  
+
 
 
   ejecutarConsultaProv_mapPerdida(): void {
     // Captura el valor seleccionado del <select>
     const selectElement = <HTMLSelectElement>document.getElementById('cboProvs');
     const provv = selectElement.value;
-  
+
     if (provv) {
       // Llama a la función queryByDepartamento con el valor seleccionado
       this.mapa.queryByProvincia(provv)
@@ -357,7 +359,7 @@ export class VisorComponent implements OnInit {
     } else {
       console.log('Por favor, selecciona un provv.');
     }
-    
+
   }
 
 
@@ -374,7 +376,7 @@ export class VisorComponent implements OnInit {
     } else {
       console.log('Por favor, selecciona un distrrr.');
     }
-    
+
   }
 
 
@@ -382,7 +384,7 @@ export class VisorComponent implements OnInit {
 
     // Captura el valor seleccionado del <select>
     const txtElement = <HTMLSelectElement>document.getElementById('txtdni');
-    const distrrr = txtElement.value;      
+    const distrrr = txtElement.value;
 
     if (distrrr) {
       this.mapa.consultarYZoom(
@@ -390,12 +392,12 @@ export class VisorComponent implements OnInit {
         "TXT_NRODOC",
         distrrr
       );
-      
+
     } else {
       console.log('Por favor, selecciona un distrrr.');
     }
-    
+
   }
 
-  
+
 }

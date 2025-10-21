@@ -183,8 +183,11 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
         const valores = response.features.map(f => f.attributes.CONTEO);
 
         this.actualizarDatos(categorias, valores);
-      } else {
-        console.warn(" No se devolvieron datos del servicio.");
+      } else{
+
+        
+        this.actualizarDatos([], []); // envías vacío para limpiar el chart
+
       }
     } catch (err) {
       console.error(" Error al consultar ArcGIS", err);
@@ -196,7 +199,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
   public async cargarDatosByProv(ubigeo: string) {
 
-      alert("ddxxxx : "+ubigeo);
+      //alert("ddxxxx : "+ubigeo);
  
      const q = new Query({
       where:  `PROV = '${ubigeo}'`,

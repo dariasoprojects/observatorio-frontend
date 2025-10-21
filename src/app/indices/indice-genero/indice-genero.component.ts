@@ -67,9 +67,13 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
         const valores = this.tablaDatos.map(d => d.productores);
 
         this.actualizarDatos(categorias, valores);
-      } else {
-        console.warn("No se devolvieron datos del servicio.");
+      } else{
+
+        this.tablaDatos = [];
+        this.actualizarDatos([], []); // envías vacío para limpiar el chart
+
       }
+      
     } catch (err) {
       console.error("Error al consultar ArcGIS", err);
     }
@@ -97,7 +101,14 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
         const valores = this.tablaDatos.map(d => d.productores);
 
         this.actualizarDatos(categorias, valores);
+      
+      }else{
+
+        this.tablaDatos = [];
+        this.actualizarDatos([], []); // envías vacío para limpiar el chart
+
       }
+
     } catch (err) {
       console.error("Error al consultar ArcGIS (Departamental)", err);
     }
@@ -125,7 +136,13 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
         const valores = this.tablaDatos.map(d => d.productores);
 
         this.actualizarDatos(categorias, valores);
+      }else{
+
+        this.tablaDatos = [];
+        this.actualizarDatos([], []); // envías vacío para limpiar el chart
+
       }
+
     } catch (err) {
       console.error(" Error al consultar ArcGIS (Provincial)", err);
     }
