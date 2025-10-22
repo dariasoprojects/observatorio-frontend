@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-
-// ArcGIS API
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
+import { Input } from '@angular/core';
+
 
 @Component({
   selector: 'app-indice-supsemb',
@@ -14,6 +14,13 @@ import * as query from "@arcgis/core/rest/query";
   styleUrls: ['./indice-superficie-sembrada.component.css']
 })
 export class IndiceSuperfiSembComponent implements OnInit {
+
+  @Input() valorSeleccionado!: string | null;
+  @Input() valorSeleccionadoText!: string | null;
+  @Input() valorSeleccionadoProv!: string | null;
+  @Input() valorSeleccionadoProvText!: string | null;
+
+
   categorias: string[] = [];
   chart!: Highcharts.Chart;
 
@@ -22,7 +29,16 @@ export class IndiceSuperfiSembComponent implements OnInit {
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
   ngOnInit() {
-    this.cargarDatos(); // Nacional por defecto
+    //this.cargarDatos(); // Nacional por defecto
+    if (this.valorSeleccionadoProv !== null) {      
+      this.cargarDatosByProv(this.valorSeleccionadoProv);
+    }else{
+      if (this.valorSeleccionado !== null) {        
+        this.cargarDatosByDpto(this.valorSeleccionado);      
+      }else{
+        this.cargarDatos();  
+      }      
+    }
   }
 
   private crearGrafico() {
@@ -96,8 +112,7 @@ export class IndiceSuperfiSembComponent implements OnInit {
     }
   }
 
-  public async cargarDatosByDpto(ubigeo: string) {
-
+  public async cargarDatosByDpto(ubigeo: string) {    
    
     const q = new Query({
       where: `INDICE = 'SUPSEMB' AND CAPA = 2 AND UBIGEO = '${ubigeo}'`,
