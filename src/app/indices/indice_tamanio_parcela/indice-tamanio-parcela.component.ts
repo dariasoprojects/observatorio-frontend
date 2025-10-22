@@ -1,12 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , Input} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-
-// ArcGIS API
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
-
 import { UbigeoService } from '../../services/ubigeo.service';
+
 
 
 @Component({
@@ -17,6 +15,13 @@ import { UbigeoService } from '../../services/ubigeo.service';
   styleUrls: ['./indice-tamanio-parcela.component.css']
 })
 export class IndiceTamanioParceComponent implements OnInit {
+
+  @Input() valorSeleccionado!: string | null;
+  @Input() valorSeleccionadoText!: string | null;
+  @Input() valorSeleccionadoProv!: string | null;
+  @Input() valorSeleccionadoProvText!: string | null;
+
+
   categorias: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
@@ -30,8 +35,18 @@ export class IndiceTamanioParceComponent implements OnInit {
 
   async ngOnInit() {
     await this.ubigeoSrv.cargarTodo();
-    this.cargarDatos();
+    //this.cargarDatos();
+    if (this.valorSeleccionadoProv !== null) {      
+      this.cargarDatosByProv(this.valorSeleccionadoProv);
+    }else{
+      if (this.valorSeleccionado !== null) {        
+        this.cargarDatosByDpto(this.valorSeleccionado);      
+      }else{
+        this.cargarDatos();  
+      }      
+    }
   }
+
 
   private crearGrafico() {
     this.chart = Highcharts.chart('container-tamparce', {
@@ -55,6 +70,7 @@ export class IndiceTamanioParceComponent implements OnInit {
       credits: { enabled: false }
     });
   }
+
 
   private async cargarDatos() {
     const q = new Query({
@@ -110,6 +126,8 @@ export class IndiceTamanioParceComponent implements OnInit {
 
 
   public async cargarDatosByDpto(ubigeo: string) {
+
+    //alert(ubigeo);
     const q = new Query({
        where: `INDICE = 'TAMPARC' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
@@ -156,7 +174,7 @@ export class IndiceTamanioParceComponent implements OnInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'TAMPARC' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
+      where: `INDICE = 'TAMPARC' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
