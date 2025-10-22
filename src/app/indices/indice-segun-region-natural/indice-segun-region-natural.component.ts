@@ -1,10 +1,10 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-
-// ArcGIS API
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
+import { Input } from '@angular/core';
+
 
 @Component({
   selector: 'app-indice-segun-region-natural',
@@ -14,6 +14,13 @@ import * as query from "@arcgis/core/rest/query";
   styleUrls: ['./indice-segun-region-natural.component.css']
 })
 export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit {
+
+  @Input() valorSeleccionado!: string | null;
+  @Input() valorSeleccionadoText!: string | null;
+
+  @Input() valorSeleccionadoProv!: string | null;
+  @Input() valorSeleccionadoProvText!: string | null;
+
   categorias: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
@@ -24,7 +31,21 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
   ngOnInit() {
-    this.cargarDatos(); // Nacional por defecto
+    //this.cargarDatos(); // Nacional por defecto
+    //  Cargar datos desde el servicio
+    console.log('Valor inicial combo dpto:', this.valorSeleccionado);
+    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);    
+    console.log('Valor inicial combo prov:', this.valorSeleccionadoProv);
+
+    if (this.valorSeleccionadoProv !== null) {      
+      this.cargarDatosByProv(this.valorSeleccionadoProv);
+    }else{
+      if (this.valorSeleccionado !== null) {        
+        this.cargarDatosByDpto(this.valorSeleccionado);      
+      }else{
+        this.cargarDatos();  
+      }      
+    }
   }
 
   ngAfterViewInit() {

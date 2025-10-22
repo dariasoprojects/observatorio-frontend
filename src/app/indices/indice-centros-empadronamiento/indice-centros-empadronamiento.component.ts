@@ -1,21 +1,14 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-
-// ArcGIS API
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { MapCommService } from '../../services/map-comm.service';
-
-
 import * as XLSX from 'xlsx'; // npm i xlsx
-
 import { saveAs } from 'file-saver'; // npm i file-saver
-
-
 import { MatDialog } from '@angular/material/dialog';
-
 import { DialogExportarComponent } from '../../dialog-exportar/dialog-exportar.component';
+import { Input } from '@angular/core';
 
 
 @Component({
@@ -26,6 +19,15 @@ import { DialogExportarComponent } from '../../dialog-exportar/dialog-exportar.c
   styleUrls: ['./indice-centros-empadronamiento.component.css']
 })
 export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewInit {
+
+  //@Input() valorSeleccionado!: string | null;
+
+  @Input() valorSeleccionado!: string | null;
+  @Input() valorSeleccionadoText!: string | null;
+
+  @Input() valorSeleccionadoProv!: string | null;
+  @Input() valorSeleccionadoProvText!: string | null;
+
   categorias: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
@@ -33,9 +35,24 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/1";
 
+
+
   ngOnInit() {
     //  Cargar datos desde el servicio
-    this.cargarDatos();
+    console.log('Valor inicial combo dpto:', this.valorSeleccionado);
+    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);    
+    console.log('Valor inicial combo prov:', this.valorSeleccionadoProv);
+
+    if (this.valorSeleccionadoProvText !== null) {      
+      this.cargarDatosByProv(this.valorSeleccionadoProvText);
+    }else{
+      if (this.valorSeleccionadoText !== null) {        
+        this.cargarDatosByDpto(this.valorSeleccionadoText);      
+      }else{
+        this.cargarDatos();  
+      }      
+    }
+    
   }
 
   ngAfterViewInit() {
@@ -225,7 +242,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
         this.actualizarDatos(categorias, valores);
       } else {
-        console.warn(" No se devolvieron datos del servicio.");
+        this.actualizarDatos([], []); // envías vacío para limpiar el chart
       }
     } catch (err) {
       console.error(" Error al consultar ArcGIS", err);

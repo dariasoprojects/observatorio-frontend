@@ -70,47 +70,94 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
 }
 
 
-.subtitle{  
+.subtitle {
+  width: 623px; /* ancho especificado */
+  font-size: 24px; /* tamaño actualizado */
+  line-height: 145%; /* ajustado según solicitud */
+  font-weight: 400; /* Regular */
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7); /* #FFFFFF al 70% de opacidad */
+  font-family: 'Calibri', sans-serif; /* tipografía */
+}
+
+.subtitle-2 {
   font-size: 17px;
-  line-height: 1; /* espacio mínimo entre líneas */
   font-weight: normal;
   text-align: center;
   color: #dcdcdc;
+  white-space: nowrap; /* una sola línea */
+  margin-bottom: 20px; /* separación con las cajas */
 }
 
+
+.slogan-title {
+  width: 570px;       /* ancho especificado */
+  color: #FFFFFF;     /* color del texto */
+  font-family: 'Raleway', sans-serif; /* tipografía */
+  font-weight: 900;   /* Black */
+  font-size: 30px;    /* tamaño de fuente */
+  margin: 0;
+}
+.slogan-sub-title {
+  width: 565px;
+  height: 26px;
+  color: #FFFFFF;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 500; /* Medium */
+  font-size: 20px;
+  line-height: 26px;
+  margin: 0 auto; /* centra el div horizontalmente */
+}
 
 .banner {
   /* background-color: rgba(0, 0, 0, 0.6); */
-  padding: 15px 25px;
   border-radius: 12px;
   text-align: center;
-  font-size: 50px;
-  line-height: 1; /* espacio mínimo entre líneas */
-  font-weight: bold;
+  font-size: 60px; /* aumentado */
+  line-height: 120%; /* ajustado según solicitud */
+  font-weight: 600; /* SemiBold */
+  color: #FFFFFF; /* color del texto */
+  font-family: 'Raleway', sans-serif; /* tipografía */
 }
+
 
 .banner2 {
   /* background-color: rgba(0, 0, 0, 0.6); */
-  padding: 15px 25px;
+  width: 318px; /* ancho especificado */
   border-radius: 12px;
-  text-align: center;
-  font-size: 40px;
-  line-height: 1; /* espacio mínimo entre líneas */
-  font-weight: bold;
+  text-align: left;
+  font-size: 48px; /* tamaño actualizado */
+  line-height: 120%; /* ajustado según solicitud */
+  font-weight: 800; /* ExtraBold */
+  color: #FFFFFF; /* color del texto */
+  font-family: 'Raleway', sans-serif; /* tipografía */
 }
+
 
 .video-container video {
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
+.video-container {
+  position: relative;
+  width: 500px; /* igual que el video */
+  margin: 5px;
+}
+
 .buttons {
+  width: 500px; /* 🔹 igual al ancho del video */
   display: flex;
-  gap: 15px;
+  justify-content: flex-end; /* 🔹 alinea el botón al borde derecho del video */
+  margin-top: 10px; /* separación entre video y botón */
+}
+
+.move-right {
+  /* opcional: agrega separación si lo deseas */
+  margin-right: 0;
 }
 
 button {
@@ -158,6 +205,13 @@ button {
   width: 400px;
 }
 
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* separación entre ícono y texto */
+  margin-bottom: 10px; /* espacio con el subtítulo */
+}
+
 .data-panel h3 {
   margin-bottom: 25px;
   font-size: 22px;
@@ -169,6 +223,7 @@ button {
   flex-direction: column;
   gap: 20px;
   align-items: center;
+  margin-top: 20px;
 }
 
 .data-box {

@@ -52,7 +52,7 @@ export class GraficoComponent implements AfterViewInit {
     });
   }
 
-  // 🔹 Método público que el padre puede llamar
+  //  Método público que el padre puede llamar
   actualizarDatos(nuevasProvincias: string[], nuevosValores: number[]) {
     if (this.chart) {
       this.chart.xAxis[0].setCategories(nuevasProvincias, false);

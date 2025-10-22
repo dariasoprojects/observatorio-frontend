@@ -106,7 +106,7 @@
                         <div class="form-section">
                             <div class="form-group">
                                 <label class="form-label">Departamento *</label>
-                                <select (change)="ejecutarConsulta()"  id="cbodptos" class="form-select">
+                                <select (change)="ejecutarConsulta($event)"  id="cbodptos" class="form-select">
                                     <option value="00">Dpto</option>
                                     <!-- <option value="LAMBAYEQUE">Lambayeque</option>
                                     <option value="LIMA">Lima</option> -->
@@ -136,11 +136,13 @@
                                       <option value="24">TUMBES</option>
                                       <option value="25">UCAYALI</option>
                                 </select>
+
+                                
                             <!-- </div>
 
                             <div class="form-group"> -->
                                 <label class="form-label">Provincia </label>
-                                <select  (change)="ejecutarConsultaProv()"  id="cboProvs" class="form-select">
+                                <select  (change)="ejecutarConsultaProv($event)"  id="cboProvs" class="form-select">
 
                                 </select>
                             </div>
@@ -177,7 +179,7 @@
 
                         <div class="data-cards">
 
-                            <app-indice-centros-empadronamiento></app-indice-centros-empadronamiento>
+                            <app-indice-centros-empadronamiento [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-centros-empadronamiento>
                         </div>
 
 
@@ -188,7 +190,7 @@
 
                         <div class="data-cards">
 
-                            <app-indice-fuente-ingreso></app-indice-fuente-ingreso>
+                            <app-indice-fuente-ingreso    [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-fuente-ingreso>
                         </div>
                     </div>
 
@@ -197,7 +199,7 @@
 
                         <div class="data-cards">
 
-                            <app-indice-segun-region-natural></app-indice-segun-region-natural>
+                            <app-indice-segun-region-natural  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-segun-region-natural>
                         </div>
                     </div>
 
@@ -206,7 +208,7 @@
 
                         <div class="data-cards">
 
-                            <app-indice-nivel-estudio></app-indice-nivel-estudio>
+                            <app-indice-nivel-estudio    [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-nivel-estudio>
                         </div>
                     </div>
 
@@ -216,7 +218,7 @@
 
                         <div class="data-cards">
 
-                            <app-indice-genero></app-indice-genero>
+                            <app-indice-genero   [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-genero>
                         </div>
                     </div>
 
@@ -225,7 +227,7 @@
 
                         <div class="data-cards">
 
-                            <app-indice-tipoorg></app-indice-tipoorg>
+                            <app-indice-tipoorg  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-tipoorg>
                         </div>
                     </div>
 
@@ -235,7 +237,7 @@
 
                         <div class="data-cards">
 
-                            <app-indice-tipo-activ></app-indice-tipo-activ>
+                            <app-indice-tipo-activ   [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-tipo-activ>
                         </div>
                     </div>
 
@@ -246,7 +248,7 @@
 
                         <div class="data-cards">
 
-                            <app-indice-supagri></app-indice-supagri>
+                            <app-indice-supagri   [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-supagri>
                         </div>
                     </div>
 
