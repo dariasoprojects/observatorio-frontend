@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-
-// ArcGIS API
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
+import { Input } from '@angular/core';
+
 
 @Component({
   selector: 'app-indice-supagri',
@@ -14,6 +14,13 @@ import * as query from "@arcgis/core/rest/query";
   styleUrls: ['./indice-superficie-agricola.component.css']
 })
 export class IndiceSuperfiAgriComponent implements OnInit {
+
+  @Input() valorSeleccionado!: string | null;
+  @Input() valorSeleccionadoText!: string | null;
+  @Input() valorSeleccionadoProv!: string | null;
+  @Input() valorSeleccionadoProvText!: string | null;
+
+
   categorias: string[] = [];
   chart!: Highcharts.Chart;
 
@@ -21,8 +28,20 @@ export class IndiceSuperfiAgriComponent implements OnInit {
 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
+  
   ngOnInit() {
-    this.cargarDatos(); // Nacional por defecto
+
+    //this.cargarDatos(); // Nacional por defecto
+    if (this.valorSeleccionadoProv !== null) {      
+      this.cargarDatosByProv(this.valorSeleccionadoProv);
+    }else{
+      if (this.valorSeleccionado !== null) {        
+        this.cargarDatosByDpto(this.valorSeleccionado);      
+      }else{
+        this.cargarDatos();  
+      }      
+    }
+
   }
 
   private crearGrafico() {
@@ -86,9 +105,13 @@ export class IndiceSuperfiAgriComponent implements OnInit {
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
         this.crearGrafico(); // Crear gráfico cuando ya hay datos
-      } else {
-        console.warn("No se devolvieron datos del servicio.");
+
+      }else{
+        this.tablaDatos = [];
+        this.categorias = [];
+        this.crearGrafico(); // envías vacío para limpiar el chart
       }
+
     } catch (err) {
       console.error("Error al consultar ArcGIS", err);
     }
@@ -115,7 +138,13 @@ export class IndiceSuperfiAgriComponent implements OnInit {
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
         this.crearGrafico();
+      }else{
+        this.tablaDatos = [];
+        this.categorias = [];
+        this.crearGrafico(); // envías vacío para limpiar el chart
       }
+
+
     } catch (err) {
       console.error("Error al consultar ArcGIS (Departamental)", err);
     }
@@ -142,9 +171,15 @@ export class IndiceSuperfiAgriComponent implements OnInit {
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
         this.crearGrafico();
+      }else{
+        this.tablaDatos = [];
+        this.categorias = [];
+        this.crearGrafico(); // envías vacío para limpiar el chart
       }
     } catch (err) {
       console.error("Error al consultar ArcGIS (Provincial)", err);
     }
   }
+
+  
 }

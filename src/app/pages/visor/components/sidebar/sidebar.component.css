@@ -1,0 +1,135 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f9fafb;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 320px;
+  background-color: white;
+  border-right: 1px solid #e5e7eb;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sidebar-content {
+  padding: 16px;
+}
+
+/* Items */
+.menu-item {
+  margin-bottom: 8px;
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu-item.active.indicator-item {
+  background-color: #22c55e;
+  color: white;
+  padding: 24px 12px;
+}
+
+.menu-item.other-option {
+  background-color: #f2f5f7;
+  padding: 12px;
+}
+
+.menu-item.other-option.active {
+  background-color: #22c55e; /* mismo verde */
+  color: white;
+}
+.menu-item.other-option.active .menu-icon,
+.menu-item.other-option.active [class^="menu-icon-"] {
+  stroke: currentColor;
+}
+
+
+.menu-item:hover {
+  background-color: #f3f4f6;
+}
+
+.menu-item.active:hover {
+  background-color: #16a34a;
+}
+
+.menu-item-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Iconos */
+.menu-icon,
+.menu-icon-avance,
+.menu-icon-actividad,
+.menu-icon-educa,
+.menu-icon-region,
+.menu-icon-moneda,
+.menu-icon-sexo,
+.menu-icon-organiza,
+.menu-icon-supagri,
+.menu-icon-supsemb,
+.menu-icon-tamparce,
+.menu-icon-regimen,
+.menu-icon-cultivosprin,
+.menu-icon-cultitran,
+.menu-icon-cultivosperma,
+.menu-icon-fertiabo,
+.menu-icon-bienesreci,
+.menu-icon-servreci {
+  width: 35px;
+  height: 35px;
+  stroke: #2c3e50;
+  fill: none;
+  flex-shrink: 0;
+}
+
+/* Texto */
+.menu-text {
+  text-align: left;
+  flex: 1;
+}
+
+.menu-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.menu-subtitle {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
+}

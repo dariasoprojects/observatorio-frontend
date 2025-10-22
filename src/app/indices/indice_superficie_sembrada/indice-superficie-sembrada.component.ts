@@ -86,8 +86,10 @@ export class IndiceSuperfiSembComponent implements OnInit {
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
         this.crearGrafico(); // Crear gráfico cuando ya hay datos
-      } else {
-        console.warn("No se devolvieron datos del servicio.");
+      } else{
+        this.tablaDatos = [];
+        this.categorias = [];
+        this.crearGrafico(); // envías vacío para limpiar el chart
       }
     } catch (err) {
       console.error("Error al consultar ArcGIS", err);
@@ -117,7 +119,12 @@ export class IndiceSuperfiSembComponent implements OnInit {
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
         this.crearGrafico();
+      }else{
+        this.tablaDatos = [];
+        this.categorias = [];
+        this.crearGrafico(); // envías vacío para limpiar el chart
       }
+
     } catch (err) {
       console.error("Error al consultar ArcGIS (Departamental)", err);
     }
@@ -144,7 +151,13 @@ export class IndiceSuperfiSembComponent implements OnInit {
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
         this.crearGrafico();
+        
+      }else{
+        this.tablaDatos = [];
+        this.categorias = [];
+        this.crearGrafico(); // envías vacío para limpiar el chart
       }
+
     } catch (err) {
       console.error("Error al consultar ArcGIS (Provincial)", err);
     }

@@ -1,8 +1,8 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { Mapa } from '../../mapa'; 
+import { Mapa } from '../../mapa';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
@@ -29,19 +29,20 @@ import { SumatoriasComponent  } from '../../sumatorias/sumatorias.component';
 import { ConsultaMultipleComponent  } from '../../consulta_multiple/consulta-multiple.component';
 
 import { MapCommService } from '../../services/map-comm.service';
+import {SidebarComponent} from './components/sidebar/sidebar.component';
 
 
 
 
 @Component({
-  standalone: true, 
+  standalone: true,
   selector: 'app-visor',
   templateUrl: './visor.component.html',
   styleUrls: ['./visor.component.css'],
-  imports: [CommonModule , GraficoComponent, IndiceCentrosEmpadronamientoComponent, IndiceFuenteIngresoComponent,
-  IndiceSegunRegionNaturalComponent,IndiceNivelEstudioComponent,IndiceGeneroComponent, IndiceTipoOrgComponent,
-  IndiceTipoActividadComponent, IndiceSuperfiAgriComponent,IndiceSuperfiSembComponent,IndiceTamanioParceComponent, 
-  IndiceFertilizanteComponent, SumatoriasComponent, ConsultaMultipleComponent]
+  imports: [CommonModule, GraficoComponent, IndiceCentrosEmpadronamientoComponent, IndiceFuenteIngresoComponent,
+    IndiceSegunRegionNaturalComponent, IndiceNivelEstudioComponent, IndiceGeneroComponent, IndiceTipoOrgComponent,
+    IndiceTipoActividadComponent, IndiceSuperfiAgriComponent, IndiceSuperfiSembComponent, IndiceTamanioParceComponent,
+    IndiceFertilizanteComponent, SumatoriasComponent, ConsultaMultipleComponent, SidebarComponent]
 })
 export class VisorComponent implements OnInit {
 
@@ -50,7 +51,7 @@ export class VisorComponent implements OnInit {
 
   mapa: Mapa;
 
-  categoriasTerritoriales: any[] = [];  
+  categoriasTerritoriales: any[] = [];
 
   selectedFile: File | null = null;
 
@@ -70,10 +71,18 @@ export class VisorComponent implements OnInit {
 
   seccionActiva: string | null = null;
 
+  valorSeleccionado: string | null = null;
+  valorSeleccionadoText: string | null = null;
+
+  valorSeleccionadoProv: string | null = null;
+  valorSeleccionadoProvText: string | null = null;
+
 
   @ViewChild(GraficoComponent) graficoComponent!: GraficoComponent;
 
   @ViewChild(IndiceCentrosEmpadronamientoComponent) indiceCentrosEmpadronamiento!: IndiceCentrosEmpadronamientoComponent;
+
+  @ViewChild(IndiceTipoActividadComponent) indiceTipoActividadComponent!: IndiceTipoActividadComponent;
 
   @ViewChild(IndiceFuenteIngresoComponent) indiceFuenteIngresoComponent!: IndiceFuenteIngresoComponent;
 
@@ -85,18 +94,11 @@ export class VisorComponent implements OnInit {
 
   @ViewChild(IndiceTipoOrgComponent) indiceTipoOrgComponent!: IndiceTipoOrgComponent;
 
-  @ViewChild(IndiceTipoActividadComponent) indiceTipoActividadComponent!: IndiceTipoActividadComponent;
-
   @ViewChild(IndiceSuperfiAgriComponent) indiceSuperfiAgriComponent!: IndiceSuperfiAgriComponent;
 
   @ViewChild(IndiceSuperfiSembComponent) indiceSuperfiSembComponent!: IndiceSuperfiSembComponent;
 
   @ViewChild(IndiceTamanioParceComponent) indiceTamanioParceComponent!: IndiceTamanioParceComponent;
-
-  
-
-
-  
 
   @ViewChild(IndiceFertilizanteComponent) indiceFertilizanteComponent!: IndiceFertilizanteComponent;
 
@@ -108,26 +110,27 @@ export class VisorComponent implements OnInit {
   constructor(private http: HttpClient, private comm: MapCommService) {
     //this.comm = new MapCommService();
 
-    this.mapa = new Mapa('mapaDiv', this.comm);    
+    this.mapa = new Mapa('mapaDiv', this.comm);
   }
-  
 
-  ngOnInit(): void {    
-   
+
+  ngOnInit(): void {
+
     this.mapa.iniciar()
       .then(res => {
-        console.log(res);  
+        console.log(res);
         console.log("Mapa iniciado con éxito, realizando más acciones...");
       })
       .catch(err => {
         console.error("Error al iniciar el mapa:", err);  // Manejo del error
       });
-   
+
 
   }
 
 
   mostrarSeccion(id: string) {
+
     // dar click en el mismo botón, se oculta
     if (this.seccionActiva === id) {
       this.seccionActiva = null;
@@ -150,8 +153,8 @@ export class VisorComponent implements OnInit {
   }
 
 
-  zoomInicial(): void {    
-      this.mapa.resetZoom();            
+  zoomInicial(): void {
+      this.mapa.resetZoom();
   }
 
 
@@ -186,22 +189,31 @@ export class VisorComponent implements OnInit {
       "25": "Ucayali"
     };
 
-    const ubigeoStr = ubigeo.toString().padStart(2, "0"); 
-    const clave = ubigeoStr.substring(0, 2);             
+    const ubigeoStr = ubigeo.toString().padStart(2, "0");
+    const clave = ubigeoStr.substring(0, 2);
     return (departamentos[clave] || "Desconocido").toUpperCase();
   }
-  
-  
-  async ejecutarConsulta(): Promise<void> {
-    // Captura el valor seleccionado del <select>
+
+
+  async ejecutarConsulta(event: Event): Promise<void> {
+
+    //limpiamos las de provincias
+    this.valorSeleccionadoProv = null;
+    this.valorSeleccionadoProvText = null; 
+
+    
+    const selectElement1 = event.target as HTMLSelectElement;
+    this.valorSeleccionado = selectElement1.value;
+
+    this.valorSeleccionadoText = selectElement1.options[selectElement1.selectedIndex].text;
+
+
     const selectElement = <HTMLSelectElement>document.getElementById('cbodptos');
     const departamento = selectElement.value;
-    
-    //este se debe anular
-    const departamento2 = this.getNombreDepartamento (departamento);
 
-    //alert(departamento);
-    //alert(departamento);
+    //este se debe normalizar
+    const departamento2 = this.getNombreDepartamento (departamento);
+        
 
     if (departamento) {
       // Llama a la función queryByDepartamento con el valor seleccionado
@@ -213,142 +225,214 @@ export class VisorComponent implements OnInit {
       this.sumatoriasComponent.cargarDatosByDpto(departamento);
 
       try {
-        await this.indiceCentrosEmpadronamiento.cargarDatosByDpto(departamento2);
-        console.log(' Centros cargados');
+        if(this.indiceCentrosEmpadronamiento){
+          await this.indiceCentrosEmpadronamiento.cargarDatosByDpto(departamento2);
+          console.log('indiceCentrosEmpadronamiento cargados');
+        }        
       } catch (err) {
         console.warn(' Error en indiceCentrosEmpadronamiento:', err);
       }
 
-      
 
       try {
-        await this.indiceNivelEstudioComponent.cargarDatosByDpto(departamento);
-        console.log(' Nivel de estudio cargado');
+        if(this.indiceTipoActividadComponent){
+          await this.indiceTipoActividadComponent.cargarDatosByDpto(departamento);
+          console.log('indiceTipoActividadComponent cargados');
+        }        
       } catch (err) {
-        console.warn(' Error en indiceNivelEstudioComponent:', err);
-      }
-
-
-
-      try {
-        await this.indiceSegunRegionNaturalComponent.cargarDatosByDpto(departamento);
-        console.log(' Nivel de estudio cargado');
-      } catch (err) {
-        console.warn(' Error en indiceNivelEstudioComponent:', err);
+        console.warn(' Error en indiceTipoActividadComponent:', err);
       }
 
 
       try {
-        await this.indiceFuenteIngresoComponent.cargarDatosByDpto(departamento);
-        console.log(' Nivel de estudio cargado');
+        if(this.indiceNivelEstudioComponent){
+          await this.indiceNivelEstudioComponent.cargarDatosByDpto(departamento);
+          console.log('indiceNivelEstudioComponent cargado');
+        }
       } catch (err) {
         console.warn(' Error en indiceNivelEstudioComponent:', err);
       }
 
 
       try {
-        await this.indiceGeneroComponent.cargarDatosByDpto(departamento);
-        console.log(' Nivel de estudio cargado');
+        if(this.indiceSegunRegionNaturalComponent){
+          await this.indiceSegunRegionNaturalComponent.cargarDatosByDpto(departamento);
+          console.log('indiceSegunRegionNaturalComponent cargado');  
+        }        
       } catch (err) {
-        console.warn(' Error en indiceNivelEstudioComponent:', err);
+        console.warn(' Error en indiceSegunRegionNaturalComponent:', err);
       }
-
 
 
       try {
-        await this.indiceTipoOrgComponent.cargarDatosByDpto(departamento);
-        console.log(' Nivel de estudio cargado');
+        if (this.indiceFuenteIngresoComponent){
+          await this.indiceFuenteIngresoComponent.cargarDatosByDpto(departamento);
+          console.log('indiceFuenteIngresoComponent cargado');
+        }        
       } catch (err) {
-        console.warn(' Error en indiceNivelEstudioComponent:', err);
+        console.warn(' Error en indiceFuenteIngresoComponent:', err);
       }
-
 
 
       try {
-        await this.indiceSuperfiAgriComponent.cargarDatosByDpto(departamento);
-        console.log(' Nivel de estudio cargado');
+        if(this.indiceGeneroComponent){
+          await this.indiceGeneroComponent.cargarDatosByDpto(departamento);
+          console.log('indiceGeneroComponent cargado');
+        }        
       } catch (err) {
-        console.warn(' Error en indiceNivelEstudioComponent:', err);
+        console.warn(' Error en indiceGeneroComponent:', err);
       }
-
-
-
 
 
       try {
-        await this.indiceSuperfiSembComponent.cargarDatosByDpto(departamento);
-        console.log(' Nivel de estudio cargado');
+        if(this.indiceTipoOrgComponent){
+          await this.indiceTipoOrgComponent.cargarDatosByDpto(departamento);
+          console.log('indiceTipoOrgComponent cargado'); 
+        }        
       } catch (err) {
-        console.warn(' Error en indiceNivelEstudioComponent:', err);
+        console.warn(' Error en indiceTipoOrgComponent:', err);
+      }
+
+
+      try {
+        if(this.indiceSuperfiAgriComponent){
+          await this.indiceSuperfiAgriComponent.cargarDatosByDpto(departamento);
+          console.log('indiceSuperfiAgriComponent cargado');
+        }        
+      } catch (err) {
+        console.warn(' Error en indiceSuperfiAgriComponent:', err);
+      }
+
+
+      try {
+        if(this.indiceSuperfiSembComponent){
+          await this.indiceSuperfiSembComponent.cargarDatosByDpto(departamento);
+          console.log('indiceSuperfiSembComponent cargado');
+        }        
+      } catch (err) {
+        console.warn(' Error en indiceSuperfiSembComponent:', err);
+      }
+
+
+      try {
+        if(this.indiceTamanioParceComponent){
+          await this.indiceTamanioParceComponent.cargarDatosByDpto(departamento);
+          console.log('indiceTamanioParceComponent cargado');
+        }        
+      } catch (err) {
+        console.warn(' Error en indiceTamanioParceComponent:', err);
       }
 
 
 
-       try {
-        await this.indiceTamanioParceComponent.cargarDatosByDpto(departamento);
-        console.log(' Nivel de estudio cargado');
-      } catch (err) {
-        console.warn(' Error en indiceNivelEstudioComponent:', err);
-      }
-
-
-
-
-
-
-      
-
-
-      
-
-
-      
 
     } else {
       console.log('Por favor, selecciona un departamento.');
     }
-    
+
   }
 
 
 
-  ejecutarConsultaProv(): void {
+  ejecutarConsultaProv(event: Event): void {
+
+
+    const selectElement2 = event.target as HTMLSelectElement;
+    this.valorSeleccionadoProv = selectElement2.value;
+
+
+
+    this.valorSeleccionadoProvText = selectElement2.options[selectElement2.selectedIndex].text;
+    
 
 
     // Captura el valor seleccionado del <select>
     const selectElement = <HTMLSelectElement>document.getElementById('cboProvs');
     const provincia = selectElement.value;
     const provincia2 = selectElement.options[selectElement.selectedIndex].text;
-    
+
     //este se debe anular
     //const provincia2 = this.getNombreDepartamento (provincia);
 
-  
+
 
     if (provincia) {
       // Llama a la función queryByDepartamento con el valor seleccionado
       this.mapa.queryByProvincia(provincia)
         .then(() => console.log(`Consulta realizada para el departamento: ${provincia}`))
         .catch(err => console.error('Error al realizar la consulta:', err));
-      
-      this.sumatoriasComponent.cargarDatosByProv(provincia);
 
-      this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);
+      
+
+      if(this.sumatoriasComponent){        
+        this.sumatoriasComponent.cargarDatosByProv(provincia);
+      }
+
+      if(this.indiceCentrosEmpadronamiento){
+        this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);  
+      }
+
+
+      if(this.indiceTipoActividadComponent){
+        this.indiceTipoActividadComponent.cargarDatosByProv(provincia); 
+
+      }
+      
+      
+      if(this.indiceNivelEstudioComponent){
+        this.indiceNivelEstudioComponent.cargarDatosByProv(provincia);  
+      }
+
+      if(this.indiceSegunRegionNaturalComponent){
+        this.indiceSegunRegionNaturalComponent.cargarDatosByProv(provincia);
+      }
+      
+
+      if(this.indiceFuenteIngresoComponent){
+        this.indiceFuenteIngresoComponent.cargarDatosByProv(provincia);  
+      }
+      
+
+      if(this.indiceGeneroComponent){
+        this.indiceGeneroComponent.cargarDatosByProv(provincia);
+      }
+      
+
+      if(this.indiceTipoOrgComponent){
+        this.indiceTipoOrgComponent.cargarDatosByProv(provincia);  
+      }
+      
+
+      if(this.indiceSuperfiAgriComponent){
+        this.indiceSuperfiAgriComponent.cargarDatosByProv(provincia);  
+      }
+      
+
+      if(this.indiceSuperfiSembComponent){
+        this.indiceSuperfiSembComponent.cargarDatosByProv(provincia);  
+      }
+      
+
+      if(this.indiceTamanioParceComponent){
+        this.indiceTamanioParceComponent.cargarDatosByProv(provincia);  
+      }
+      
+
     } else {
       console.log('Por favor, selecciona un departamento.');
     }
-    
+
   }
 
 
-  
+
 
 
   ejecutarConsultaProv_mapPerdida(): void {
     // Captura el valor seleccionado del <select>
     const selectElement = <HTMLSelectElement>document.getElementById('cboProvs');
     const provv = selectElement.value;
-  
+
     if (provv) {
       // Llama a la función queryByDepartamento con el valor seleccionado
       this.mapa.queryByProvincia(provv)
@@ -357,7 +441,7 @@ export class VisorComponent implements OnInit {
     } else {
       console.log('Por favor, selecciona un provv.');
     }
-    
+
   }
 
 
@@ -374,7 +458,7 @@ export class VisorComponent implements OnInit {
     } else {
       console.log('Por favor, selecciona un distrrr.');
     }
-    
+
   }
 
 
@@ -382,7 +466,7 @@ export class VisorComponent implements OnInit {
 
     // Captura el valor seleccionado del <select>
     const txtElement = <HTMLSelectElement>document.getElementById('txtdni');
-    const distrrr = txtElement.value;      
+    const distrrr = txtElement.value;
 
     if (distrrr) {
       this.mapa.consultarYZoom(
@@ -390,12 +474,12 @@ export class VisorComponent implements OnInit {
         "TXT_NRODOC",
         distrrr
       );
-      
+
     } else {
       console.log('Por favor, selecciona un distrrr.');
     }
-    
+
   }
 
-  
+
 }

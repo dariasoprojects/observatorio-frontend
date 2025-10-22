@@ -21,7 +21,7 @@ export class IndiceFertilizanteComponent implements OnInit, AfterViewInit {
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/1";
 
   ngOnInit() {
-    // 🔹 Cargar datos desde el servicio
+    //  Cargar datos desde el servicio
     this.cargarDatos();
   }
 
@@ -70,8 +70,9 @@ export class IndiceFertilizanteComponent implements OnInit, AfterViewInit {
         const valores = response.features.map(f => f.attributes.CONTEO);
 
         this.actualizarDatos(categorias, valores);
-      } else {
-        console.warn(" No se devolvieron datos del servicio.");
+      } else{
+        
+        this.actualizarDatos([],[]); // envías vacío para limpiar el chart
       }
     } catch (err) {
       console.error(" Error al consultar ArcGIS", err);
@@ -105,8 +106,9 @@ export class IndiceFertilizanteComponent implements OnInit, AfterViewInit {
         const valores = response.features.map(f => f.attributes.CONTEO);
 
         this.actualizarDatos(categorias, valores);
-      } else {
-        console.warn(" No se devolvieron datos del servicio.");
+      } else{
+        
+        this.actualizarDatos([],[]); // envías vacío para limpiar el chart
       }
     } catch (err) {
       console.error(" Error al consultar ArcGIS", err);

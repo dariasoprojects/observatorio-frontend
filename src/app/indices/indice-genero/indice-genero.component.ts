@@ -1,10 +1,9 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-
-// ArcGIS API
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
+import { Input } from '@angular/core';
 
 @Component({
   selector: 'app-indice-genero',
@@ -13,7 +12,15 @@ import * as query from "@arcgis/core/rest/query";
   templateUrl: './indice-genero.component.html',
   styleUrls: ['./indice-genero.component.css']
 })
+
+
 export class IndiceGeneroComponent implements OnInit, AfterViewInit {
+
+  @Input() valorSeleccionado!: string | null;
+  @Input() valorSeleccionadoText!: string | null;
+  @Input() valorSeleccionadoProv!: string | null;
+  @Input() valorSeleccionadoProvText!: string | null;
+
   categorias: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
@@ -23,8 +30,18 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
   // URL 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
-  ngOnInit() {
-    this.cargarDatos(); // Nacional por defecto
+  ngOnInit() {    
+
+    if (this.valorSeleccionadoProv !== null) {      
+      this.cargarDatosByProv(this.valorSeleccionadoProv);
+    }else{
+      if (this.valorSeleccionado !== null) {        
+        this.cargarDatosByDpto(this.valorSeleccionado);      
+      }else{
+        this.cargarDatos();  
+      }      
+    }
+
   }
 
   ngAfterViewInit() {
@@ -67,9 +84,13 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
         const valores = this.tablaDatos.map(d => d.productores);
 
         this.actualizarDatos(categorias, valores);
-      } else {
-        console.warn("No se devolvieron datos del servicio.");
+      } else{
+
+        this.tablaDatos = [];
+        this.actualizarDatos([], []); // envías vacío para limpiar el chart
+
       }
+      
     } catch (err) {
       console.error("Error al consultar ArcGIS", err);
     }
@@ -97,7 +118,14 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
         const valores = this.tablaDatos.map(d => d.productores);
 
         this.actualizarDatos(categorias, valores);
+      
+      }else{
+
+        this.tablaDatos = [];
+        this.actualizarDatos([], []); // envías vacío para limpiar el chart
+
       }
+
     } catch (err) {
       console.error("Error al consultar ArcGIS (Departamental)", err);
     }
@@ -125,7 +153,13 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
         const valores = this.tablaDatos.map(d => d.productores);
 
         this.actualizarDatos(categorias, valores);
+      }else{
+
+        this.tablaDatos = [];
+        this.actualizarDatos([], []); // envia vacio para limpiar chart
+
       }
+
     } catch (err) {
       console.error(" Error al consultar ArcGIS (Provincial)", err);
     }

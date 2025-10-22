@@ -97,8 +97,11 @@ export class IndiceTamanioParceComponent implements OnInit {
 
         // Crear el gráfico
         this.crearGrafico();
-      } else {
-        console.warn("No se devolvieron datos del servicio.");
+      }else{
+        this.tablaDatos = [];
+        this.categorias = [];
+        this.valores = []
+        this.crearGrafico(); // envías vacío para limpiar el chart
       }
     } catch (err) {
       console.error("Error al consultar ArcGIS", err);
