@@ -8,6 +8,7 @@ import Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
 
 import { GraficoComponent } from '../../grafico/grafico.component';
+import { IndicePadronProdComponent  } from '../../indices/indice-padron-productores/indice-padron-productores.component';
 import { IndiceCentrosEmpadronamientoComponent  } from '../../indices/indice-centros-empadronamiento/indice-centros-empadronamiento.component';
 import { IndiceFuenteIngresoComponent  } from '../../indices/indice-fuente-ingreso/indice-fuente-ingreso.component';
 import { IndiceSegunRegionNaturalComponent  } from '../../indices/indice-segun-region-natural/indice-segun-region-natural.component';
@@ -18,7 +19,10 @@ import { IndiceTipoActividadComponent  } from '../../indices/indice-segun-tipo-a
 import { IndiceSuperfiAgriComponent  } from '../../indices/indice_superficie_agricola/indice-superficie-agricola.component';
 import { IndiceSuperfiSembComponent  } from '../../indices/indice_superficie_sembrada/indice-superficie-sembrada.component';
 import { IndiceTamanioParceComponent  } from '../../indices/indice_tamanio_parcela/indice-tamanio-parcela.component';
-
+import { IndiceRegimenTenenComponent  } from '../../indices/indice_regimen_tenencia/indice-regimen-tenencia.component';
+import { IndicePrincipalesCultivosComponent  } from '../../indices/indice_principales_cultivos/indice-principales-cultivos.component';
+import { IndiceCultivosTransitComponent  } from '../../indices/indice_cultivos_transitorios/indice-cultivos-transitorios.component';
+import { IndiceCultivosPermaComponent  } from '../../indices/indice_cultivos_permanentes/indice-cultivos-permanentes.component';
 
 
 
@@ -39,10 +43,12 @@ import {SidebarComponent} from './components/sidebar/sidebar.component';
   selector: 'app-visor',
   templateUrl: './visor.component.html',
   styleUrls: ['./visor.component.css'],
-  imports: [CommonModule, GraficoComponent, IndiceCentrosEmpadronamientoComponent, IndiceFuenteIngresoComponent,
+  imports: [CommonModule, GraficoComponent, IndicePadronProdComponent, IndiceCentrosEmpadronamientoComponent, IndiceFuenteIngresoComponent,
     IndiceSegunRegionNaturalComponent, IndiceNivelEstudioComponent, IndiceGeneroComponent, IndiceTipoOrgComponent,
     IndiceTipoActividadComponent, IndiceSuperfiAgriComponent, IndiceSuperfiSembComponent, IndiceTamanioParceComponent,
-    IndiceFertilizanteComponent, SumatoriasComponent, ConsultaMultipleComponent, SidebarComponent]
+    IndiceRegimenTenenComponent,IndicePrincipalesCultivosComponent,IndiceCultivosTransitComponent,IndiceCultivosPermaComponent,
+    IndiceFertilizanteComponent, SumatoriasComponent, 
+    ConsultaMultipleComponent, SidebarComponent]
 })
 export class VisorComponent implements OnInit {
 
@@ -80,6 +86,9 @@ export class VisorComponent implements OnInit {
 
   @ViewChild(GraficoComponent) graficoComponent!: GraficoComponent;
 
+  
+  @ViewChild(IndicePadronProdComponent) indicePadronProdComponent!: IndicePadronProdComponent;
+
   @ViewChild(IndiceCentrosEmpadronamientoComponent) indiceCentrosEmpadronamiento!: IndiceCentrosEmpadronamientoComponent;
 
   @ViewChild(IndiceTipoActividadComponent) indiceTipoActividadComponent!: IndiceTipoActividadComponent;
@@ -100,6 +109,16 @@ export class VisorComponent implements OnInit {
 
   @ViewChild(IndiceTamanioParceComponent) indiceTamanioParceComponent!: IndiceTamanioParceComponent;
 
+  @ViewChild(IndiceRegimenTenenComponent) indiceRegimenTenenComponent!: IndiceRegimenTenenComponent;
+
+  @ViewChild(IndicePrincipalesCultivosComponent) indicePrincipalesCultivosComponent!: IndicePrincipalesCultivosComponent;
+
+  @ViewChild(IndiceCultivosTransitComponent) indiceCultivosTransitComponent!: IndiceCultivosTransitComponent;
+
+  @ViewChild(IndiceCultivosPermaComponent) indiceCultivosPermaComponent!: IndiceCultivosPermaComponent;
+
+  
+
   @ViewChild(IndiceFertilizanteComponent) indiceFertilizanteComponent!: IndiceFertilizanteComponent;
 
   @ViewChild(SumatoriasComponent) sumatoriasComponent!: SumatoriasComponent;
@@ -111,6 +130,7 @@ export class VisorComponent implements OnInit {
     //this.comm = new MapCommService();
 
     this.mapa = new Mapa('mapaDiv', this.comm);
+    //this.esVisible("sec_padron_pa");
   }
 
 
@@ -124,6 +144,8 @@ export class VisorComponent implements OnInit {
       .catch(err => {
         console.error("Error al iniciar el mapa:", err);  // Manejo del error
       });
+
+    this.seccionActiva = 'sec_padron_pa';
 
 
   }
@@ -216,13 +238,25 @@ export class VisorComponent implements OnInit {
         
 
     if (departamento) {
-      // Llama a la función queryByDepartamento con el valor seleccionado
+      
       this.mapa.queryByDepartamento(departamento)
         .then(() => console.log(`Consulta realizada para el departamento: ${departamento}`))
         .catch(err => console.error('Error al realizar la consulta:', err));
 
       this.mapa.obtenerProvinciasPorDepartamento(departamento);
       this.sumatoriasComponent.cargarDatosByDpto(departamento);
+
+      
+      
+      try {
+        if(this.indicePadronProdComponent){
+          await this.indicePadronProdComponent.cargarDatosByDpto(departamento);
+          console.log('indicePadronProdComponent cargados');
+        }        
+      } catch (err) {
+        console.warn(' Error en indicePadronProdComponent:', err);
+      }
+
 
       try {
         if(this.indiceCentrosEmpadronamiento){
@@ -324,6 +358,55 @@ export class VisorComponent implements OnInit {
       }
 
 
+      try {
+        if(this.indiceRegimenTenenComponent){
+          await this.indiceRegimenTenenComponent.cargarDatosByDpto(departamento);
+          console.log('indiceRegimenTenenComponent cargado');
+        }        
+      } catch (err) {
+        console.warn(' Error en indiceRegimenTenenComponent:', err);
+      }
+
+
+      try {
+        if(this.indicePrincipalesCultivosComponent){
+          await this.indicePrincipalesCultivosComponent.cargarDatosByDpto(departamento);
+          console.log('indicePrincipalesCultivosComponent cargado');
+        }        
+      } catch (err) {
+        console.warn(' Error en indicePrincipalesCultivosComponent:', err);
+      }
+
+
+      try {
+        if(this.indiceCultivosTransitComponent){
+          await this.indiceCultivosTransitComponent.cargarDatosByDpto(departamento);
+          console.log('indiceCultivosTransitComponent cargado');
+        }        
+      } catch (err) {
+        console.warn(' Error en indiceCultivosTransitComponent:', err);
+      }
+
+
+      try {
+        if(this.indiceCultivosPermaComponent){
+          await this.indiceCultivosPermaComponent.cargarDatosByDpto(departamento);
+          console.log('indiceCultivosPermaComponent cargado');
+        }        
+      } catch (err) {
+        console.warn(' Error en indiceCultivosPermaComponent:', err);
+      }
+
+
+      
+
+
+      
+
+
+
+
+      
 
 
     } else {
@@ -367,6 +450,14 @@ export class VisorComponent implements OnInit {
       if(this.sumatoriasComponent){        
         this.sumatoriasComponent.cargarDatosByProv(provincia);
       }
+
+      
+
+      if(this.indicePadronProdComponent){
+        this.indicePadronProdComponent.cargarDatosByProv(provincia);  
+      }
+
+
 
       if(this.indiceCentrosEmpadronamiento){
         this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);  
@@ -416,6 +507,33 @@ export class VisorComponent implements OnInit {
       if(this.indiceTamanioParceComponent){
         this.indiceTamanioParceComponent.cargarDatosByProv(provincia);  
       }
+
+
+      if(this.indiceRegimenTenenComponent){
+        this.indiceRegimenTenenComponent.cargarDatosByProv(provincia);  
+      }
+
+
+      if(this.indicePrincipalesCultivosComponent){
+        this.indicePrincipalesCultivosComponent.cargarDatosByProv(provincia);  
+      }
+
+
+      if(this.indiceCultivosTransitComponent){
+        this.indiceCultivosTransitComponent.cargarDatosByProv(provincia);  
+      }
+
+
+      if(this.indiceCultivosPermaComponent){
+        this.indiceCultivosPermaComponent.cargarDatosByProv(provincia);  
+      }
+
+
+      
+
+
+
+      
       
 
     } else {
