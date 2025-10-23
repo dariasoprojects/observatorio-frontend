@@ -1,0 +1,22 @@
+<div class="indice-princult">
+  <!-- Contenedor del gráfico -->
+  <div id="container-princult"></div>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-princult">
+      <thead>
+        <tr>
+          <th>Jurisdicción</th>
+          <th>Parcelas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ubigeo }}</td>
+          <td>{{ fila.parcelas }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

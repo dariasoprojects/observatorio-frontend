@@ -151,6 +151,17 @@
 
 
 
+                    <div  *ngIf="esVisible('sec_padron_pa')"  id="sec_padron_pa" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-padronp  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-padronp>
+                        </div>
+                    </div>
+
+                    
+
+                
 
 
                     <div  *ngIf="esVisible('sec_indi_19')"  id="sec_indi_19" class="card">
@@ -275,9 +286,43 @@
 
 
 
+                    <div  *ngIf="esVisible('sec_indi_regtene')"  id="sec_indi_regtene" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-regtene  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-regtene>
+                        </div>
+                    </div>
 
 
 
+                    <div  *ngIf="esVisible('sec_pricip_cultiv')"  id="sec_pricip_cultiv" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-princult  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-princult>
+                        </div>
+                    </div>
+
+
+
+                     <div  *ngIf="esVisible('sec_cultiv_transit')"  id="sec_cultiv_transit" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-cultivtran  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-cultivtran>
+                        </div>
+                    </div>
+
+
+
+                     <div  *ngIf="esVisible('sec_cultiv_perma')"  id="sec_cultiv_perma" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-cultivperm  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-cultivperm>
+                        </div>
+                    </div>
 
 
 

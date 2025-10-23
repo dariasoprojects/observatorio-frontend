@@ -26,8 +26,9 @@ export class SidebarComponent {
   selectSection(id: string) { this.sectionSelected.emit(id); }
 
   readonly items: Item[] = [
+    { title:'Padrón de Productores Agrarios', section:'sec_padron_pa', icon:'empadronamiento' },
     { title:'Centros de empadronamiento', section:'sec_indi_01', icon:'empadronamiento' },
-    { title:'Avance PPA', section:'sec_indi_01', icon:'avance' },
+    // { title:'Avance PPA', section:'sec_indi_01', icon:'avance' },
     { title:'Según tipo de actividad', section:'sec_indi_03a', icon:'actividad' },
     { title:'Según Nivel de Educación alcanzado', section:'sec_indi_04', icon:'educa' },
     { title:'Según Región Natural', section:'sec_indi_03', icon:'region' },
@@ -37,10 +38,10 @@ export class SidebarComponent {
     { title:'Superficie Agrícola', section:'sec_indi_supagri', icon:'supagri' },
     { title:'Superficie Sembrada', section:'sec_indi_supsemb', icon:'supsemb' },
     { title:'Tamaño de la Parcela', section:'sec_indi_tamparce', icon:'tamparce' },
-    { title:'Régimen Tenencia Tierras', section:'sec_indi_01', icon:'regimen' },
-    { title:'Principales Cultivos', section:'sec_indi_01', icon:'cultivosprin' },
-    { title:'Cultivos Transitorios', section:'sec_indi_01', icon:'cultivostrans' },
-    { title:'Cultivos Permanentes', section:'sec_indi_01', icon:'cultivosperma' },
+    { title:'Régimen Tenencia Tierras', section:'sec_indi_regtene', icon:'regimen' },
+    { title:'Principales Cultivos', section:'sec_pricip_cultiv', icon:'cultivosprin' },
+    { title:'Cultivos Transitorios', section:'sec_cultiv_transit', icon:'cultivostrans' },
+    { title:'Cultivos Permanentes', section:'sec_cultiv_perma', icon:'cultivosperma' },
     { title:'Uso de Fertilizante/Abono', section:'sec_indi_19', icon:'fertiabo' },
     { title:'Bienes recibidos', section:'sec_indi_01', icon:'bienesreci' },
     { title:'Servicios recibidos', section:'sec_indi_01', icon:'servreci' },
