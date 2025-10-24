@@ -331,7 +331,7 @@ body {
 }
 
 .left-panel {
-     width: 520px;
+     width: 500px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -657,7 +657,7 @@ body {
     .sidebar {
         width: 280px;
     }
-    
+
     .left-panel {
         width: 280px;
     }
@@ -667,30 +667,61 @@ body {
     .main-content {
         flex-direction: column;
     }
-    
+
     .sidebar {
         width: 100%;
         height: auto;
     }
-    
+
     .content-area {
         flex-direction: column;
     }
-    
+
     .left-panel {
         width: 100%;
     }
-    
+
     .right-panel {
         height: 400px;
     }
-    
+
     .header-content {
         flex-direction: column;
         gap: 12px;
     }
-    
+
     .logo-section {
         align-self: flex-start;
     }
 }
+
+
+/**/
+
+/* El header y el contenido deben tener un z-index mayor */
+.header {
+  position: relative;
+  z-index: 10;
+}
+
+.app-container {
+  margin-left: calc(var(--rail-w) + var(--rail-g)) !important;
+  position: relative;
+  z-index: 1;
+}
+
+
+/* Responsive: rail más estrecho */
+@media (max-width: 600px) {
+
+  .app-container {
+    margin-left: calc(var(--rail-w) + var(--rail-g)) !important;
+  }
+}
+
+/* Anula el padding que agregamos antes (por si quedó) */
+.header, .main-content{
+  padding-left: 0 !important;
+}
+
+

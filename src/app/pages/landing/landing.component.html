@@ -9,6 +9,7 @@
         <div class="slogan-sub-title ">Sistema de Información Geoespacial Agrícola</div>
       </div>
     </div>
+    <button class="btn-login">Iniciar sesión</button>
   </header>
 
   <!-- CONTENIDO PRINCIPAL -->
@@ -21,11 +22,16 @@
       <span class="subtitle">Consulta, analiza y sigue la poducción agraria con información<br> actualizada en tiempo real </span>
 
       <div class="video-container">
-        <video width="500" height="300" controls autoplay muted poster="assets/img/poster.jpg">
-          <source src="assets/video.mp4" type="video/mp4">
-          Tu navegador no soporta video HTML5.
-        </video>
+        <iframe
+          src="https://www.youtube.com/embed/VuqAojmGlwQ"
+          title="#HistoriasDelAgro | Manuel Dioses, agricultor de banano de Tumbes"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen>
+        </iframe>
       </div>
+
 
       <div class="buttons">
         <button [routerLink]="['/visor']" class="btn-primary">

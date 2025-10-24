@@ -11,7 +11,7 @@ import * as query from "@arcgis/core/rest/query";
   standalone: true,
   imports: [CommonModule],
   templateUrl: './sumatorias.component.html',
-  styleUrls: ['../app.component.css']
+  styleUrls: ['./sumatorias.component.css']
 })
 export class SumatoriasComponent implements OnInit, AfterViewInit {
   categorias: string[] = [];
@@ -78,7 +78,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         console.log("Conteo de registros únicos por nombres y apellidopa:", conteoRegistros);
         this.nroProductores = conteoRegistros.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-        
+
 
 
 
@@ -97,7 +97,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
 
         const resConteoSimple = await query.executeQueryJSON(this.url, qConteoSimple);
 
-        console.log("resConteoSimple", resConteoSimple); 
+        console.log("resConteoSimple", resConteoSimple);
 
         let conteoTotal = 0;
         if (resConteoSimple.features.length > 0) {
@@ -108,13 +108,13 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
 
         this.nroParcelas = conteoTotal.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-        
+
 
         //SUMAR AREAS
 
         const qSuma = new Query({
           where: "1=1",  // condición que necesites
-          outFields: ["AREA_UT_CU_NUM"], 
+          outFields: ["AREA_UT_CU_NUM"],
           outStatistics: [
             {
               statisticType: "sum",           // sumatoria
@@ -134,10 +134,10 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
 
         console.log("Suma total de hectáreas:", this.metrosCuadradosAHa(sumaHectareas));
         //this.totHectareas = this.metrosCuadradosAHa(sumaHectareas).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        this.totHectareas = sumaHectareas.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        this.totHectareas = sumaHectareas.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
         // Aquí puedes actualizar inputs o variables independientes
-          
+
 
     } catch (err) {
       console.error(" Error al consultar ArcGIS", err);
@@ -155,7 +155,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         // 1️⃣ Conteo de registros únicos por nombres + apellidopa
         const qConteo = new Query({
           where: whereFiltro,
-          outFields: ["NOMBRES", "APELLIDOPA"],          
+          outFields: ["NOMBRES", "APELLIDOPA"],
           groupByFieldsForStatistics: ["NOMBRES", "APELLIDOPA"],
           outStatistics: [
             {
@@ -200,7 +200,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         // Suma hectáreas
         const qSuma = new Query({
           where: whereFiltro,
-          outFields: ["AREA_UT_CU_NUM"], 
+          outFields: ["AREA_UT_CU_NUM"],
           outStatistics: [
             {
               statisticType: "sum",
@@ -217,7 +217,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
           sumaHectareas = resSuma.features[0].attributes.SUMA_HECTAREAS || 0;
         }
 
-        this.totHectareas = this.metrosCuadradosAHa(sumaHectareas).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        this.totHectareas = this.metrosCuadradosAHa(sumaHectareas).toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
     } catch (err) {
       console.error(" Error al consultar ArcGIS", err);
@@ -234,7 +234,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         // 1️⃣ Conteo de registros únicos por nombres + apellidopa
         const qConteo = new Query({
           where: whereFiltro,
-          outFields: ["NOMBRES", "APELLIDOPA"],          
+          outFields: ["NOMBRES", "APELLIDOPA"],
           groupByFieldsForStatistics: ["NOMBRES", "APELLIDOPA"],
           outStatistics: [
             {
@@ -279,7 +279,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         // Suma hectáreas
         const qSuma = new Query({
           where: whereFiltro,
-          outFields: ["AREA_UT_CU_NUM"], 
+          outFields: ["AREA_UT_CU_NUM"],
           outStatistics: [
             {
               statisticType: "sum",
@@ -296,7 +296,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
           sumaHectareas = resSuma.features[0].attributes.SUMA_HECTAREAS || 0;
         }
 
-        this.totHectareas = this.metrosCuadradosAHa(sumaHectareas).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        this.totHectareas = this.metrosCuadradosAHa(sumaHectareas).toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
     } catch (err) {
       console.error(" Error al consultar ArcGIS", err);
