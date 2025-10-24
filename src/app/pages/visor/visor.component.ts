@@ -34,6 +34,8 @@ import { ConsultaMultipleComponent  } from '../../consulta_multiple/consulta-mul
 
 import { MapCommService } from '../../services/map-comm.service';
 import {SidebarComponent} from './components/sidebar/sidebar.component';
+import {LayoutVerticalComponent} from './components/layout-vertical/layout-vertical.component';
+
 
 
 
@@ -48,7 +50,7 @@ import {SidebarComponent} from './components/sidebar/sidebar.component';
     IndiceTipoActividadComponent, IndiceSuperfiAgriComponent, IndiceSuperfiSembComponent, IndiceTamanioParceComponent,
     IndiceRegimenTenenComponent,IndicePrincipalesCultivosComponent,IndiceCultivosTransitComponent,IndiceCultivosPermaComponent,
     IndiceFertilizanteComponent, SumatoriasComponent, 
-    ConsultaMultipleComponent, SidebarComponent]
+    ConsultaMultipleComponent, SidebarComponent,LayoutVerticalComponent]
 })
 export class VisorComponent implements OnInit {
 
@@ -528,12 +530,6 @@ export class VisorComponent implements OnInit {
         this.indiceCultivosPermaComponent.cargarDatosByProv(provincia);  
       }
 
-
-      
-
-
-
-      
       
 
     } else {

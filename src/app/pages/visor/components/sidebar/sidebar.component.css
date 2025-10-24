@@ -90,18 +90,28 @@ body {
 .menu-icon-fertiabo,
 .menu-icon-bienesreci,
 .menu-icon-servreci {
-  width: 35px;
-  height: 35px;
-  stroke: #2c3e50;
-  fill: none;
-  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  stroke: #2c3e50;        /* Color de trazo */
+  fill: none;             /* Sin relleno (Outlined) */
+  stroke-width: 2;        /* Grosor del trazo para efecto outlined */
+  stroke-linecap: round;  /* Bordes redondeados */
+  stroke-linejoin: round; /* Unión suave de líneas */
+  flex-shrink: 0;         /* Mantiene tamaño fijo */
 }
+
 
 /* Texto */
 .menu-text {
   text-align: left;
   flex: 1;
+  color: #262626;
+  font-family: Calibri, sans-serif;
+  font-weight: 400; /* Regular */
+  font-size: 20px;
+  line-height: 16px;
 }
+
 
 .menu-title-row {
   display: flex;
