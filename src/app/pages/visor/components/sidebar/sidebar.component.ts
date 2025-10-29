@@ -43,8 +43,8 @@ export class SidebarComponent {
     { title:'Cultivos Transitorios', section:'sec_cultiv_transit', icon:'cultivostrans' },
     { title:'Cultivos Permanentes', section:'sec_cultiv_perma', icon:'cultivosperma' },
     { title:'Uso de Fertilizante/Abono', section:'sec_indi_19', icon:'fertiabo' },
-    { title:'Bienes recibidos', section:'sec_indi_01', icon:'bienesreci' },
-    { title:'Servicios recibidos', section:'sec_indi_01', icon:'servreci' },
+    // { title:'Bienes recibidos', section:'sec_indi_01', icon:'bienesreci' },
+    // { title:'Servicios recibidos', section:'sec_indi_01', icon:'servreci' },
   ];
 
   /** Dónde poner los <br> tal como estaban (después de índices 1, 7, 15) */

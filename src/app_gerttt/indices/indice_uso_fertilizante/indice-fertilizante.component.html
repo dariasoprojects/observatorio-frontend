@@ -1,0 +1,23 @@
+<div class="indice-fertilizante">
+  <!-- Contenedor del gráfico -->
+  <div id="container-fertilizante"></div>
+
+  <!-- Tabla con los mismos datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-fertilizante">
+      <thead>
+        <tr>
+          <th>Centro</th>
+          <th>Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of categorias; let i = index">
+          <td>{{ c }}</td>
+          <td>{{ valores[i] }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>

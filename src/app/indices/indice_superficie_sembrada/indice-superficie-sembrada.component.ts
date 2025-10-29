@@ -4,6 +4,7 @@ import * as Highcharts from 'highcharts';
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { Input } from '@angular/core';
+import {FormatUtil} from "../../shared/utils/format.util";
 
 
 @Component({
@@ -30,14 +31,14 @@ export class IndiceSuperfiSembComponent implements OnInit {
 
   ngOnInit() {
     //this.cargarDatos(); // Nacional por defecto
-    if (this.valorSeleccionadoProv !== null) {      
+    if (this.valorSeleccionadoProv !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
     }else{
-      if (this.valorSeleccionado !== null) {        
-        this.cargarDatosByDpto(this.valorSeleccionado);      
+      if (this.valorSeleccionado !== null) {
+        this.cargarDatosByDpto(this.valorSeleccionado);
       }else{
-        this.cargarDatos();  
-      }      
+        this.cargarDatos();
+      }
     }
   }
 
@@ -112,8 +113,8 @@ export class IndiceSuperfiSembComponent implements OnInit {
     }
   }
 
-  public async cargarDatosByDpto(ubigeo: string) {    
-   
+  public async cargarDatosByDpto(ubigeo: string) {
+
     const q = new Query({
       where: `INDICE = 'SUPSEMB' AND CAPA = 2 AND UBIGEO = '${ubigeo}'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
@@ -166,7 +167,7 @@ export class IndiceSuperfiSembComponent implements OnInit {
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
         this.crearGrafico();
-        
+
       }else{
         this.tablaDatos = [];
         this.categorias = [];
@@ -177,4 +178,6 @@ export class IndiceSuperfiSembComponent implements OnInit {
       console.error("Error al consultar ArcGIS (Provincial)", err);
     }
   }
+
+    protected readonly FormatUtil = FormatUtil;
 }
