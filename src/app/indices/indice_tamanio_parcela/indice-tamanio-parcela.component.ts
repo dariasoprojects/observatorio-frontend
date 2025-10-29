@@ -35,7 +35,7 @@ export class IndiceTamanioParceComponent implements OnInit {
   constructor(private ubigeoSrv: UbigeoService) {}
 
   async ngOnInit() {
-    alert("ngOnInit tamanio");
+    
     await this.ubigeoSrv.cargarTodo();
     //this.cargarDatos();
     if (this.valorSeleccionadoProv !== null) {
