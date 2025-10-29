@@ -9,14 +9,16 @@
         <tr>
           <th>Tipo Organización</th>
           <th>Productores</th>
-          
+
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let fila of tablaDatos">
           <td>{{ fila.ddescr }}</td>
-          <td>{{ fila.productores }}</td>
-          
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
+
         </tr>
       </tbody>
     </table>

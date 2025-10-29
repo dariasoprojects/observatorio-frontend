@@ -4,6 +4,7 @@ import * as Highcharts from 'highcharts';
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { Input } from '@angular/core';
+import {FormatUtil} from '../../shared/utils/format.util';
 
 
 @Component({
@@ -28,18 +29,18 @@ export class IndiceSuperfiAgriComponent implements OnInit {
 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
-  
+
   ngOnInit() {
 
     //this.cargarDatos(); // Nacional por defecto
-    if (this.valorSeleccionadoProv !== null) {      
+    if (this.valorSeleccionadoProv !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
     }else{
-      if (this.valorSeleccionado !== null) {        
-        this.cargarDatosByDpto(this.valorSeleccionado);      
+      if (this.valorSeleccionado !== null) {
+        this.cargarDatosByDpto(this.valorSeleccionado);
       }else{
-        this.cargarDatos();  
-      }      
+        this.cargarDatos();
+      }
     }
 
   }
@@ -181,5 +182,6 @@ export class IndiceSuperfiAgriComponent implements OnInit {
     }
   }
 
-  
+
+  protected readonly FormatUtil = FormatUtil;
 }

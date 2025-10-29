@@ -2,22 +2,31 @@
   <!-- Contenedor del gráfico -->
   <div id="container-fertilizante"></div>
 
-  <!-- Tabla con los mismos datos -->
+  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
     <table class="tabla-fertilizante">
       <thead>
         <tr>
-          <th>Centro</th>
-          <th>Cantidad</th>
+          <th>Jurisdicción</th>
+          <th>Parcelas</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let c of categorias; let i = index">
-          <td>{{ c }}</td>
-          <td>{{ valores[i] }}</td>
+        <tr *ngFor="let fila of tablaDatos">
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.ubigeo) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
+           <td>
+              <button mat-raised-button color="primary" (click)="abrirDialogoExportar(fila.ubigeo)">
+                Export
+              </button>
+          </td>
         </tr>
       </tbody>
     </table>
-
   </div>
 </div>

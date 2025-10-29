@@ -13,8 +13,12 @@
       </thead>
       <tbody>
         <tr *ngFor="let fila of tablaDatos">
-          <td>{{ fila.ubigeo }}</td>
-          <td>{{ fila.parcelas }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.ubigeo) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
         </tr>
       </tbody>
     </table>

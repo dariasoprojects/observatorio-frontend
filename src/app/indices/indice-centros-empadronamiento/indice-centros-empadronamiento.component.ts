@@ -9,6 +9,7 @@ import { saveAs } from 'file-saver'; // npm i file-saver
 import { MatDialog } from '@angular/material/dialog';
 import { DialogExportarComponent } from '../../dialog-exportar/dialog-exportar.component';
 import { Input } from '@angular/core';
+import {FormatUtil} from "../../shared/utils/format.util";
 
 
 @Component({
@@ -40,19 +41,19 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   ngOnInit() {
     //  Cargar datos desde el servicio
     console.log('Valor inicial combo dpto:', this.valorSeleccionado);
-    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);    
+    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);
     console.log('Valor inicial combo prov:', this.valorSeleccionadoProv);
 
-    if (this.valorSeleccionadoProvText !== null) {      
+    if (this.valorSeleccionadoProvText !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProvText);
     }else{
-      if (this.valorSeleccionadoText !== null) {        
-        this.cargarDatosByDpto(this.valorSeleccionadoText);      
+      if (this.valorSeleccionadoText !== null) {
+        this.cargarDatosByDpto(this.valorSeleccionadoText);
       }else{
-        this.cargarDatos();  
-      }      
+        this.cargarDatos();
+      }
     }
-    
+
   }
 
   ngAfterViewInit() {
@@ -176,7 +177,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   public async cargarDatosByDpto(ubigeo: string) {
 
     //alert("ddxxxx DEPE : "+ubigeo);
- 
+
      const q = new Query({
       where:  `reg = '${ubigeo}'`,
       outFields: ["PROV"], // requerido cuando agrupas por reg
@@ -202,7 +203,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
         this.actualizarDatos(categorias, valores);
       } else{
 
-        
+
         this.actualizarDatos([], []); // envías vacío para limpiar el chart
 
       }
@@ -217,7 +218,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   public async cargarDatosByProv(ubigeo: string) {
 
       //alert("ddxxxx : "+ubigeo);
- 
+
      const q = new Query({
       where:  `PROV = '${ubigeo}'`,
       outFields: ["DIST"], // requerido cuando agrupas por reg
@@ -261,4 +262,6 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
       this.chart.series[0].setData(nuevosValores, true);
     }
   }
+
+    protected readonly FormatUtil = FormatUtil;
 }

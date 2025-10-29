@@ -1,6 +1,6 @@
 <div class="indice-tipoactiv">
   <!-- Contenedor del gráfico -->
-  <div id="container-tipoactiv"></div>
+  <div id="container-tipoactiv" ></div>
 
   <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
@@ -16,9 +16,15 @@
       <tbody>
         <tr *ngFor="let fila of tablaDatos">
           <td>{{ fila.ddescr }}</td>
-          <td>{{ fila.productores }}</td>
-          <td>{{ fila.hectarea }}</td>
-          <td>{{ fila.parcelas }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.hectarea) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
         </tr>
       </tbody>
     </table>

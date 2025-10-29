@@ -15,10 +15,10 @@
   font-size: 14px;
 }
 
-.tabla-cultivperm th, 
+.tabla-cultivperm th,
 .tabla-cultivperm td {
   border: 1px solid #ddd;
-  padding: 6px; 
+  padding: 6px;
   text-align: left;
 }
 
@@ -29,4 +29,10 @@
 
 .tabla-cultivperm tr:nth-child(even) {
   background-color: #fafafa;
+}
+
+.tabla-cultivperm th.num-col,
+.tabla-cultivperm td.num-col {
+  text-align: right;
+  padding-right: 12px;
 }

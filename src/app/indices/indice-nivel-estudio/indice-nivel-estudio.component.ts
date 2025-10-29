@@ -6,6 +6,7 @@ import * as Highcharts from 'highcharts';
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { Input } from '@angular/core';
+import {FormatUtil} from "../../shared/utils/format.util";
 
 @Component({
   selector: 'app-indice-nivel-estudio',
@@ -15,7 +16,7 @@ import { Input } from '@angular/core';
   styleUrls: ['./indice-nivel-estudio.component.css']
 })
 export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
-  
+
   @Input() valorSeleccionado!: string | null;
   @Input() valorSeleccionadoText!: string | null;
 
@@ -37,20 +38,20 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
 
     //  Cargar datos desde el servicio
     console.log('Valor inicial combo dpto:', this.valorSeleccionado);
-    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);    
+    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);
     console.log('Valor inicial combo prov:', this.valorSeleccionadoProv);
 
-    if (this.valorSeleccionadoProv !== null) {      
+    if (this.valorSeleccionadoProv !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
     }else{
-      if (this.valorSeleccionado !== null) {        
-        this.cargarDatosByDpto(this.valorSeleccionado);      
+      if (this.valorSeleccionado !== null) {
+        this.cargarDatosByDpto(this.valorSeleccionado);
       }else{
-        this.cargarDatos();  
-      }      
+        this.cargarDatos();
+      }
     }
 
-    
+
   }
 
   ngAfterViewInit() {
@@ -58,16 +59,90 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
   }
 
   private crearGrafico() {
-    this.chart = Highcharts.chart('container-neducacion', {
-      chart: { type: 'pie', height: 500 },
-      title: { text: 'Según Nivel de Educación alcanzado' },
+
+
+    const options: Highcharts.Options = {
+      chart: {
+        type: 'pie',
+        height: 500,
+        events: {
+          render: function (this: Highcharts.Chart) {
+            const chart = this as Highcharts.Chart;
+            const s0 = chart.series[0] as Highcharts.SeriesPieOptions & any;
+            if (!s0 || !s0.center) return;
+
+            const cx = chart.plotLeft + s0.center[0];
+            const cy = chart.plotTop  + s0.center[1];
+
+            const pts = chart.series[0]?.points || [];
+            const total = pts.reduce((acc: number, p: any) => acc + (p.y || 0), 0);
+            const totalStr = total.toLocaleString('es-PE');
+
+            // borrar textos previos
+            const prev = (chart as any)._centerTexts || {};
+            if (prev.top) prev.top.destroy();
+            if (prev.bot) prev.bot.destroy();
+
+            // línea 1
+            const top = chart.renderer
+              .text('Total', cx, cy - 6)
+              .attr({ align: 'center' })
+              .css({ fontSize: '12px', fontWeight: '400', color: '#222' })
+              .add();
+
+            // línea 2
+            const bot = chart.renderer
+              .text(totalStr, cx, cy + 14)
+              .attr({ align: 'center' })
+              .css({ fontSize: '18px', fontWeight: '700', color: '#222' })
+              .add();
+
+            (chart as any)._centerTexts = { top, bot };
+          }
+        }
+      },
+
+
+      title: {
+        text: 'Según Nivel de Educación alcanzado',
+        align: 'center'
+      },
+
+      credits: { enabled: false },
+
+      tooltip: {
+        pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y:,.0f})'
+      },
+
+      plotOptions: {
+        pie: {
+          innerSize: '60%',                 // ✅ Donut
+          dataLabels: {
+            enabled: true,
+            format: '{point.percentage:.1f} %',
+            distance: -40,                  // ✅ Etiquetas dentro del arco
+            style: {
+              fontWeight: 'bold',
+              textOutline: 'none',
+              fontSize: '11px'
+            }
+          },
+          showInLegend: true
+        }
+      },
+
       series: [{
         name: 'Productores',
         type: 'pie',
-        data: this.categorias.map((c, i) => ({ name: c, y: this.valores[i] }))
+        data: this.categorias.map((c, i) => ({
+          name: c,
+          y: this.valores[i]
+        })),
+        colors: ['#20B5B8', '#229389', '#D2DD45', '#FFE44A', '#FFB022', '#F76C4A', '#F23C3C']
       }],
-      credits: { enabled: false }
-    });
+
+    };
+    this.chart = Highcharts.chart('container-neducacion', options);
   }
 
   private async cargarDatos() {
@@ -106,7 +181,7 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
 
   public async cargarDatosByDpto(ubigeo: string) {
 
-    
+
     const q = new Query({
       where: `INDICE = 'NIVEST' AND CAPA = 2 AND UBIGEO = '${ubigeo}'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
@@ -164,7 +239,7 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
         this.tablaDatos = [];
         this.actualizarDatos([], []); // envías vacío para limpiar el chart
       }
-      
+
     } catch (err) {
       console.error(" Error al consultar ArcGIS (Provincial)", err);
     }
@@ -181,4 +256,6 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
       );
     }
   }
+
+    protected readonly FormatUtil = FormatUtil;
 }

@@ -1,5 +1,5 @@
 <div class="indice-centros">
-  
+
   <div id="container-centros"></div>
 
   <div class="tabla-wrapper">
@@ -15,7 +15,9 @@
       <tbody>
         <tr *ngFor="let c of categorias; let i = index">
           <td>{{ c }}</td>
-          <td>{{ valores[i] }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(valores[i]) }}
+          </td>
           <td>
             <label class="switch">
               <input

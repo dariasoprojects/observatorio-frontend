@@ -15,10 +15,10 @@
   font-size: 14px;
 }
 
-.tabla-genero th, 
+.tabla-genero th,
 .tabla-genero td {
   border: 1px solid #ddd;
-  padding: 6px; 
+  padding: 6px;
   text-align: left;
 }
 
@@ -29,4 +29,10 @@
 
 .tabla-genero tr:nth-child(even) {
   background-color: #fafafa;
+}
+
+.tabla-genero th.num-col,
+.tabla-genero td.num-col {
+  text-align: right;
+  padding-right: 12px;
 }
