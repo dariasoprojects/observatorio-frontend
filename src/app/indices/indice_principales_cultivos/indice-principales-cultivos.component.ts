@@ -139,7 +139,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
 
   private async cargarDatos() {
     const q = new Query({
-      where: "INDICE = 'REGTENE' AND CAPA = 1",
+      where: "INDICE = 'CULTIPRIN' AND CAPA = 1",
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
@@ -194,7 +194,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
 
     //alert(ubigeo);
     const q = new Query({
-       where: `INDICE = 'REGTENE' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
+       where: `INDICE = 'CULTIPRIN' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
@@ -239,7 +239,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'REGTENE' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
+      where: `INDICE = 'CULTIPRIN' AND CAPA = 4 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });

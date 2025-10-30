@@ -99,14 +99,9 @@
               { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/fonts", "output": "/assets/esri/fonts" },
               { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/images", "output": "/assets/esri/images" }
             ],
-            "styles":  [
+            "styles": [
               "src/styles.css",
-              "src/assets/esri/themes/light/main.css",
-
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/primeng/resources/themes/lara-light-blue/theme.css"
-
+              "src/assets/esri/themes/light/main.css"
             ],
             "scripts": []
           },

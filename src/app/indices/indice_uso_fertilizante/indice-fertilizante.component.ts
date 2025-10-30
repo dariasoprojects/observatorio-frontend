@@ -115,7 +115,7 @@ export class IndiceFertilizanteComponent implements OnInit {
       },
 
       title: {
-        text: 'Fertilizante',
+        text: 'Uso de Fertilizante (Parcelas)',
         align: 'center'
       },
 
@@ -163,7 +163,7 @@ export class IndiceFertilizanteComponent implements OnInit {
 
 
     const q = new Query({
-      where: "INDICE = 'TAMPARC' AND CAPA = 1",
+      where: "INDICE = 'FERTILIZA' AND CAPA = 1",
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
@@ -218,7 +218,7 @@ export class IndiceFertilizanteComponent implements OnInit {
 
     //alert(ubigeo);
     const q = new Query({
-       where: `INDICE = 'TAMPARC' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
+       where: `INDICE = 'FERTILIZA' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
@@ -263,7 +263,7 @@ export class IndiceFertilizanteComponent implements OnInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'TAMPARC' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
+      where: `INDICE = 'FERTILIZA' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
