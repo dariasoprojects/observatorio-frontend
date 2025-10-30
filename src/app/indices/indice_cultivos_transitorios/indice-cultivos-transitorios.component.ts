@@ -137,7 +137,7 @@ export class IndiceCultivosTransitComponent implements OnInit {
 
   private async cargarDatos() {
     const q = new Query({
-      where: "INDICE = 'REGTENE' AND CAPA = 1",
+      where: "INDICE = 'CULTITRANS' AND CAPA = 1",
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
@@ -192,7 +192,7 @@ export class IndiceCultivosTransitComponent implements OnInit {
 
     //alert(ubigeo);
     const q = new Query({
-       where: `INDICE = 'REGTENE' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
+       where: `INDICE = 'CULTITRANS' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
@@ -237,7 +237,7 @@ export class IndiceCultivosTransitComponent implements OnInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'REGTENE' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
+      where: `INDICE = 'CULTITRANS' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
