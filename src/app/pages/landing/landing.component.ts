@@ -1,21 +1,24 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import {SumatoriasService} from '../../services/sumatorias.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css'],
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule]
 })
 export class LandingComponent {
 
   nroProductores: string = '';
   nroParcelas: string = '';
   nroHectareas: string = '';
-  constructor(private sumatoriasService: SumatoriasService) {}
+  constructor(
+    private sumatoriasService: SumatoriasService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.sumatoriasService.getProductores().subscribe(
@@ -39,8 +42,11 @@ export class LandingComponent {
 
   }
 
-  reproducirVideo() {
-    const video = document.querySelector('video');
-    if (video) (video as HTMLVideoElement).play();
+  onLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  onVisor(){
+    this.router.navigate(['/visor']);
   }
 }

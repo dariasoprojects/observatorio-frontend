@@ -11,6 +11,8 @@
           <th>Productores</th>
           <th>Hectárea</th>
           <th>Parcelas</th>
+          <th>Ver en Mapa</th>
+          <th>Datos</th>
         </tr>
       </thead>
       <tbody>
@@ -24,6 +26,21 @@
           </td>
           <td class="num-col">
             {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
+          <td>
+            <label class="switch">
+              <input
+                type="checkbox"
+                [checked]="activeReg === fila.ddescr "
+                (change)="toggleCluster($event, fila.ddescr )"
+              />
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td>
+            <button mat-raised-button color="primary" (click)="abrirDialogoExportar(fila.ddescr )">
+              Export
+            </button>
           </td>
         </tr>
       </tbody>
