@@ -136,7 +136,7 @@ export class IndiceRegimenTenenComponent implements OnInit {
   }
 
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'REGTENE' AND CAPA = 1",
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],

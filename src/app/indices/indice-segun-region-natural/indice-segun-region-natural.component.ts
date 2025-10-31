@@ -138,7 +138,7 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
     this.chart = Highcharts.chart('container-region', options);
   }
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'REGNAT' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],

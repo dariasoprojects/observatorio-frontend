@@ -157,7 +157,7 @@ export class IndiceFertilizanteComponent implements OnInit {
   }
 
 
-  private async cargarDatos() {
+  public async cargarDatos() {
 
    
 

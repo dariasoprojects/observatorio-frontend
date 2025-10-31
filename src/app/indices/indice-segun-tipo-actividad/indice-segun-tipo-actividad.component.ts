@@ -99,7 +99,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
     this.chart = Highcharts.chart('container-tipoactiv', options);
   }
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'TIPACT' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],

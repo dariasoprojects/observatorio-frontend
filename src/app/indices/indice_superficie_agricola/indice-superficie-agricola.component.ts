@@ -85,7 +85,7 @@ export class IndiceSuperfiAgriComponent implements OnInit {
     });
   }
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'SUPAGRI' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],

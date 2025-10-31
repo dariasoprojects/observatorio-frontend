@@ -47,6 +47,7 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
       if (this.valorSeleccionado !== null) {
         this.cargarDatosByDpto(this.valorSeleccionado);
       }else{
+        console.log("d:","lamza nacional");
         this.cargarDatos();
       }
     }
@@ -145,7 +146,7 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
     this.chart = Highcharts.chart('container-neducacion', options);
   }
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'NIVEST' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],

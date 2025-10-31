@@ -138,7 +138,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
 
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "1=1",
       outFields: ["REG"], // requerido cuando agrupas por reg

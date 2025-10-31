@@ -133,7 +133,7 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
     this.chart = Highcharts.chart('container-tipoorg', options);
   }
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'TIPORG' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
