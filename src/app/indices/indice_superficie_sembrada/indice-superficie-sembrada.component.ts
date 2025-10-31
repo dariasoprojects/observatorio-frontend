@@ -82,7 +82,7 @@ export class IndiceSuperfiSembComponent implements OnInit {
     });
   }
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'SUPSEMB' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],

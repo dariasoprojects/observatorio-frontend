@@ -51,7 +51,7 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
 
 
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     try {
         
         const qConteo = new Query({

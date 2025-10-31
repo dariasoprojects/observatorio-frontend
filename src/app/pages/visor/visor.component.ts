@@ -237,6 +237,14 @@ export class VisorComponent implements OnInit {
 
     //este se debe normalizar
     const departamento2 = this.getNombreDepartamento (departamento);
+
+
+    console.log("departamento sleccionado COMBO:", departamento);
+
+    if(departamento==="00" ){
+      this.valorSeleccionado = null;
+      this.valorSeleccionadoText = null;
+    }
         
 
     if (departamento) {
@@ -246,14 +254,33 @@ export class VisorComponent implements OnInit {
         .catch(err => console.error('Error al realizar la consulta:', err));
 
       this.mapa.obtenerProvinciasPorDepartamento(departamento);
-      this.sumatoriasComponent.cargarDatosByDpto(departamento);
 
+      if(departamento==="00" || departamento===null){
+        this.sumatoriasComponent.cargarDatos();
+      }else{
+        this.sumatoriasComponent.cargarDatosByDpto(departamento);  
+      }
+      
+
+
+          /*
+          if(departamento==="00" || departamento===null){
+                
+          }else{
+            
+          } 
+          */   
       
       
       try {
         if(this.indicePadronProdComponent){
-          await this.indicePadronProdComponent.cargarDatosByDpto(departamento);
+          
           console.log('indicePadronProdComponent cargados');
+          if(departamento==="00" || departamento===null){
+            await this.indicePadronProdComponent.cargarDatos();    
+          }else{
+            await this.indicePadronProdComponent.cargarDatosByDpto(departamento);  
+          }
         }        
       } catch (err) {
         console.warn(' Error en indicePadronProdComponent:', err);
@@ -262,8 +289,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceCentrosEmpadronamiento){
-          await this.indiceCentrosEmpadronamiento.cargarDatosByDpto(departamento2);
+          
           console.log('indiceCentrosEmpadronamiento cargados');
+          if(departamento==="00" || departamento===null){
+            await this.indiceCentrosEmpadronamiento.cargarDatos();      
+          }else{
+            await this.indiceCentrosEmpadronamiento.cargarDatosByDpto(departamento2);
+          }    
         }        
       } catch (err) {
         console.warn(' Error en indiceCentrosEmpadronamiento:', err);
@@ -272,8 +304,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceTipoActividadComponent){
-          await this.indiceTipoActividadComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceTipoActividadComponent cargados');
+          if(departamento==="00" || departamento===null){
+            await this.indiceTipoActividadComponent.cargarDatos();      
+          }else{
+            await this.indiceTipoActividadComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceTipoActividadComponent:', err);
@@ -282,8 +319,14 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceNivelEstudioComponent){
-          await this.indiceNivelEstudioComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceNivelEstudioComponent cargado');
+          if(departamento==="00" || departamento===null){
+            console.log("ingreso al if if if");
+            await this.indiceNivelEstudioComponent.cargarDatos();      
+          }else{
+            await this.indiceNivelEstudioComponent.cargarDatosByDpto(departamento);
+          }
         }
       } catch (err) {
         console.warn(' Error en indiceNivelEstudioComponent:', err);
@@ -292,8 +335,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceSegunRegionNaturalComponent){
-          await this.indiceSegunRegionNaturalComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceSegunRegionNaturalComponent cargado');  
+          if(departamento==="00" || departamento===null){
+            await this.indiceSegunRegionNaturalComponent.cargarDatos();      
+          }else{
+            await this.indiceSegunRegionNaturalComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceSegunRegionNaturalComponent:', err);
@@ -302,8 +350,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if (this.indiceFuenteIngresoComponent){
-          await this.indiceFuenteIngresoComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceFuenteIngresoComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indiceFuenteIngresoComponent.cargarDatos();      
+          }else{
+            await this.indiceFuenteIngresoComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceFuenteIngresoComponent:', err);
@@ -312,7 +365,14 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceGeneroComponent){
-          await this.indiceGeneroComponent.cargarDatosByDpto(departamento);
+          //alert(departamento);
+          //alert(departamento2);
+          if(departamento==="00" || departamento===null){
+            await this.indiceGeneroComponent.cargarDatos();
+          }else{
+            await this.indiceGeneroComponent.cargarDatosByDpto(departamento);  
+          }
+          
           console.log('indiceGeneroComponent cargado');
         }        
       } catch (err) {
@@ -322,8 +382,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceTipoOrgComponent){
-          await this.indiceTipoOrgComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceTipoOrgComponent cargado'); 
+          if(departamento==="00" || departamento===null){
+            await this.indiceTipoOrgComponent.cargarDatos();      
+          }else{
+            await this.indiceTipoOrgComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceTipoOrgComponent:', err);
@@ -332,8 +397,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceSuperfiAgriComponent){
-          await this.indiceSuperfiAgriComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceSuperfiAgriComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indiceSuperfiAgriComponent.cargarDatos();      
+          }else{
+            await this.indiceSuperfiAgriComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceSuperfiAgriComponent:', err);
@@ -342,8 +412,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceSuperfiSembComponent){
-          await this.indiceSuperfiSembComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceSuperfiSembComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indiceSuperfiSembComponent.cargarDatos();      
+          }else{
+            await this.indiceSuperfiSembComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceSuperfiSembComponent:', err);
@@ -352,8 +427,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceTamanioParceComponent){
-          await this.indiceTamanioParceComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceTamanioParceComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indiceTamanioParceComponent.cargarDatos();      
+          }else{
+            await this.indiceTamanioParceComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceTamanioParceComponent:', err);
@@ -362,8 +442,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceRegimenTenenComponent){
-          await this.indiceRegimenTenenComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceRegimenTenenComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indiceRegimenTenenComponent.cargarDatos();      
+          }else{
+            await this.indiceRegimenTenenComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceRegimenTenenComponent:', err);
@@ -372,8 +457,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indicePrincipalesCultivosComponent){
-          await this.indicePrincipalesCultivosComponent.cargarDatosByDpto(departamento);
+          
           console.log('indicePrincipalesCultivosComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indicePrincipalesCultivosComponent.cargarDatos();      
+          }else{
+            await this.indicePrincipalesCultivosComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indicePrincipalesCultivosComponent:', err);
@@ -382,8 +472,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceCultivosTransitComponent){
-          await this.indiceCultivosTransitComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceCultivosTransitComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indiceCultivosTransitComponent.cargarDatos();      
+          }else{
+            await this.indiceCultivosTransitComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceCultivosTransitComponent:', err);
@@ -392,8 +487,13 @@ export class VisorComponent implements OnInit {
 
       try {
         if(this.indiceCultivosPermaComponent){
-          await this.indiceCultivosPermaComponent.cargarDatosByDpto(departamento);
+          
           console.log('indiceCultivosPermaComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indiceCultivosPermaComponent.cargarDatos();      
+          }else{
+            await this.indiceCultivosPermaComponent.cargarDatosByDpto(departamento);
+          }
         }        
       } catch (err) {
         console.warn(' Error en indiceCultivosPermaComponent:', err);

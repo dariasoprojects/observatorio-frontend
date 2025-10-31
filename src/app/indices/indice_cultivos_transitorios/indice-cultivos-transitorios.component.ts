@@ -135,7 +135,7 @@ export class IndiceCultivosTransitComponent implements OnInit {
   }
 
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'CULTITRANS' AND CAPA = 1",
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],

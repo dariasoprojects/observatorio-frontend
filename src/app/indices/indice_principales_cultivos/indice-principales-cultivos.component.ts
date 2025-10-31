@@ -137,7 +137,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
   }
 
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'CULTIPRIN' AND CAPA = 1",
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],

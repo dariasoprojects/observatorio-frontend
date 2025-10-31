@@ -137,7 +137,7 @@ export class IndiceTamanioParceComponent implements OnInit {
   }
 
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     
     const q = new Query({
       where: "INDICE = 'TAMPARC' AND CAPA = 1",

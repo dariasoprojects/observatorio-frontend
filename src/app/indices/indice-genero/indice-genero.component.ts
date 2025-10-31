@@ -135,7 +135,7 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
   }
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'GEN' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],

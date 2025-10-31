@@ -142,7 +142,7 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
 
   }
 
-  private async cargarDatos() {
+  public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'FUING' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
