@@ -400,22 +400,6 @@ export class VisorComponent implements OnInit {
       }
 
 
-
-
-      try {
-        if(this.indiceFertilizanteComponent){
-          await this.indiceFertilizanteComponent.cargarDatosByDpto(departamento);
-          console.log('indiceFertilizanteComponent cargado');
-        }        
-      } catch (err) {
-        console.warn(' Error en indiceFertilizanteComponent:', err);
-      }
-
-
-
-      
-
-
       
 
 
@@ -545,15 +529,6 @@ export class VisorComponent implements OnInit {
       if(this.indiceCultivosPermaComponent){
         this.indiceCultivosPermaComponent.cargarDatosByProv(provincia);  
       }
-
-
-
-      if(this.indiceFertilizanteComponent){
-        this.indiceFertilizanteComponent.cargarDatosByProv(provincia);  
-      }
-
-
-      
 
       
 
