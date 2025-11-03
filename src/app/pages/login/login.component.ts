@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import {Router} from '@angular/router';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-login',
   imports: [
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CommonModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -52,7 +54,7 @@ export class LoginComponent {
     console.log('Contraseña:', contrasena);
 
     // Si la autenticación es correcta, se redirige
-    this.router.navigate(['/visor']);
+    this.router.navigate(['/auth/visor']);
   }
 
 }

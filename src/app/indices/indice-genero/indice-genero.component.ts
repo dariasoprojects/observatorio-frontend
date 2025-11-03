@@ -93,7 +93,7 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
       },
 
       title: {
-        text: 'Según Género',
+        text: 'Distribución por Género',
         align: 'center'
       },
 

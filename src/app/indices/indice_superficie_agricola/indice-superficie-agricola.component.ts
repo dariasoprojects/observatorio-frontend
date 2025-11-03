@@ -52,7 +52,7 @@ export class IndiceSuperfiAgriComponent implements OnInit {
         height: 500,
         animation: { duration: 800 }
       },
-      title: { text: 'Superficie Agrícola por Departamento' },
+      title: { text: 'Área (ha) agrícola' },
       xAxis: {
         categories: this.categorias,
         title: { text: 'Departamentos' }

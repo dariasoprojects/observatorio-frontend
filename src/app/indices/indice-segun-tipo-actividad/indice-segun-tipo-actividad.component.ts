@@ -78,7 +78,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       },
 
       title: {
-        text: 'Según Tipo de Actividad',
+        text: 'Tipo de Actividad',
         align: 'center'
       },
 

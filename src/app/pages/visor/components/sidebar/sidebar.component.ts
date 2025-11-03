@@ -27,10 +27,10 @@ export class SidebarComponent {
 
   readonly items: Item[] = [
     { title:'Padrón de Productores Agrarios', section:'sec_padron_pa', icon:'empadronamiento' },
-    { title:'Centros de empadronamiento', section:'sec_indi_01', icon:'empadronamiento' },
+    { title:'Centros de Empadronamiento', section:'sec_indi_01', icon:'empadronamiento' },
     // { title:'Avance PPA', section:'sec_indi_01', icon:'avance' },
-    { title:'Según tipo de actividad', section:'sec_indi_03a', icon:'actividad' },
-    { title:'Según Nivel de Educación alcanzado', section:'sec_indi_04', icon:'educa' },
+    { title:'Según Tipo de Actividad', section:'sec_indi_03a', icon:'actividad' },
+    { title:'Según Nivel de Educación', section:'sec_indi_04', icon:'educa' },
     { title:'Según Región Natural', section:'sec_indi_03', icon:'region' },
     { title:'Según Fuentes de Ingreso', section:'sec_indi_02', icon:'moneda' },
     { title:'Según Género', section:'sec_indi_05', icon:'sexo' },

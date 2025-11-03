@@ -49,7 +49,7 @@ export class IndicePadronProdComponent implements OnInit {
         height: 500,
         animation: { duration: 800 }
       },
-      title: { text: 'Padrón de Productores' },
+      title: { text: 'Cantidad de Productores Agrarios' },
       xAxis: {
         categories: this.categorias,
         title: { text: 'Departamentos' }

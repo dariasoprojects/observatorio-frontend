@@ -97,7 +97,7 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
       },
 
       title: {
-        text: 'Según Región Natural',
+        text: 'Cantidad de Productores por Región Natural',
         align: 'center'
       },
 

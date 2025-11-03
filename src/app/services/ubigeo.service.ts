@@ -16,14 +16,14 @@ export class UbigeoService {
   private cache: UbigeoRecord[] = [];
   private cargado = false;
 
-  private url = 'https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ENIS/LimitesNacionalesSE/MapServer/2';
+  private url = 'https://gis.bosques.gob.pe/server/rest/services/Geobosques_Visor/serv_geobosques_visor_cartografia_base/MapServer/4';
 
   async cargarTodo(): Promise<void> {
     if (this.cargado) return;
 
     const q = new Query({
       where: '1=1',
-      outFields: ['IDDPTO', 'NOMBDEP', 'IDPROV', 'NOMBPROV', 'IDDIST', 'NOMBDIST'],
+      outFields: ['coddep', 'nomdep', 'codprov', 'nomprov', 'coddist', 'nomdist'],
       returnGeometry: false
     });
 
@@ -32,18 +32,20 @@ export class UbigeoService {
       this.cache = res.features.map(f => {
         const a = f.attributes;
         return {
-          idDpto: a.IDDPTO,
-          nomDpto: a.NOMBDEP,
-          idProv: a.IDPROV,
-          nomProv: a.NOMBPROV,
-          idDist: a.IDDIST,
-          nomDist: a.NOMBDIST
+          idDpto: a.coddep,
+          nomDpto: a.nomdep,
+          idProv: a.coddep+a.codprov,
+          nomProv: a.nomprov,
+          idDist: a.coddep+a.codprov+a.coddist,
+          nomDist: a.nomdist
         };
       });
+
+      console.log("res.features zzzzzzzzzzzz:", res.features);
       
 
       this.cargado = true;
-      console.log(' Ubigeos cargados:', this.cache.length);
+      console.log(' Ubigeos cargados:', this.cache);
     } catch (err) {
       console.error(' Error cargando tabla de ubigeos:', err);
     }
@@ -72,6 +74,41 @@ export class UbigeoService {
     }
     return ubigeo;
   }
+
+
+  /** Devuelve código (2, 4 o 6 dígitos) según el nombre */
+  getCodigo(nombre: string): string {
+    if (!nombre) return '';
+
+    const n = nombre.toLowerCase().trim();
+
+    // Buscar por distrito (nombre exacto o parcial)
+    let record = this.cache.find(
+      r =>
+        r.nomDist?.toLowerCase() === n ||
+        r.nomDist?.toLowerCase().includes(n)
+    );
+    if (record) return record.idDist;
+
+    // Buscar por provincia
+    record = this.cache.find(
+      r =>
+        r.nomProv?.toLowerCase() === n ||
+        r.nomProv?.toLowerCase().includes(n)
+    );
+    if (record) return record.idProv;
+
+    // Buscar por departamento
+    record = this.cache.find(
+      r =>
+        r.nomDpto?.toLowerCase() === n ||
+        r.nomDpto?.toLowerCase().includes(n)
+    );
+    if (record) return record.idDpto;
+
+    return ''; // si no encuentra nada
+  }
+
 
   /** Devuelve provincias por departamento */
   getProvincias(depId: string): { id: string; nombre: string }[] {

@@ -37,6 +37,7 @@ export class Mapa {
   private mapView: MapView | null = null;
   private map: Map | null = null;
   private capaCluster!: FeatureLayer;
+   private capaClusterPpa!: FeatureLayer;
   private divId: string;
   private resultsLayer: GraphicsLayer | null = null;
   private simpleFillSymbol: SimpleFillSymbol | null = null;
@@ -81,7 +82,44 @@ export class Mapa {
     });
 
 
+    this.comm.filterRequestPpa$.subscribe(reg => {
+      if (reg) {
+        console.log('Filtrando cluster por REG:', reg);
+        this.filtrarClusterPorRegPpa(reg);
+      } else {
+        console.log('Desactivando todo');
+        this.desactivarClusterPpa();
+      }
+    });
+
+
   }
+
+
+
+  filtrarClusterPorRegPpa(reg: string | null) {
+    if (!this.capaClusterPpa) return;
+
+    if (reg) {
+      this.capaClusterPpa.definitionExpression = `UBIGEO3 like '${reg}%'`;
+      this.capaClusterPpa.visible = true;
+      console.log('Mostrando cluster para REG  UBIGEO3 :', reg);
+    } else {
+      this.capaClusterPpa.visible = false;
+      console.log('Ocultando cluster');
+    }
+
+  }
+ desactivarClusterPpa() {
+    // Aquí limpias la capa o remueves el cluster del mapa
+    if (this.capaClusterPpa) {
+      this.capaClusterPpa.visible = false;        // Oculta la capa
+      this.capaClusterPpa.definitionExpression = ""; // Limpia filtro
+    }
+  }
+
+
+
 
 
 
@@ -297,27 +335,33 @@ export class Mapa {
 
       this.capaMapServer = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/SectoresEstadisticos/MapServer/",
+        visible: false
       });
 
       this.rasterBosqueAmazonico= new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/UnidadHidrografica/MapServer/",
+        visible: false
         
       });
 
       this.capaClusterAlertas = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Microcuencas/MapServer/",
+        visible: false
       });
 
       this.capaJuntausuario = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/",
+        visible: false
       });
 
       this.capaComiteRiego = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/ComisionesRiego/MapServer/",
+        visible: false
       });
 
       this.capaAntenasCelular = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Antenas/MapServer/",
+        visible: false
       });
 
 
@@ -355,6 +399,45 @@ export class Mapa {
       });
 
 
+
+
+
+       this.capaClusterPpa = new FeatureLayer({
+          url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0',
+          outFields: ['*'],
+          visible: false,
+          featureReduction: {
+            type: 'cluster',
+            clusterRadius: '100px',
+            labelsVisible: true, // mostrar número
+            labelingInfo: [
+              {
+                deconflictionStrategy: "none",
+                labelExpressionInfo: { expression: "$feature.cluster_count" }, // número de puntos en el cluster
+                labelPlacement: "center-center", // centrar el label
+                symbol: {
+                  type: "text",
+                  color: "white",
+                  font: {
+                    size: 14,
+                    weight: "bold",
+                    family: "Arial"
+                  },
+                  haloColor: "black", // opcional, para mejor visibilidad
+                  haloSize: 1
+                }
+              }
+            ]
+          },
+          popupTemplate: {
+            title: 'Centro: {UBIGEO3}',
+            content: 'Cantidad de registros agrupados por cluster.'
+          }
+        });
+
+
+
+
     
 
 
@@ -374,6 +457,7 @@ export class Mapa {
 
 
       this.map.add(this.capaCluster);
+      this.map.add(this.capaClusterPpa);
 
       this.legendContainer = document.createElement('div');
       this.legendContainer.classList.add('esri-widget', 'esri-widget--panel');
@@ -1138,7 +1222,7 @@ export class Mapa {
     const res = await query.executeQueryJSON(url, q);
     const selectProv = document.getElementById("cboProvs") as HTMLSelectElement;
 
-    selectProv.innerHTML = `<option value="">--Seleccione--</option>`;
+    selectProv.innerHTML = `<option value="00">-- Todas --</option>`;
     res.features.forEach(f => {
       const opt = document.createElement("option");
       opt.value = f.attributes.IDPROV;
