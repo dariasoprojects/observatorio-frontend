@@ -4,7 +4,7 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 :root{
-  --rail-w: 60px;
+  --rail-w: 8px;
   --rail-g: 8px;
 }
 /* ========= Variables base (mobile-first) ========= */
