@@ -100,7 +100,7 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
       },
 
       title: {
-        text: 'Fuente de Ingreso - Nacional',
+        text: 'Principales Fuente de Ingreso - Nacional',
         align: 'center'
       },
 

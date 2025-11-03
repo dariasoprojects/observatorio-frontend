@@ -92,7 +92,7 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
       },
 
       title: {
-        text: 'Según Tipo Organización',
+        text: 'Organización de Productores Agrarios',
         align: 'center'
       },
 

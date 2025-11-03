@@ -49,8 +49,8 @@ import {LayoutVerticalComponent} from './components/layout-vertical/layout-verti
     IndiceSegunRegionNaturalComponent, IndiceNivelEstudioComponent, IndiceGeneroComponent, IndiceTipoOrgComponent,
     IndiceTipoActividadComponent, IndiceSuperfiAgriComponent, IndiceSuperfiSembComponent, IndiceTamanioParceComponent,
     IndiceRegimenTenenComponent,IndicePrincipalesCultivosComponent,IndiceCultivosTransitComponent,IndiceCultivosPermaComponent,
-    IndiceFertilizanteComponent, SumatoriasComponent, 
-    ConsultaMultipleComponent, SidebarComponent,LayoutVerticalComponent]
+    IndiceFertilizanteComponent, SumatoriasComponent,
+    ConsultaMultipleComponent, SidebarComponent]
 })
 export class VisorComponent implements OnInit {
 
@@ -88,7 +88,7 @@ export class VisorComponent implements OnInit {
 
   @ViewChild(GraficoComponent) graficoComponent!: GraficoComponent;
 
-  
+
   @ViewChild(IndicePadronProdComponent) indicePadronProdComponent!: IndicePadronProdComponent;
 
   @ViewChild(IndiceCentrosEmpadronamientoComponent) indiceCentrosEmpadronamiento!: IndiceCentrosEmpadronamientoComponent;
@@ -119,7 +119,7 @@ export class VisorComponent implements OnInit {
 
   @ViewChild(IndiceCultivosPermaComponent) indiceCultivosPermaComponent!: IndiceCultivosPermaComponent;
 
-  
+
 
   @ViewChild(IndiceFertilizanteComponent) indiceFertilizanteComponent!: IndiceFertilizanteComponent;
 
@@ -154,13 +154,7 @@ export class VisorComponent implements OnInit {
 
 
   mostrarSeccion(id: string) {
-
-    // dar click en el mismo botón, se oculta
-    if (this.seccionActiva === id) {
-      this.seccionActiva = null;
-    } else {
-      this.seccionActiva = id;
-    }
+    this.seccionActiva = id;
   }
 
   esVisible(id: string): boolean {
@@ -260,16 +254,6 @@ export class VisorComponent implements OnInit {
       }else{
         this.sumatoriasComponent.cargarDatosByDpto(departamento);  
       }
-      
-
-
-          /*
-          if(departamento==="00" || departamento===null){
-                
-          }else{
-            
-          } 
-          */   
       
       
       try {
@@ -500,9 +484,25 @@ export class VisorComponent implements OnInit {
       }
 
 
+
+      try {
+        if(this.indiceFertilizanteComponent){
+          
+          console.log('indiceFertilizanteComponent cargado');
+          if(departamento==="00" || departamento===null){
+            await this.indiceFertilizanteComponent.cargarDatos();      
+          }else{
+            await this.indiceFertilizanteComponent.cargarDatosByDpto(departamento);
+          }
+        }        
+      } catch (err) {
+        console.warn(' Error en indiceFertilizanteComponent:', err);
+      }
+
+
       
 
-
+      
       
 
 
@@ -520,6 +520,15 @@ export class VisorComponent implements OnInit {
 
 
   ejecutarConsultaProv(event: Event): void {
+
+    const selectElementDpto = <HTMLSelectElement>document.getElementById('cbodptos');
+    const departamento = selectElementDpto.value;
+
+    //este se debe normalizar
+    const departamento2 = this.getNombreDepartamento (departamento);
+
+
+
 
 
     const selectElement2 = event.target as HTMLSelectElement;
@@ -548,87 +557,186 @@ export class VisorComponent implements OnInit {
         .catch(err => console.error('Error al realizar la consulta:', err));
 
       
+      // if(provincia==="00"){
+      //   this..cargarDatosByDpto(departamento);
+      // }else{
+      //   this..cargarDatosByProv(provincia);
+      // }
 
       if(this.sumatoriasComponent){        
-        this.sumatoriasComponent.cargarDatosByProv(provincia);
+        if(provincia==="00"){
+          this.sumatoriasComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.sumatoriasComponent.cargarDatosByProv(provincia);
+        }
+        //this.sumatoriasComponent.cargarDatosByProv(provincia);
       }
 
       
 
       if(this.indicePadronProdComponent){
-        this.indicePadronProdComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indicePadronProdComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indicePadronProdComponent.cargarDatosByProv(provincia);
+        }
+        //this.indicePadronProdComponent.cargarDatosByProv(provincia);  
       }
 
 
 
       if(this.indiceCentrosEmpadronamiento){
-        this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);  
+        if(provincia==="00"){
+          this.indiceCentrosEmpadronamiento.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);
+        }
+        //this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);  
       }
 
 
       if(this.indiceTipoActividadComponent){
-        this.indiceTipoActividadComponent.cargarDatosByProv(provincia); 
+        if(provincia==="00"){
+          this.indiceTipoActividadComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceTipoActividadComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceTipoActividadComponent.cargarDatosByProv(provincia); 
 
       }
       
       
       if(this.indiceNivelEstudioComponent){
-        this.indiceNivelEstudioComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceNivelEstudioComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceNivelEstudioComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceNivelEstudioComponent.cargarDatosByProv(provincia);  
       }
 
       if(this.indiceSegunRegionNaturalComponent){
-        this.indiceSegunRegionNaturalComponent.cargarDatosByProv(provincia);
+        if(provincia==="00"){
+          this.indiceSegunRegionNaturalComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceSegunRegionNaturalComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceSegunRegionNaturalComponent.cargarDatosByProv(provincia);
       }
       
 
       if(this.indiceFuenteIngresoComponent){
-        this.indiceFuenteIngresoComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceFuenteIngresoComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceFuenteIngresoComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceFuenteIngresoComponent.cargarDatosByProv(provincia);  
       }
       
 
       if(this.indiceGeneroComponent){
-        this.indiceGeneroComponent.cargarDatosByProv(provincia);
+        if(provincia==="00"){
+          this.indiceGeneroComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceGeneroComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceGeneroComponent.cargarDatosByProv(provincia);
       }
       
 
       if(this.indiceTipoOrgComponent){
-        this.indiceTipoOrgComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceTipoOrgComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceTipoOrgComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceTipoOrgComponent.cargarDatosByProv(provincia);  
       }
       
 
       if(this.indiceSuperfiAgriComponent){
-        this.indiceSuperfiAgriComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceSuperfiAgriComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceSuperfiAgriComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceSuperfiAgriComponent.cargarDatosByProv(provincia);  
       }
       
 
       if(this.indiceSuperfiSembComponent){
-        this.indiceSuperfiSembComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceSuperfiSembComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceSuperfiSembComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceSuperfiSembComponent.cargarDatosByProv(provincia);  
       }
       
 
       if(this.indiceTamanioParceComponent){
-        this.indiceTamanioParceComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceTamanioParceComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceTamanioParceComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceTamanioParceComponent.cargarDatosByProv(provincia);  
       }
 
 
       if(this.indiceRegimenTenenComponent){
-        this.indiceRegimenTenenComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceRegimenTenenComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceRegimenTenenComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceRegimenTenenComponent.cargarDatosByProv(provincia);  
       }
 
 
       if(this.indicePrincipalesCultivosComponent){
-        this.indicePrincipalesCultivosComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indicePrincipalesCultivosComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indicePrincipalesCultivosComponent.cargarDatosByProv(provincia);
+        }
+        //this.indicePrincipalesCultivosComponent.cargarDatosByProv(provincia);  
       }
 
 
       if(this.indiceCultivosTransitComponent){
-        this.indiceCultivosTransitComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceCultivosTransitComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceCultivosTransitComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceCultivosTransitComponent.cargarDatosByProv(provincia);  
       }
 
 
       if(this.indiceCultivosPermaComponent){
-        this.indiceCultivosPermaComponent.cargarDatosByProv(provincia);  
+        if(provincia==="00"){
+          this.indiceCultivosPermaComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceCultivosPermaComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceCultivosPermaComponent.cargarDatosByProv(provincia);  
       }
+
+
+      if(this.indiceFertilizanteComponent){
+        if(provincia==="00"){
+          this.indiceFertilizanteComponent.cargarDatosByDpto(departamento);
+        }else{
+          this.indiceFertilizanteComponent.cargarDatosByProv(provincia);
+        }
+        //this.indiceFertilizanteComponent.cargarDatosByProv(provincia);  
+      }
+
+
+
+      
 
       
 
@@ -637,6 +745,9 @@ export class VisorComponent implements OnInit {
     }
 
   }
+
+
+
 
 
 

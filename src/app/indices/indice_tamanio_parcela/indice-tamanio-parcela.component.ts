@@ -95,7 +95,7 @@ export class IndiceTamanioParceComponent implements OnInit {
       },
 
       title: {
-        text: 'Distribución de Tamaño de Parcelas',
+        text: 'Tamaño de las Parcelas',
         align: 'center'
       },
 

@@ -1,0 +1,226 @@
+:host{
+  display:block;
+  /* Layout tokens */
+  --hdr-h: 56px;      /* alto del header fuera del grid */
+  --gap: 12px;        /* separación entre columnas/filas del grid */
+  --pad: 12px;        /* padding del grid */
+  --left-w: 260px;    /* ancho sidebar */
+  --right-w: 320px;   /* ancho panel derecho */
+}
+
+/* ============== GRID PRINCIPAL (fila 1: top-wide, fila 2: mapa+dcha) ============== */
+.content-grid{
+  display:grid;
+  grid-template-columns: var(--left-w) 1fr var(--right-w);
+  grid-template-rows: auto 1fr;
+  gap: var(--gap);
+  padding: var(--pad);
+  box-sizing: border-box;
+
+  /* Altura calculada sin cortar el contenido inferior */
+  min-height: calc(100vh - var(--hdr-h) - (2 * var(--pad)));
+  height: auto;
+
+  background:#f4f6f8;
+}
+
+/* ============== LATERAL IZQUIERDO ============== */
+.side-left{
+  grid-column:1;
+  grid-row:1 / span 2;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  padding:10px;
+  overflow:auto;    /* scroll interno si se necesita */
+  min-height:0;
+}
+
+/* Bloque “marca” + botón */
+.side-left__head{
+  position: sticky;   /* queda fijo al hacer scroll en el sidebar */
+  top: 0;
+  z-index: 2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding-bottom:8px;
+  margin-bottom:8px;
+  background:#fff;    /* para que no se “transparente” al hacer scroll */
+}
+
+/* Marca centrada */
+.brand-small{ display:flex; align-items:center; gap:8px; font:800 14px "Raleway",sans-serif; }
+.brand-small.centered{ display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
+.brand-small.centered img{ height:36px; object-fit:contain; }
+.brand-small.centered span{ font:800 16px/1 "Raleway",sans-serif; color:#0f172a; letter-spacing:.5px; }
+
+/* Botón de colapso, fuera del borde */
+.side-left__toggle {
+  position: absolute;
+  right: -14px;
+  top: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;       /* fondo invisible */
+  color: #3f3f3f;                /* color del ícono */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: none;              /* sin sombra */
+  transition: color 0.2s ease;
+}
+
+.side-left__toggle:hover {
+  color: #000;                   /* cambia tono en hover para indicar acción */
+}
+
+.side-left__toggle i {
+  font-size: 14px;
+}
+
+/* Buscador */
+.search{ position:relative; margin:6px 0 10px; }
+.search .pi{ position:absolute; left:8px; top:50%; transform:translateY(-50%); color:#6b7280; font-size:12px; }
+.search input{ width:100%; height:34px; padding-left:28px; border-radius:8px; }
+
+/* Listas */
+.list{ list-style:none; padding:0; margin:6px 0; display:flex; flex-direction:column; gap:6px; }
+.link{ width:100%; text-align:left; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; }
+.link:hover{ background:#f3f4f6; }
+
+.hdr{ display:flex; align-items:center; gap:8px; color:#111827; font-weight:700; }
+.hdr .pi{ font-size:14px; color:#374151; }
+.panel-tight .p-panel-content{ padding:8px 10px !important; }
+
+/* ============== TOP-WIDE ============== */
+.top-wide{
+  grid-column:2 / 4; grid-row:1;
+  background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:6px;
+}
+.topbar{ display:flex; align-items:center; justify-content:space-between; min-height:44px; }
+.topbar-left{ display:flex; align-items:center; gap:8px; }
+.arrow-btn{
+  width:28px; height:28px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:none; outline:none; cursor:pointer;
+  background:#3f3f3f; color:#fff; box-shadow:0 1px 2px rgba(0,0,0,.25);
+}
+.arrow-btn:hover{ background:#2f2f2f; }
+.arrow-btn i{ font-size:12px; }
+
+.topbar-right{ display:flex; align-items:center; gap:10px; }
+.usr-avatar.p-avatar{ width:28px; height:28px; font-size:12px; background:#bde7f0; color:#0b5563; }
+.usr-info{ line-height:1.1; text-align:left; }
+.usr-name{ font-weight:700; font-size:12px; color:#111827; }
+.usr-role{ font-size:11px; color:#6b7280; }
+.panel-flat .p-panel-header{ display:none; }
+.panel-flat .p-panel-content{ padding:6px 10px !important; }
+
+/* ============== MODO COLAPSADO (estrecha solo la izquierda) ============== */
+.content-grid.left-collapsed{
+  grid-template-columns: 56px 1fr var(--right-w);
+}
+.content-grid.left-collapsed .side-left .brand-small span,
+.content-grid.left-collapsed .side-left .search,
+.content-grid.left-collapsed .side-left .p-panel .p-panel-header .p-panel-title,
+.content-grid.left-collapsed .side-left .list,
+.content-grid.left-collapsed .side-left .p-panel-content{
+  display:none !important;
+}
+.content-grid.left-collapsed .side-left{ padding:8px; }
+.content-grid.left-collapsed .side-left__toggle{ right:-14px; }
+
+/* ============== CENTRO: MAPA ============== */
+.center-map{
+  grid-column:2; grid-row:2;
+  background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:6px;
+  display:flex; min-height:0; position:relative;
+}
+.map{ flex:1 1 auto; width:100%; height:100%; border-radius:8px; overflow:hidden; background:#0b3d59; }
+.map-tools{ position:absolute; left:10px; bottom:10px; display:flex; gap:6px; }
+
+/* ============== DERECHA (sticky con altura segura) ============== */
+.side-right{
+  grid-column:3; grid-row:2;
+  background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:10px;
+  overflow:hidden; min-height:0;
+}
+.right-sticky{
+  position: sticky; top: var(--pad);
+  display:flex; flex-direction:column; gap:10px;
+  /* sin recortes: considera header, paddings y gap */
+  max-height: calc(100vh - var(--hdr-h) - (2 * var(--pad)) - var(--gap));
+  overflow:auto;
+}
+
+.muted{ color:#6b7280; display:block; margin-bottom:6px; }
+.side-right label{ display:block; font-size:12px; color:#6b7280; margin:8px 0 4px; }
+
+/* ===== KPIs ===== */
+.kpi-hint{ display:block; margin:8px 0 16px; color:#6b7280; font-size:13px; line-height:1.45; }
+.kpi-panel .p-panel-content{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:18px !important;
+  padding:8px 16px 16px !important;
+}
+.kpi{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; color:#fff; border-radius:14px;
+  padding:18px 12px; min-height:80px;
+  box-shadow:0 2px 4px rgba(0,0,0,.08);
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+.kpi + .kpi{ margin-top:12px !important; }
+.kpi:hover{ transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,.12); filter:brightness(1.05); }
+.kpi__value{ font-weight:800; font-size:30px; line-height:1.1; letter-spacing:.3px; }
+.kpi__label{ margin-top:6px; font-weight:600; font-size:13px; line-height:1.1; opacity:.95; }
+.kpi--green{ background:#0d6638; }
+.kpi--blue { background:#087ca7; }
+.kpi--brown{ background:#8b4c10; }
+
+/* ============== RESPONSIVE ============== */
+/* Mantén escritorio hasta 800px */
+@media (max-width: 700px){
+  .content-grid{
+    grid-template-columns: var(--left-w) 1fr;
+    grid-template-rows: auto auto 1fr auto;  /* left | top | map | right */
+    min-height: auto;
+  }
+  .side-left  { grid-column:1; grid-row:1 / span 3; }
+  .top-wide   { grid-column:2; grid-row:1; }
+  .center-map { grid-column:2; grid-row:2; }
+  .side-right { grid-column:1 / -1; grid-row:3; }
+  .right-sticky{ position: static; max-height: none; overflow: visible; }
+  .center-map .map{ min-height:520px; }
+}
+
+/* 1 columna <600px (móvil) */
+@media (max-width: 600px){
+  .content-grid{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 60vh auto;
+  }
+  .side-left, .top-wide, .center-map, .side-right{ grid-column:1; grid-row:auto; }
+}
+
+/* Opción: bloquear siempre 3 columnas (ignora breakpoints) */
+.content-grid.desktop-lock{
+  grid-template-columns: var(--left-w) 1fr var(--right-w) !important;
+  grid-template-rows: auto 1fr !important;
+}
+.desktop-lock .side-left { grid-column:1; grid-row:1 / span 2; }
+.desktop-lock .top-wide  { grid-column:2 / 4; grid-row:1; }
+.desktop-lock .center-map{ grid-column:2; grid-row:2; }
+.desktop-lock .side-right{ grid-column:3; grid-row:2; }
+.desktop-lock .right-sticky{
+  position: sticky; top: var(--pad);
+  max-height: calc(100vh - var(--hdr-h) - (2 * var(--pad)));
+  overflow:auto;
+}

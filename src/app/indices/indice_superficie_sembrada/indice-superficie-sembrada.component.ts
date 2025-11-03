@@ -49,7 +49,7 @@ export class IndiceSuperfiSembComponent implements OnInit {
         height: 500,
         animation: { duration: 800 }
       },
-      title: { text: 'Superficie Sembrada' },
+      title: { text: 'Área (ha) Total / Sembrada' },
       xAxis: {
         categories: this.categorias,
         title: { text: 'Departamentos' }

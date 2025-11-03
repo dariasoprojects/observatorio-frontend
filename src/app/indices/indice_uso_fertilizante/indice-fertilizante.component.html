@@ -1,32 +1,63 @@
 <div class="indice-fertilizante">
+
+  
+
   <!-- Contenedor del gráfico -->
   <div id="container-fertilizante"></div>
 
+
+  <!-- Combo de filtro -->
+  <div style="margin-bottom: 15px;">
+    <mat-form-field appearance="fill" style="width: 300px;">
+      <mat-label>Tipo de fertilizante</mat-label>
+      <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
+        <mat-option *ngFor="let cat of categorias" [value]="cat">
+          {{ cat }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+
+
   <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
+   <span> Uso de Fertilizantes</span>
     <table class="tabla-fertilizante">
       <thead>
         <tr>
           <th>Jurisdicción</th>
           <th>Parcelas</th>
-          <th></th>
+          <th>Datos</th>
+          <th>Ver en Mapa</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let fila of tablaDatos">
-          <td class="num-col">
-            {{ FormatUtil.formatInteger(fila.ubigeo) }}
+        <tr *ngFor="let fila of tablaFiltrada">
+          <td class="num-col">{{ fila.ubigeo }}</td>
+          <td class="num-col">{{ FormatUtil.formatInteger(fila.parcelas) }}</td>
+          <td>
+            <button
+  mat-icon-button
+  color="primary"
+  class="mini-icon"
+  matTooltip="Exportar a Excel"
+  (click)="abrirDialogoExportar(fila.ubigeo)"
+>
+  <mat-icon>file_download</mat-icon>
+</button>
           </td>
-          <td class="num-col">
-            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
-          </td>
-           <td>
-              <button mat-raised-button color="primary" (click)="abrirDialogoExportar(fila.ubigeo)">
-                Export
-              </button>
-          </td>
+         <td>
+         <mat-slide-toggle
+  color="primary"
+  [checked]="activeReg === fila.ubigeo"
+  (change)="toggleCluster($event, fila.ubigeo)"
+  class="small-toggle"
+></mat-slide-toggle>
+        </td>
         </tr>
       </tbody>
     </table>
   </div>
+
 </div>

@@ -92,7 +92,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
       },
 
       title: {
-        text: 'Cultivos Permanentes',
+        text: 'Superficie Sembrada - Cultivos Permanentes',
         align: 'center'
       },
 

@@ -94,7 +94,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
       },
 
       title: {
-        text: 'Principales Cultivos',
+        text: 'Superficie Sembrada - Principales Cultivos',
         align: 'center'
       },
 

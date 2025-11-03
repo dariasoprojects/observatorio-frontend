@@ -1,18 +1,48 @@
-import { Component, OnInit , Input} from '@angular/core';
+// import { Component, OnInit , Input} from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import * as Highcharts from 'highcharts';
+// import Query from "@arcgis/core/rest/support/Query";
+// import * as query from "@arcgis/core/rest/query";
+// import { UbigeoService } from '../../services/ubigeo.service';
+// import {FormatUtil} from '../../shared/utils/format.util';
+// import { MatDialog } from '@angular/material/dialog';
+// import { MapCommService } from '../../services/map-comm.service';
+
+
+// import { MatSelectModule } from '@angular/material/select';
+// import { MatFormFieldModule } from '@angular/material/form-field';
+// import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+// import { MatIconModule } from '@angular/material/icon';
+// import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+// import { DialogExportarComponent } from './dialog-exportar/dialog-exportar.component';
+
+import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import * as Highcharts from 'highcharts';
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { UbigeoService } from '../../services/ubigeo.service';
-import {FormatUtil} from '../../shared/utils/format.util';
+import { FormatUtil } from '../../shared/utils/format.util';
 import { MatDialog } from '@angular/material/dialog';
+
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MapCommService } from '../../services/map-comm.service';
 import { DialogExportarComponent } from './dialog-exportar/dialog-exportar.component';
 
 @Component({
   selector: 'app-indice-fertilizante',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,
+    FormsModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatSlideToggleModule,
+    MatIconModule],
   templateUrl: './indice-fertilizante.component.html',
   styleUrls: ['./indice-fertilizante.component.css']
 })
@@ -27,8 +57,13 @@ export class IndiceFertilizanteComponent implements OnInit {
   categorias: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
+  activeReg: string | null = null;
+  activeNivel: string | null = null;
 
-  tablaDatos: { ubigeo: string; parcelas: number }[] = [];
+  tablaDatos: { ubigeo: string; parcelas: number; ddescr: string  }[] = [];
+  tablaFiltrada: { ubigeo: string; parcelas: number; ddescr: string }[] = [];
+
+  categoriaSeleccionada: string = '';
 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
   private urlParcelas = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
@@ -36,32 +71,27 @@ export class IndiceFertilizanteComponent implements OnInit {
 
 
 
-    constructor(private ubigeoSrv: UbigeoService, private mapComm: MapCommService, private dialog: MatDialog) {}  // <-- solo para inyectar
+  constructor(private ubigeoSrv: UbigeoService, 
+              private mapComm: MapCommService, 
+              private dialog: MatDialog) {}  // <-- solo para inyectar
 
 
   async ngOnInit() {
-     
     await this.ubigeoSrv.cargarTodo();
 
-    console.log("this.valorSeleccionadoProv -- ", this.valorSeleccionadoProv);
-    console.log("this.valorSeleccionado -- ", this.valorSeleccionado);
-    //this.cargarDatos();
-    if (this.valorSeleccionadoProv !== null  && this.valorSeleccionadoProv !== undefined) {
-      this.cargarDatosByProv(this.valorSeleccionadoProv);
-    }else{
-      
-      if (this.valorSeleccionado !== null   && this.valorSeleccionado !== undefined) {
-        this.cargarDatosByDpto(this.valorSeleccionado);
-      }else{
-        
-        this.cargarDatos();
-      }
+    if (this.valorSeleccionadoProv) {
+      await this.cargarDatosByProv(this.valorSeleccionadoProv);
+      this.activeNivel="3"
+    } else if (this.valorSeleccionado) {
+      await this.cargarDatosByDpto(this.valorSeleccionado);
+      this.activeNivel="2"
+    } else {
+      this.activeNivel="1"
+      await this.cargarDatos();
     }
   }
 
-
-   abrirDialogoExportar(reg: string) {
-    //alert(reg);
+  abrirDialogoExportar(reg: string) {
     this.dialog.open(DialogExportarComponent, {
       width: '900px',
       height: '500px',
@@ -69,10 +99,268 @@ export class IndiceFertilizanteComponent implements OnInit {
     });
   }
 
+  // ---------------------------------------------------
+  //  CARGA GENERAL
+  // ---------------------------------------------------
+  public async cargarDatos() {
+    const q = new Query({
+      where: "INDICE = 'FERTILIZA' AND CAPA = 1",
+      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
+      returnGeometry: false
+    });
 
+    const response = await query.executeQueryJSON(this.url, q);
+    const data = response.features.map(f => ({
+      ubigeo: f.attributes.UBIGEO,
+      ddescr: f.attributes.DDESCR,
+      parcelas: f.attributes.PARCELAS
+    }));
+
+    
+
+    this.prepararDatos(data);
+  }
+
+  // ---------------------------------------------------
+  //  CARGA POR DEPARTAMENTO
+  // ---------------------------------------------------
+  public async cargarDatosByDpto(ubigeo: string) {
+    const q = new Query({
+      where: `INDICE = 'FERTILIZA' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
+      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
+      returnGeometry: false
+    });
+
+    // const response = await query.executeQueryJSON(this.url, q);
+    // const data = response.features.map(f => ({
+    //   ubigeo: f.attributes.UBIGEO,
+    //   ddescr: f.attributes.DDESCR,
+    //   parcelas: f.attributes.PARCELAS
+    // }));
+
+    // this.prepararDatos(data);
+
+    try {
+      const response = await query.executeQueryJSON(this.url, q);
+
+      if (response.features.length > 0) {
+        const data = response.features.map(f => ({
+          ubigeo: f.attributes.UBIGEO,
+          ddescr: f.attributes.DDESCR,
+          parcelas: f.attributes.PARCELAS
+        }));
+
+        // 👉 Llama a prepararDatos (que internamente llama a actualizarDatos)
+        this.prepararDatos(data);
+
+      } else {
+        this.tablaDatos = [];
+        this.tablaFiltrada = [];
+      }
+    } catch (err) {
+      console.error("Error al consultar ArcGIS (Departamental)", err);
+    }
+
+
+  }
+
+  // ---------------------------------------------------
+  //  CARGA POR PROVINCIA
+  // ---------------------------------------------------
+  public async cargarDatosByProv(ubigeo: string) {
+    const q = new Query({
+      where: `INDICE = 'FERTILIZA' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
+      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
+      returnGeometry: false
+    });
+
+    // const response = await query.executeQueryJSON(this.url, q);
+    // const data = response.features.map(f => ({
+    //   ubigeo: f.attributes.UBIGEO,
+    //   ddescr: f.attributes.DDESCR,
+    //   parcelas: f.attributes.PARCELAS
+    // }));
+
+    // this.prepararDatos(data);
+
+    try {
+      const response = await query.executeQueryJSON(this.url, q);
+
+      if (response.features.length > 0) {
+        const data = response.features.map(f => ({
+          ubigeo: f.attributes.UBIGEO,
+          ddescr: f.attributes.DDESCR,
+          parcelas: f.attributes.PARCELAS
+        }));
+
+        // 👉 Usa la misma función centralizada
+        this.prepararDatos(data);
+
+      } else {
+        this.tablaDatos = [];
+        this.tablaFiltrada = [];
+      }
+    } catch (err) {
+      console.error("Error al consultar ArcGIS (Provincial)", err);
+    }
+
+
+  }
+
+  // ---------------------------------------------------
+  //  PROCESAR Y AGRUPAR
+  // ---------------------------------------------------
+  private prepararDatos(data: any[]) {
+    console.log("prepararDatos ..XXXXXXX. ", data);
+
+    // Agrupar para el gráfico (por tipo de fertilizante)
+    const agrGrafico: Record<string, number> = {};
+    data.forEach(it => {
+      const clave = it.ddescr || "No definido";
+      if (!agrGrafico[clave]) agrGrafico[clave] = 0;
+      agrGrafico[clave] += it.parcelas;
+    });
+
+    const cats = Object.keys(agrGrafico);
+    const vals = Object.values(agrGrafico);
+
+    // Guardar la tabla base con ubigeo, ddescr y parcelas (ordenada alfabéticamente)
+    const tablaOrdenada = data
+      .map(d => ({
+        ubigeo: this.ubigeoSrv.getNombre(d.ubigeo),
+        parcelas: d.parcelas,
+        ddescr: d.ddescr || "No definido"
+      }))
+      .sort((a, b) => a.ubigeo.localeCompare(b.ubigeo, 'es', { sensitivity: 'base' }));
+
+    // 👉 ahora llamamos al método central de actualización
+    this.actualizarDatos(cats, vals, tablaOrdenada);
+  }
+
+
+
+  // ---------------------------------------------------
+  //  ACTUALIZAR DATOS GLOBALES
+  // ---------------------------------------------------
+  private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[], tabla: any[]) {
+    this.categorias = [...nuevasCategorias];
+    this.valores = [...nuevosValores];
+    this.tablaDatos = [...tabla];
+
+    // Selecciona la primera categoría por defecto si no hay una previa
+    if (!this.categoriaSeleccionada && this.categorias.length > 0) {
+      this.categoriaSeleccionada = this.categorias[0];
+    }
+
+    // Filtrar tabla (sumando por jurisdicción)
+    this.filtrarPorCategoria();
+
+    // Crear gráfico la primera vez, o actualizarlo si ya existe
+    if (!this.chart) {
+      this.crearGrafico();
+    } else {
+      const serie = this.chart.series[0];
+      const puntos = this.categorias.map((c, i) => ({ name: c, y: this.valores[i] }));
+      serie.setData(puntos, true);
+    }
+  }
+
+
+
+  // ---------------------------------------------------
+  //  FILTRADO DINÁMICO
+  // ---------------------------------------------------
+ 
+
+
+  filtrarPorCategoria() {
+    let datosFiltrados = [...this.tablaDatos];
+
+    // Si se elige una categoría específica → filtra por ddescr
+    if (this.categoriaSeleccionada) {
+      datosFiltrados = datosFiltrados.filter(
+        f => f.ddescr === this.categoriaSeleccionada
+      );
+    }
+
+    //  Agrupar nuevamente por UBIGEO y sumar parcelas
+    const agrUbigeo: Record<string, number> = {};
+    datosFiltrados.forEach(it => {
+      if (!agrUbigeo[it.ubigeo]) agrUbigeo[it.ubigeo] = 0;
+      agrUbigeo[it.ubigeo] += it.parcelas;
+    });
+
+    //  Convertir a arreglo de tabla final
+    this.tablaFiltrada = Object.entries(agrUbigeo).map(([ubigeo, parcelas]) => ({
+      ubigeo,
+      parcelas,
+      ddescr: this.categoriaSeleccionada || "Todos"
+    }));
+  }
+
+
+
+  // toggleCluster(event: Event, reg: string) {
+  //   const checked = (event.target as HTMLInputElement).checked;
+
+  //   if (checked) {
+  //     console.log('Activando filtro para:', reg);
+  //     this.activeReg = reg;
+
+  //     //this.mapComm.requestFilter(reg);
+  //   } else {
+  //     console.log('Desactivando filtro');
+  //     this.activeReg = null;
+  //     //this.mapComm.requestFilter(null);
+  //   }
+  // }
+
+
+  toggleCluster(event: MatSlideToggleChange, ubigeo: string) {
+    const isChecked = event.checked;
+    console.log('Toggle cambiado:', ubigeo, isChecked);
+
+    let codReg = null;
+    
+    switch (this.activeNivel) {
+      case '1':
+        
+         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 2);
+        break;
+      case '2':
+        
+         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 4);
+        break;
+      case '3':
+         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 6);
+        
+        break;      
+    }
+
+    //alert(ubigeo);
+    //const codReg=  this.ubigeoSrv.getCodigo(ubigeo);
+    //alert(ubigeo);
+
+    if(isChecked){
+      // activar el cluster o acción ON
+      console.log('Activando filtro para:', ubigeo);
+      this.activeReg = ubigeo;
+      this.mapComm.requestFilterPpa(codReg);
+    }else{
+      console.log('Desactivando filtro');
+      this.activeReg = null;
+      this.mapComm.requestFilterPpa(null);
+      // desactivar el cluster o acción OFF
+    }
+  }
+
+
+  
+
+  // ---------------------------------------------------
+  //  CREAR GRÁFICO
+  // ---------------------------------------------------
   private crearGrafico() {
-
-
     const options: Highcharts.Options = {
       chart: {
         type: 'pie',
@@ -84,25 +372,26 @@ export class IndiceFertilizanteComponent implements OnInit {
             if (!s0 || !s0.center) return;
 
             const cx = chart.plotLeft + s0.center[0];
-            const cy = chart.plotTop  + s0.center[1];
+            const cy = chart.plotTop + s0.center[1];
 
+            // Calcular total
             const pts = chart.series[0]?.points || [];
             const total = pts.reduce((acc: number, p: any) => acc + (p.y || 0), 0);
             const totalStr = total.toLocaleString('es-PE');
 
-            // borrar textos previos
+            // Borrar textos previos si existen
             const prev = (chart as any)._centerTexts || {};
             if (prev.top) prev.top.destroy();
             if (prev.bot) prev.bot.destroy();
 
-            // línea 1
+            // Línea 1 (etiqueta)
             const top = chart.renderer
               .text('Total', cx, cy - 6)
               .attr({ align: 'center' })
               .css({ fontSize: '12px', fontWeight: '400', color: '#222' })
               .add();
 
-            // línea 2
+            // Línea 2 (valor)
             const bot = chart.renderer
               .text(totalStr, cx, cy + 14)
               .attr({ align: 'center' })
@@ -114,29 +403,18 @@ export class IndiceFertilizanteComponent implements OnInit {
         }
       },
 
-      title: {
-        text: 'Uso de Fertilizante (Parcelas)',
-        align: 'center'
-      },
-
+      title: { text: 'Uso de Fertilizante (Parcelas)', align: 'center' },
       credits: { enabled: false },
-
-      tooltip: {
-        pointFormat: '<b>{point.y:,.0f}</b> parcelas ({point.percentage:.1f}%)'
-      },
+      tooltip: { pointFormat: '<b>{point.y:,.0f}</b> parcelas ({point.percentage:.1f}%)' },
 
       plotOptions: {
         pie: {
-          innerSize: '60%',                 //  Donut
+          innerSize: '60%',
           dataLabels: {
             enabled: true,
             format: '{point.percentage:.1f} %',
-            distance: -40,                  //  Etiquetas dentro del arco
-            style: {
-              fontWeight: 'bold',
-              textOutline: 'none',
-              fontSize: '11px'
-            }
+            distance: -40,
+            style: { fontWeight: 'bold', textOutline: 'none', fontSize: '11px' }
           },
           showInLegend: true
         }
@@ -145,184 +423,16 @@ export class IndiceFertilizanteComponent implements OnInit {
       series: [{
         name: 'Parcelas',
         type: 'pie',
-        data: this.categorias.map((c, i) => ({
-          name: c,
-          y: this.valores[i]
-        })),
+        data: this.categorias.map((c, i) => ({ name: c, y: this.valores[i] })),
         colors: ['#20B5B8', '#229389', '#D2DD45', '#FFE44A', '#FFB022', '#F76C4A', '#F23C3C']
-      }],
-
+      }]
     };
+
     this.chart = Highcharts.chart('container-fertilizante', options);
   }
 
 
-  public async cargarDatos() {
 
-   
-
-
-    const q = new Query({
-      where: "INDICE = 'FERTILIZA' AND CAPA = 1",
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        //  Agrupar por UBIGEO (para la tabla)
-        const agrupadoPorUbigeo: Record<string, number> = {};
-        data.forEach(item => {
-          if (!agrupadoPorUbigeo[item.ubigeo]) agrupadoPorUbigeo[item.ubigeo] = 0;
-          agrupadoPorUbigeo[item.ubigeo] += item.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrupadoPorUbigeo).map(([ubigeo, parcelas]) => {
-          const codigo = String(ubigeo);
-          const nombre = this.ubigeoSrv.getNombre(codigo);
-          return { ubigeo: nombre, parcelas };
-        });
-
-        // Agrupar por DDESCR (para el gráfico)
-        const agrupadoPorTam: Record<string, number> = {};
-        data.forEach(item => {
-          const clave = item.ddescr || "No definido";
-          if (!agrupadoPorTam[clave]) agrupadoPorTam[clave] = 0;
-          agrupadoPorTam[clave] += item.parcelas;
-        });
-        this.categorias = Object.keys(agrupadoPorTam);
-        this.valores = Object.values(agrupadoPorTam);
-
-        // Crear el gráfico
-        this.crearGrafico();
-      }else{
-        this.tablaDatos = [];
-        this.categorias = [];
-        this.valores = []
-        this.crearGrafico(); // envías vacío para limpiar el chart
-      }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS", err);
-    }
-  }
-
-
-  public async cargarDatosByDpto(ubigeo: string) {
-
-    //alert(ubigeo);
-    const q = new Query({
-       where: `INDICE = 'FERTILIZA' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        // Tabla: sumar por UBIGEO
-        const agrUbigeo: Record<string, number> = {};
-        data.forEach(it => {
-          if (!agrUbigeo[it.ubigeo]) agrUbigeo[it.ubigeo] = 0;
-          agrUbigeo[it.ubigeo] += it.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrUbigeo).map(([u, p]) => ({ ubigeo: u, parcelas: p }));
-
-        // Pie: agrupar por DDESCR
-        const agrTam: Record<string, number> = {};
-        data.forEach(it => {
-          const k = it.ddescr || "No definido";
-          if (!agrTam[k]) agrTam[k] = 0;
-          agrTam[k] += it.parcelas;
-        });
-        const cats = Object.keys(agrTam);
-        const vals = Object.values(agrTam);
-
-        this.actualizarDatos(cats, vals);
-      } else {
-        this.tablaDatos = [];
-        this.actualizarDatos([], []);
-      }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Departamental)", err);
-    }
-  }
-
-  public async cargarDatosByProv(ubigeo: string) {
-    const q = new Query({
-      where: `INDICE = 'FERTILIZA' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        // Tabla: sumar por UBIGEO
-        const agrUbigeo: Record<string, number> = {};
-        data.forEach(it => {
-          if (!agrUbigeo[it.ubigeo]) agrUbigeo[it.ubigeo] = 0;
-          agrUbigeo[it.ubigeo] += it.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrUbigeo).map(([u, p]) => ({ ubigeo: u, parcelas: p }));
-
-        // Pie: agrupar por DDESCR
-        const agrTam: Record<string, number> = {};
-        data.forEach(it => {
-          const k = it.ddescr || "No definido";
-          if (!agrTam[k]) agrTam[k] = 0;
-          agrTam[k] += it.parcelas;
-        });
-        const cats = Object.keys(agrTam);
-        const vals = Object.values(agrTam);
-
-        this.actualizarDatos(cats, vals);
-      } else {
-        this.tablaDatos = [];
-        this.actualizarDatos([], []);
-      }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Provincial)", err);
-    }
-  }
-
-  private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[]) {
-    this.categorias = [...nuevasCategorias];
-    this.valores = [...nuevosValores];
-
-    if (!this.chart) {
-      // Si todavía no existe el chart, créalo
-      this.crearGrafico();
-      return;
-    }
-
-    // Actualiza el pie existente
-    const serie = this.chart.series[0];
-    const puntos = nuevasCategorias.map((c, i) => ({ name: c, y: nuevosValores[i] }));
-    serie.setData(puntos, true); // true => redibuja
-  }
-
-
-    protected readonly Number = Number;
+  protected readonly Number = Number;
   protected readonly FormatUtil = FormatUtil;
 }

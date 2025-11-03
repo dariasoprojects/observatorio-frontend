@@ -47,7 +47,6 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
       if (this.valorSeleccionado !== null) {
         this.cargarDatosByDpto(this.valorSeleccionado);
       }else{
-        console.log("d:","lamza nacional");
         this.cargarDatos();
       }
     }
@@ -105,7 +104,7 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
 
 
       title: {
-        text: 'Según Nivel de Educación alcanzado',
+        text: 'Nivel de Estudios de los Productores',
         align: 'center'
       },
 

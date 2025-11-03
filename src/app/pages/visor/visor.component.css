@@ -86,6 +86,27 @@ body {
     margin: 0;
 }
 
+.gov-logo{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;             /* alto del badge */
+  padding: 6px 8px;         /* respiración alrededor del SVG */
+  background-color: #1f2937;/* gris oscuro (combina con .ministry-badge) */
+  border-radius: 6px;
+}
+
+.gov-logo svg{
+  display: block;
+  height: 36px;             /* tamaño del dibujo dentro del badge */
+  width: auto;
+}
+
+/* Opcional: en pantallas muy pequeñas ocultar el badge */
+@media (max-width: 480px){
+  .gov-logo{ display:none; }
+}
+
 /* Main content */
 .main-content {
     flex: 1;

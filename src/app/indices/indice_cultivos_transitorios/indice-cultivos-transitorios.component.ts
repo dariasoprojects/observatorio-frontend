@@ -93,7 +93,7 @@ export class IndiceCultivosTransitComponent implements OnInit {
       },
 
       title: {
-        text: 'Cultivos Transitorios',
+        text: 'Superficie Sembrada - Cultivos Transitorios',
         align: 'center'
       },
 

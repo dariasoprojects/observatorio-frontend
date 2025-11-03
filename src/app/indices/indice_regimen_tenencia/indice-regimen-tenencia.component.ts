@@ -94,7 +94,7 @@ export class IndiceRegimenTenenComponent implements OnInit {
       },
 
       title: {
-        text: 'Regimen de Tenencia',
+        text: 'Régimen Tenencia de Tierras',
         align: 'center'
       },
 
