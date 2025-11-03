@@ -329,7 +329,7 @@ export class Mapa {
     try {
 
       this.capaParcelasPadron = new MapImageLayer({        
-          url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/",
+        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/",
         title: "Parcelas Productores"
       }); 
 
