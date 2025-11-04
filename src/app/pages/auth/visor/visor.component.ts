@@ -6,6 +6,7 @@ import {FormsModule} from '@angular/forms';
 import {DropdownModule} from 'primeng/dropdown';
 import {CardModule} from 'primeng/card';
 import {TagModule} from 'primeng/tag';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-visor',
@@ -23,6 +24,8 @@ import {TagModule} from 'primeng/tag';
 })
 export class VisorComponent {
 
+  constructor(private router: Router) {}
+  
   departamentos = [{name:'Lima'},{name:'Cusco'},{name:'Piura'}];
   provincias = [{name:'Lima'},{name:'Huaral'}];
   distritos = [{name:'Miraflores'},{name:'Surco'}];
@@ -48,5 +51,9 @@ export class VisorComponent {
 
     // (opcional) si usas ArcGIS/Leaflet y el mapa pierde tamaño:
     // setTimeout(() => this.resizeMap(), 0);
+  }
+
+  onLogout(): void {
+    this.router.navigate(['/']);
   }
 }

@@ -36,6 +36,7 @@ export class DialogExportarComponent implements OnInit {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
     this.regSeleccionado = data.reg;
     this.url = data.url;
+    alert(data.reg);
   }
 
   ngOnInit() {

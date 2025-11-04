@@ -55,26 +55,22 @@
   <!-- TOP-WIDE -->
   <section class="top-wide">
     <div class="topbar">
-      <!-- IZQUIERDA: botón toggle espejo -->
-      <div class="topbar-left">
-        <button
-          type="button"
-          class="arrow-btn"
-         >
-          <i class="pi pi-arrow-left"></i>
-        </button>
-      </div>
-
-      <!-- DERECHA: usuario -->
       <div class="topbar-right">
         <p-avatar label="RA" shape="circle" styleClass="usr-avatar"></p-avatar>
+
         <div class="usr-info">
           <div class="usr-name">Roberto Aranda</div>
           <div class="usr-role">Analista del Sistema</div>
         </div>
+
+        <button type="button" class="usr-icon-btn" (click)="onLogout()">
+          <i class="pi pi-sign-out"></i>
+        </button>
+
       </div>
     </div>
   </section>
+
 
   <!-- CENTRO: MAPA -->
   <main class="center-map">
