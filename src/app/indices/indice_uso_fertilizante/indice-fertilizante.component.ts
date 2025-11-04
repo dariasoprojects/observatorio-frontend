@@ -60,15 +60,13 @@ export class IndiceFertilizanteComponent implements OnInit {
   activeReg: string | null = null;
   activeNivel: string | null = null;
 
-  tablaDatos: { ubigeo: string; parcelas: number; ddescr: string  }[] = [];
-  tablaFiltrada: { ubigeo: string; parcelas: number; ddescr: string }[] = [];
+  tablaDatos: { ubigeo: string; parcelas: number; ddescr: string; codubi: string  }[] = [];
+  tablaFiltrada: { ubigeo: string; parcelas: number; ddescr: string; codubi: string }[] = [];
 
   categoriaSeleccionada: string = '';
 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
   private urlParcelas = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
-
-
 
 
   constructor(private ubigeoSrv: UbigeoService, 
@@ -92,6 +90,9 @@ export class IndiceFertilizanteComponent implements OnInit {
   }
 
   abrirDialogoExportar(reg: string) {
+
+    alert(reg);
+
     this.dialog.open(DialogExportarComponent, {
       width: '900px',
       height: '500px',
@@ -125,6 +126,7 @@ export class IndiceFertilizanteComponent implements OnInit {
   //  CARGA POR DEPARTAMENTO
   // ---------------------------------------------------
   public async cargarDatosByDpto(ubigeo: string) {
+    alert(ubigeo);
     const q = new Query({
       where: `INDICE = 'FERTILIZA' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
@@ -150,7 +152,7 @@ export class IndiceFertilizanteComponent implements OnInit {
           parcelas: f.attributes.PARCELAS
         }));
 
-        // 👉 Llama a prepararDatos (que internamente llama a actualizarDatos)
+        //  Llama a prepararDatos (que internamente llama a actualizarDatos)
         this.prepararDatos(data);
 
       } else {
@@ -229,7 +231,8 @@ export class IndiceFertilizanteComponent implements OnInit {
       .map(d => ({
         ubigeo: this.ubigeoSrv.getNombre(d.ubigeo),
         parcelas: d.parcelas,
-        ddescr: d.ddescr || "No definido"
+        ddescr: d.ddescr || "No definido",
+        codubi: d.ubigeo
       }))
       .sort((a, b) => a.ubigeo.localeCompare(b.ubigeo, 'es', { sensitivity: 'base' }));
 
@@ -283,37 +286,28 @@ export class IndiceFertilizanteComponent implements OnInit {
       );
     }
 
-    //  Agrupar nuevamente por UBIGEO y sumar parcelas
-    const agrUbigeo: Record<string, number> = {};
+    // Agrupar por UBIGEO + CODUBI y sumar parcelas
+    const agrUbigeoCodubi: Record<string, { ubigeo: string; codubi: string; parcelas: number }> = {};
+
     datosFiltrados.forEach(it => {
-      if (!agrUbigeo[it.ubigeo]) agrUbigeo[it.ubigeo] = 0;
-      agrUbigeo[it.ubigeo] += it.parcelas;
+      const clave = `${it.ubigeo}-${it.codubi}`;
+      if (!agrUbigeoCodubi[clave]) {
+        agrUbigeoCodubi[clave] = { ubigeo: it.ubigeo, codubi: it.codubi, parcelas: 0 };
+      }
+      agrUbigeoCodubi[clave].parcelas += it.parcelas;
     });
 
-    //  Convertir a arreglo de tabla final
-    this.tablaFiltrada = Object.entries(agrUbigeo).map(([ubigeo, parcelas]) => ({
-      ubigeo,
-      parcelas,
+    // Convertir a arreglo final
+    this.tablaFiltrada = Object.values(agrUbigeoCodubi).map(it => ({
+      ubigeo: it.ubigeo,
+      codubi: it.codubi,
+      parcelas: it.parcelas,
       ddescr: this.categoriaSeleccionada || "Todos"
     }));
+  
   }
 
 
-
-  // toggleCluster(event: Event, reg: string) {
-  //   const checked = (event.target as HTMLInputElement).checked;
-
-  //   if (checked) {
-  //     console.log('Activando filtro para:', reg);
-  //     this.activeReg = reg;
-
-  //     //this.mapComm.requestFilter(reg);
-  //   } else {
-  //     console.log('Desactivando filtro');
-  //     this.activeReg = null;
-  //     //this.mapComm.requestFilter(null);
-  //   }
-  // }
 
 
   toggleCluster(event: MatSlideToggleChange, ubigeo: string) {
@@ -324,22 +318,15 @@ export class IndiceFertilizanteComponent implements OnInit {
     
     switch (this.activeNivel) {
       case '1':
-        
          codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 2);
         break;
       case '2':
-        
          codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 4);
         break;
       case '3':
          codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 6);
-        
         break;      
     }
-
-    //alert(ubigeo);
-    //const codReg=  this.ubigeoSrv.getCodigo(ubigeo);
-    //alert(ubigeo);
 
     if(isChecked){
       // activar el cluster o acción ON
