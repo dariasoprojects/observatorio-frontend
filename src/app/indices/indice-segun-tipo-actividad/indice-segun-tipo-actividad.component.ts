@@ -10,11 +10,17 @@ import {FormatUtil} from '../../shared/utils/format.util';
 import {MapCommService} from '../../services/map-comm.service';
 import {MatDialog} from '@angular/material/dialog';
 import {DialogExportarComponent} from '../../dialog-exportar/dialog-exportar.component';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSlideToggleChange, MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-indice-tipo-activ',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatSlideToggleModule
+  ],
   templateUrl: './indice-segun-tipo-actividad.component.html',
   styleUrls: ['./indice-segun-tipo-actividad.component.css']
 })
@@ -216,8 +222,8 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
     }
   }
 
-  toggleCluster(event: Event, reg: string) {
-    const checked = (event.target as HTMLInputElement).checked;
+  toggleCluster(event: MatSlideToggleChange, reg: string) {
+    const checked = event.checked;;
 
     if (checked) {
       console.log('Activando filtro para:', reg);

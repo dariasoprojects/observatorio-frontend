@@ -10,12 +10,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogExportarComponent } from '../../dialog-exportar/dialog-exportar.component';
 import { Input } from '@angular/core';
 import {FormatUtil} from "../../shared/utils/format.util";
+import {MatIconModule} from '@angular/material/icon';
+import {MatSlideToggleChange, MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 
 @Component({
   selector: 'app-indice-centros-empadronamiento',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,
+    MatIconModule,
+    MatSlideToggleModule],
   templateUrl: './indice-centros-empadronamiento.component.html',
   styleUrls: ['./indice-centros-empadronamiento.component.css']
 })
@@ -31,6 +35,8 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
   categorias: string[] = [];
   valores: number[] = [];
+  valores2: number[] = [];
+  valores3: number[] = [];
   chart!: Highcharts.Chart;
   activeReg: string | null = null;
 
@@ -107,8 +113,24 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   constructor(private mapComm: MapCommService, private dialog: MatDialog) {}  // <-- solo para inyectar
 
 
-  toggleCluster(event: Event, reg: string) {
-    const checked = (event.target as HTMLInputElement).checked;
+  // toggleCluster(event: Event, reg: string) {
+  //   const checked = (event.target as HTMLInputElement).checked;
+
+  //   if (checked) {
+  //     console.log('Activando filtro para:', reg);
+  //     this.activeReg = reg;
+  //     this.mapComm.requestFilter(reg);
+  //   } else {
+  //     console.log('Desactivando filtro');
+  //     this.activeReg = null;
+  //     this.mapComm.requestFilter(null);
+  //   }
+  // }
+
+
+
+   toggleCluster(event: MatSlideToggleChange, reg: string) {
+    const checked = event.checked;;
 
     if (checked) {
       console.log('Activando filtro para:', reg);
@@ -120,6 +142,9 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
       this.mapComm.requestFilter(null);
     }
   }
+
+
+  
 
   private crearGrafico() {
     this.chart = Highcharts.chart('container-centros', {

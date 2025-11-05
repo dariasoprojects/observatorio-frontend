@@ -9,10 +9,9 @@
         <tr>
           <th>Descripción</th>
           <th>Productores</th>
-          <th>Hectárea</th>
           <th>Parcelas</th>
-          <th>Ver en Mapa</th>
           <th>Datos</th>
+          <th>Ver en Mapa</th>
         </tr>
       </thead>
       <tbody>
@@ -22,25 +21,27 @@
             {{ FormatUtil.formatInteger(fila.productores) }}
           </td>
           <td class="num-col">
-            {{ FormatUtil.formatInteger2Digitos(fila.hectarea) }}
-          </td>
-          <td class="num-col">
             {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
           </td>
           <td>
-            <label class="switch">
-              <input
-                type="checkbox"
-                [checked]="activeReg === fila.ddescr "
-                (change)="toggleCluster($event, fila.ddescr )"
-              />
-              <span class="slider"></span>
-            </label>
+            <button
+              mat-icon-button
+              color="primary"
+              class="mini-icon"
+              matTooltip="Exportar a Excel"
+              (click)="abrirDialogoExportar(fila.ddescr)"
+            >
+              <mat-icon>file_download</mat-icon>
+            </button>
           </td>
           <td>
-            <button mat-raised-button color="primary" (click)="abrirDialogoExportar(fila.ddescr )">
-              Export
-            </button>
+
+            <mat-slide-toggle
+              color="primary"
+              [checked]="activeReg === fila.ddescr"
+              (change)="toggleCluster($event, fila.ddescr)"
+              class="small-toggle"
+            ></mat-slide-toggle>
           </td>
         </tr>
       </tbody>

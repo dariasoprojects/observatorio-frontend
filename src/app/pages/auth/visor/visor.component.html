@@ -1,56 +1,13 @@
 <!-- GRID PRINCIPAL -->
 <div class="content-grid" [class.left-collapsed]="isCollapsed">
   <!-- IZQUIERDA -->
-  <aside class="side-left">
-    <!-- Header del sidebar: logo + botón colapsar -->
-    <div class="side-left__head">
-      <div class="brand-small centered" *ngIf="!isCollapsed" [attr.aria-hidden]="isCollapsed">
-        <img src="assets/logo_midagri_portada.png" alt="MIDAGRI" />
-        <span>OBSERVATORIO</span>
-      </div>
 
-      <!-- Botón toggle (sidebar) -->
-      <button
-        class="side-left__toggle"
-        type="button"
-        (click)="toggleLeft()"
-        [attr.aria-label]="isCollapsed ? 'Expandir menú' : 'Colapsar menú'">
-        <i class="pi" [ngClass]="isCollapsed ? 'pi-chevron-right' : 'pi-chevron-left'"></i>
-      </button>
-    </div>
+  <app-sidebar
+    [(isCollapsed)]="isCollapsed"
+    [activeSection]="activeSection"
+    (sectionSelected)="onSelectSection($event)">
+  </app-sidebar>
 
-    <div class="search">
-      <i class="pi pi-search"></i>
-      <input pInputText type="text" placeholder="Buscar" />
-    </div>
-
-    <p-panel [toggleable]="true" [collapsed]="false" styleClass="panel-tight" *ngIf="!isCollapsed" [attr.aria-hidden]="isCollapsed">
-      <ng-template pTemplate="header">
-        <div class="hdr">
-          <i class="pi pi-cog"></i>
-          <span>Gestión PPA</span>
-        </div>
-      </ng-template>
-
-      <ul class="list">
-        <li><button class="link">Padrón de Productores</button></li>
-        <li><button class="link">Centros de empadronamiento…</button></li>
-      </ul>
-    </p-panel>
-
-    <p-panel [toggleable]="true" [collapsed]="true" styleClass="panel-tight" *ngIf="!isCollapsed" [attr.aria-hidden]="isCollapsed">
-      <ng-template pTemplate="header">
-        <div class="hdr">
-          <i class="pi pi-id-card"></i>
-          <span>Productor agrario</span>
-        </div>
-      </ng-template>
-      <ul class="list">
-        <li><button class="link">Por tipo de actividad</button></li>
-        <li><button class="link">Por nivel de educación</button></li>
-      </ul>
-    </p-panel>
-  </aside>
 
   <!-- TOP-WIDE -->
   <section class="top-wide">
@@ -75,54 +32,12 @@
   <!-- CENTRO: MAPA -->
   <main class="center-map">
     <div id="mapContainer" class="map"></div>
-    <!-- (Opcional) Herramientas overlay -->
-    <!--
-    <div class="map-tools">
-      <button pButton icon="pi pi-plus"></button>
-      <button pButton icon="pi pi-pencil"></button>
-    </div>
-    -->
+
   </main>
 
   <!-- DERECHA -->
-  <aside class="side-right">
-    <div class="right-sticky">
-      <p-panel header="Selección geográfica" styleClass="panel-tight" (onCollapse)="onPanelToggle()" (onExpand)="onPanelToggle()">
-        <small class="muted">Consulta las estadísticas más recientes del sector agrario</small>
-
-        <label>Departamento*</label>
-        <p-dropdown [options]="departamentos" [(ngModel)]="selectedDep" optionLabel="name" placeholder="Departamento"></p-dropdown>
-
-        <label>Provincia*</label>
-        <p-dropdown [options]="provincias" [(ngModel)]="selectedProv" optionLabel="name" placeholder="Provincia"></p-dropdown>
-      </p-panel>
-
-      <p-panel header="Datos" styleClass="panel-tight kpi-panel">
-        <small class="kpi-hint">Consulta las estadísticas más recientes del sector agrario</small>
-
-        <div class="kpi kpi--green">
-          <div class="kpi__value">{{ kpi.productores | number:'1.0-0' }}</div>
-          <div class="kpi__label">Productores</div>
-        </div>
-
-        <div class="kpi kpi--blue">
-          <div class="kpi__value">{{ kpi.parcelas | number:'1.0-0' }}</div>
-          <div class="kpi__label">Parcelas</div>
-        </div>
-
-        <div class="kpi kpi--brown">
-          <div class="kpi__value">{{ kpi.hectareas | number:'1.0-0' }}</div>
-          <div class="kpi__label">Hectáreas</div>
-        </div>
-      </p-panel>
-
-      <p-panel header="Cobertura" styleClass="panel-tight">
-        <div class="coverage">
-          <div><b>Departamentos:</b> 25/25</div>
-          <div><b>Provincias:</b> 195/196</div>
-          <div><b>Fecha:</b> 28/06</div>
-        </div>
-      </p-panel>
-    </div>
-  </aside>
+  <app-side-right
+    [activeSection]="activeSection"
+  >
+  </app-side-right>
 </div>
