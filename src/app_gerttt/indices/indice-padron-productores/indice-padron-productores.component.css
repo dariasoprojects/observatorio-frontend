@@ -1,0 +1,32 @@
+.indice-padronp {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px;
+}
+
+.tabla-wrapper {
+  overflow-x: auto;
+}
+
+.tabla-padronp {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabla-padronp th, 
+.tabla-padronp td {
+  border: 1px solid #ddd;
+  padding: 6px; 
+  text-align: left;
+}
+
+.tabla-padronp th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.tabla-padronp tr:nth-child(even) {
+  background-color: #fafafa;
+}

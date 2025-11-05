@@ -145,9 +145,17 @@ export class ConsultaMultipleComponent implements OnInit {
 
 
   async ejecutarConsulta() {
+    if (!this.whereFinal) {
+      console.warn("No hay filtros definidos");
+      return;
+    }
+
+    console.log("this.whereFinal",this.whereFinal);
+
     // Construir la query con tu where acumulado
     const q = new Query({
-      where: this.whereFinal || '1=1', // tu string acumulado de filtros
+      //where: this.whereFinal || '1=1', // tu string acumulado de filtros
+      where: this.whereFinal , // tu string acumulado de filtros
       outFields: [
         "OBJECTID", "TDOC", "GENERO", "EDAD", "ECIVIL", "GRADO", "TORG", "ORGN", "LENG",
         "CMH", "SUPA", "NPAR", "TENP", "UBIG", "NCUL", "SBRE", "SRIE", "ANIM",
@@ -266,6 +274,9 @@ export class ConsultaMultipleComponent implements OnInit {
 
       let valorFormateado: string | number = this.valorSeleccionado;
 
+      
+      console.log("registro :::::->", registro);
+
       if (registro) {
         switch (registro.tipodato) {
           case 'string':
@@ -282,7 +293,7 @@ export class ConsultaMultipleComponent implements OnInit {
         }
       }
 
-      const where = `${this.variableSeleccionada} ${this.condicionSeleccionada} ${valorFormateado}`;
+      const where = `${this.variableSeleccionada.toUpperCase()} ${this.condicionSeleccionada} ${valorFormateado}`;
 
       //  Buscar nombres legibles
       const categoriaNombre =

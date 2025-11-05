@@ -1,0 +1,130 @@
+:host{
+  display:block;
+  height:100%;
+  min-height:0;
+}
+
+/* ===== CONTENEDOR LATERAL ===== */
+.side-left{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  padding:10px;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+}
+
+/* ===== CABECERA (marca + toggle) ===== */
+.side-left__head{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding-bottom:8px;
+  margin-bottom:8px;
+  background:#fff;
+}
+
+/* Botón de colapso del sidebar */
+.side-left__toggle {
+  position: absolute;
+  left: -14px;
+  top: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #3f3f3f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: none;
+  transition: color 0.2s ease;
+}
+.side-left__toggle:hover { color: #000; }
+.side-left__toggle i { font-size: 14px; }
+
+/* ===== MARCA (logo + textos) ===== */
+.brand-small{ display:flex; align-items:center; gap:8px; font:800 14px "Raleway",sans-serif; }
+.brand-small.centered{
+  display:flex; flex-direction:column; align-items:center;
+  gap:10px; padding:6px 0 8px; text-align:center;
+}
+.logo-midagri{ height:44px; width:auto; object-fit:contain; }
+
+.brand-row{
+  display:flex; align-items:center; justify-content:flex-start;
+  gap:12px; width:100%; flex-wrap:nowrap;
+}
+.brand-row svg, .logo-siea{
+  height:40px; width:auto; display:block; flex:0 0 72px; margin-top:1px;
+}
+.brand-text{
+  flex:1 1 0; max-width:240px; display:flex; flex-direction:column;
+  align-items:flex-start; white-space:normal; word-break:keep-all;
+}
+.brand-small.centered .brand-title{
+  font-family:"Raleway",sans-serif; font-weight:400; font-size:14px;
+  line-height:1.45; letter-spacing:.2px; color:#9ca3af; text-align:left; padding-bottom:3px;
+}
+.brand-line{ width:100%; height:1.5px; background:#d1d5db; margin-top:4px; border-radius:1px; }
+
+/* ===== BUSCADOR ===== */
+.search{ position:relative; margin:6px 0 10px; }
+.search .pi{ position:absolute; left:8px; top:50%; transform:translateY(-50%); color:#6b7280; font-size:12px; }
+.search input{ width:100%; height:34px; padding-left:28px; border-radius:8px; }
+
+/* ===== LISTAS / LINKS ===== */
+.list{ list-style:none; padding:0; margin:6px 0; display:flex; flex-direction:column; gap:6px; }
+.link{ width:100%; text-align:left; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; }
+.link:hover{ background:#f3f4f6; }
+
+/* ===== ENCABEZADOS DE PANEL (PrimeNG) ===== */
+.hdr{ display:flex; align-items:center; gap:8px; color:#111827; font-weight:700; }
+.hdr .pi{ font-size:14px; color:#374151; }
+.panel-tight .p-panel-content{ padding:8px 10px !important; }
+
+/* ===== RESPONSIVE FINO PARA LA MARCA (opcional) ===== */
+@media (max-width: 520px){
+  .brand-row{ flex-direction:column; align-items:flex-start; gap:6px; }
+  .logo-midagri{ height:52px; }
+  .brand-row svg, .logo-siea{ height:44px; flex:0 0 auto; margin-top:0; }
+  .brand-text{ min-width:0; max-width:none; }
+  .brand-small.centered .brand-title{ font-size:16px; }
+}
+
+.list .link{
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+}
+
+.list .link:hover{
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+.list .link.active{
+  background: #e6f4ea;          /* verde suave */
+  border-color: #22c55e;        /* borde verde */
+  color: #166534;               /* texto verde oscuro */
+  font-weight: 600;
+}
+
+.list .link.active:focus,
+.list .link.active:hover{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.25);
+}

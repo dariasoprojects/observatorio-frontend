@@ -1,0 +1,58 @@
+<div id="divDragAnalisis" class="analisis-panel" style="display:none" appDraggable>
+
+  <div class="panel-header">
+    <span> Análisis Espacial</span>
+    <button class="close-btn" (click)="cerrar()">x</button>
+  </div>
+
+  <div class="panel-body">
+
+    <label class="section-title">1. Definir Cobertura</label>
+
+    <!-- OPCIÓN KML -->
+    <div class="input-group">
+      <label>Cargar KML</label>
+      <input type="file" (change)="onFileSelect($event, 'kml')" accept=".kml">
+    </div>
+
+    <!-- OPCIÓN SHAPE -->
+    <div class="input-group">
+      <label>Cargar Shapefile (.zip)</label>
+      <input type="file" (change)="onFileSelect($event, 'shape')" accept=".zip">
+    </div>
+
+    <!-- OPCIÓN DIBUJAR -->
+    <button class="btn-primary" (click)="dibujar()"> Dibujar polígono</button>
+
+    <hr>
+
+    <label class="section-title">2. Ejecutar análisis</label>
+    <button class="btn-analyze" (click)="analizar()"> Ejecutar Superposición</button>
+
+    <hr>
+
+    <label class="section-title">3. Resultado</label>
+
+    <!-- TABLA RESULTADO -->
+    <div class="table-container" *ngIf="gridData.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumns">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of gridData">
+            <td *ngFor="let col of displayedColumns">{{ row[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="gridData.length === 0" class="empty-msg">
+      No hay resultados aún.
+    </div>
+
+  </div>
+
+</div>
