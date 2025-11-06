@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import Query from '@arcgis/core/rest/support/Query';
 import * as query from '@arcgis/core/rest/query';
+import {Observable} from 'rxjs';
+import {ProductoresSumatoriaResponse} from '../models/Sumatorias/productores-sumatoria.model';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {ProvinciasResponse} from '../models/ubigeos/provincias.model';
 
 interface UbigeoRecord {
   idDpto: string;
@@ -17,6 +21,10 @@ export class UbigeoService {
   private cargado = false;
 
   private url = 'https://gis.bosques.gob.pe/server/rest/services/Geobosques_Visor/serv_geobosques_visor_cartografia_base/MapServer/4';
+  private readonly urlDepartamento =
+    'https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ENIS/LimitesNacionalesSE/MapServer/1/query';
+
+  constructor(private http: HttpClient) {}
 
   async cargarTodo(): Promise<void> {
     if (this.cargado) return;
@@ -42,7 +50,7 @@ export class UbigeoService {
       });
 
       console.log("res.features zzzzzzzzzzzz:", res.features);
-      
+
 
       this.cargado = true;
       console.log(' Ubigeos cargados:', this.cache);
@@ -126,5 +134,27 @@ export class UbigeoService {
       if (r.idProv === provId) distritos.set(r.idDist, r.nomDist);
     });
     return Array.from(distritos, ([id, nombre]) => ({ id, nombre }));
+  }
+
+
+  getProvinciabyCodigo(coddep: string): Observable<ProvinciasResponse> {
+    const body = new HttpParams({
+      fromObject: {
+        f: 'json',
+        where: `IDDPTO  = '${coddep}'`,
+        outFields: 'IDPROV,NOMBPROV',
+        returnGeometry: 'false',
+      },
+    });
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded',
+    });
+
+    return this.http.post<ProvinciasResponse>(
+      this.urlDepartamento,
+      body.toString(),
+      { headers }
+    );
   }
 }

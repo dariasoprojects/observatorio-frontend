@@ -1,4 +1,4 @@
-import {Component, HostBinding, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostBinding, ViewChild} from '@angular/core';
 import {AvatarModule} from 'primeng/avatar';
 import {PanelModule} from 'primeng/panel';
 import {CommonModule} from '@angular/common';
@@ -28,7 +28,8 @@ import {SideRightComponent} from './components/side-right/side-right.component';
 })
 export class VisorComponent {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+              private elRef: ElementRef) {}
 
   // Aplica la clase al contenedor raíz para estrechar la 1ª columna
   @HostBinding('class.left-collapsed') get leftCollapsed() {
@@ -42,11 +43,13 @@ export class VisorComponent {
   activeSection: string | null = null;
 
   ngOnInit(): void {
-    this.activeSection = 'sec_padron_pa';
+   // this.activeSection = 'sec_padron_pa';
   }
   onSelectSection(section: string) {
     this.activeSection = section;
     console.log(this.activeSection);
+    const el = this.elRef.nativeElement as HTMLElement;
+    el.style.setProperty('--right-w', '450px');
   }
 
   onLogout(): void {
