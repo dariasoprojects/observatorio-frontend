@@ -2,7 +2,7 @@
   display: block;
 
   /* ===== Tokens globales (usados por todo el layout) ===== */
-  --hdr-h: 56px;
+  /* --hdr-h: 56px; */
   --gap: 12px;
   --pad: 12px;
   --left-w: 260px;
@@ -176,3 +176,5 @@ app-sidebar {
   height: 100%;         /* permite que el hijo use height:100% */
   min-height: 0;        /* evita que el grid limite el flex interno */
 }
+
+

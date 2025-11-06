@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {ProductoresSumatoriaResponse} from '../models/Sumatorias/productores-sumatoria.model';
 import {ParcelasSumatoriaResponse} from '../models/Sumatorias/parcelas-sumatoria.model';
 import {HectariasSumatoriaResponse} from '../models/Sumatorias/hectarias-sumatoria.model';
+import {IndicadoresSumatoriaResponse} from '../models/Sumatorias/indicadores-sumatoria.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,9 @@ export class SumatoriasService {
 
   private readonly url =
     'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0/query';
+
+  private readonly urlIndice =
+    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4/query';
 
   constructor(private http: HttpClient) {}
 
@@ -94,6 +98,69 @@ export class SumatoriasService {
 
     return this.http.post<HectariasSumatoriaResponse>(
       this.url,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  getDatosIndicadores(): Observable<IndicadoresSumatoriaResponse> {
+    const body = new HttpParams({
+      fromObject: {
+        f: 'json',
+        where: "INDICE = 'SUMAS' AND CAPA = 1",
+        outFields: 'PRODUCTORES,HECTAREA,PARCELAS',
+        returnGeometry: 'false',
+      },
+    });
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded',
+    });
+
+    return this.http.post<IndicadoresSumatoriaResponse>(
+      this.urlIndice,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  getDatosIndicadoresbyDepartamento(depCodigo: string): Observable<IndicadoresSumatoriaResponse> {
+    const body = new HttpParams({
+      fromObject: {
+        f: 'json',
+        where:  `INDICE = 'SUMAS' AND CAPA = 2 AND UBIGEO = '${depCodigo}'`,
+        outFields: 'PRODUCTORES,HECTAREA,PARCELAS',
+        returnGeometry: 'false',
+      },
+    });
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded',
+    });
+
+    return this.http.post<IndicadoresSumatoriaResponse>(
+      this.urlIndice,
+      body.toString(),
+      { headers }
+    );
+  }
+
+  getDatosIndicadoresbyProvincia(provinciaCodigo: string): Observable<IndicadoresSumatoriaResponse> {
+    const body = new HttpParams({
+      fromObject: {
+        f: 'json',
+        where:  `INDICE = 'SUMAS' AND CAPA = 3 AND UBIGEO = '${provinciaCodigo}'`,
+        outFields: 'PRODUCTORES,HECTAREA,PARCELAS',
+        returnGeometry: 'false',
+      },
+    });
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded',
+    });
+
+    return this.http.post<IndicadoresSumatoriaResponse>(
+      this.urlIndice,
       body.toString(),
       { headers }
     );

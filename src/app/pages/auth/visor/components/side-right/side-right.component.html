@@ -4,20 +4,39 @@
       <small class="muted">Consulta las estadísticas más recientes del sector agrario</small>
 
       <label>Departamento*</label>
-      <p-dropdown [options]="departamentos"
-                  [(ngModel)]="selectedDep"
-                  optionLabel="name"
-                  placeholder="Departamento">
-
+      <p-dropdown
+        [options]="departamentos"
+        [(ngModel)]="selectedDep"
+        optionLabel="name"
+        optionValue="code"
+        placeholder="Departamento"
+        [filter]="true"
+        filterPlaceholder="Buscar departamento"
+        [filterBy]="'name'"
+        [showClear]="true"
+        [appendTo]="'body'"
+        panelStyleClass="dep-panel"
+        (onChange)="onDepartamentoChange($event)"
+      >
       </p-dropdown>
+
 
       <label>Provincia*</label>
-      <p-dropdown [options]="provincias"
-                  [(ngModel)]="selectedProv"
-                  optionLabel="name"
-                  placeholder="Provincia">
-
+      <p-dropdown
+        [options]="provincias"
+        optionLabel="name"
+        optionValue="code"
+        [(ngModel)]="selectedProv"
+        placeholder="Provincia"
+        [showClear]="true"
+        [filter]="true"
+        [appendTo]="'body'"
+        panelStyleClass="dep-panel"
+        (onChange)="onProvinciaChange($event)"
+      >
       </p-dropdown>
+
+
     </p-panel>
 
     <div [ngSwitch]="activeSection">
@@ -161,9 +180,7 @@
         <app-indice-fertilizante></app-indice-fertilizante>
       </p-panel>
 
-      <p-panel *ngSwitchDefault styleClass="panel-tight">
-        <p>Selecciona una opción válida.</p>
-      </p-panel>
+
 
     </div>
 
@@ -173,17 +190,17 @@
       <small class="kpi-hint">Consulta las estadísticas más recientes del sector agrario</small>
 
       <div class="kpi kpi--green">
-        <div class="kpi__value">{{ kpi.productores | number:'1.0-0' }}</div>
+        <div class="kpi__value">{{ this.nroProductores }}</div>
         <div class="kpi__label">Productores</div>
       </div>
 
       <div class="kpi kpi--blue">
-        <div class="kpi__value">{{ kpi.parcelas | number:'1.0-0' }}</div>
+        <div class="kpi__value">{{ this.nroParcelas }}</div>
         <div class="kpi__label">Parcelas</div>
       </div>
 
       <div class="kpi kpi--brown">
-        <div class="kpi__value">{{ kpi.hectareas | number:'1.0-0' }}</div>
+        <div class="kpi__value">{{ this.nroHectareas }}</div>
         <div class="kpi__label">Hectáreas</div>
       </div>
     </p-panel>
