@@ -31,6 +31,9 @@ import { IndiceFertilizanteComponent  } from '../../indices/indice_uso_fertiliza
 
 import { SumatoriasComponent  } from '../../sumatorias/sumatorias.component';
 import { ConsultaMultipleComponent  } from '../../consulta_multiple/consulta-multiple.component';
+//import { AnalisisEspacialComponent  } from '../../analisis-espacial/analisis-espacial.component';
+
+
 
 import { MapCommService } from '../../services/map-comm.service';
 import {SidebarComponent} from './components/sidebar/sidebar.component';

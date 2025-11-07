@@ -40,7 +40,7 @@
     <div class="search"
          *ngIf="!isCollapsed" [attr.aria-hidden]="isCollapsed">
       <i class="pi pi-search"></i>
-      <input pInputText type="text" placeholder="Buscar" />
+      <input pInputText type="text" placeholder="Ingresar número DNI" />
     </div>
 
     <ng-container *ngIf="!isCollapsed">
@@ -60,6 +60,7 @@
               [attr.aria-current]="it.section === activeSection ? 'page' : null"
               [attr.aria-pressed]="it.section === activeSection ? 'true' : 'false'"
               (click)="selectSection(it.section)">
+              <i *ngIf="it.icon" class="pi" [ngClass]="it.icon" style="margin-right: 6px;"></i>
               {{ it.title }}
             </button>
           </li>

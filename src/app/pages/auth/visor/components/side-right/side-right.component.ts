@@ -66,7 +66,6 @@ export interface Provincia {
 @Component({
   selector: 'app-side-right',
   imports: [
-    DecimalPipe,
     DropdownModule,
     IndicePadronProdComponent,
     Panel,
@@ -187,7 +186,12 @@ export class SideRightComponent {
   onProvinciaChange(event: any) {
     const selectedValue = event.value;
     if(selectedValue ==null || selectedValue == '00'){
-      this.getDatosIndicadoresbyDepartamento(this.departamentoCodigo);
+      console.log(this.departamentoCodigo);
+      if(this.departamentoCodigo == '00' || this.departamentoCodigo == null){
+        this.getDatosIndicadores();
+      }else{
+        this.getDatosIndicadoresbyDepartamento(this.departamentoCodigo);
+      }
     }else{
       this.getDatosIndicadoresbyProvincia(selectedValue);
     }

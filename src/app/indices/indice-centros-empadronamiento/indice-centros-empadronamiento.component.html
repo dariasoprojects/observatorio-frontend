@@ -6,11 +6,10 @@
     <table class="tabla-centros">
       <thead>
         <tr>
-          <th>Centro de Empadronamiento</th>
+          <th>Centro</th>
           <th>Cantidad</th>
-          <th>Datos</th>
           <th>Ver en Mapa</th>
-          
+          <th>Datos</th>
         </tr>
       </thead>
       <tbody>
@@ -19,27 +18,7 @@
           <td class="num-col">
             {{ FormatUtil.formatInteger(valores[i]) }}
           </td>
-          
-          <!-- <td>
-              <button mat-raised-button color="primary" (click)="abrirDialogoExportar(c)">
-                Export
-              </button>
-          </td> -->
-
-
           <td>
-            <button
-              mat-icon-button
-              color="primary"
-              class="mini-icon"
-              matTooltip="Exportar a Excel"
-              (click)="abrirDialogoExportar(c)"
-            >
-              <mat-icon>file_download</mat-icon>
-            </button>
-          </td>
-
-          <!-- <td>
             <label class="switch">
               <input
                 type="checkbox"
@@ -48,20 +27,12 @@
               />
               <span class="slider"></span>
             </label>
-          </td> -->
-
-          <td>
-
-            <mat-slide-toggle
-              color="primary"
-              [checked]="activeReg === c"
-              (change)="toggleCluster($event, c)"
-              class="small-toggle"
-            ></mat-slide-toggle>
           </td>
-
-
-          
+          <td>
+              <button mat-raised-button color="primary" (click)="abrirDialogoExportar(c)">
+                Export
+              </button>
+          </td>
         </tr>
       </tbody>
     </table>

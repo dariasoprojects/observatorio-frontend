@@ -150,8 +150,7 @@ export class IndiceTamanioParceComponent implements OnInit {
 
       if (response.features.length > 0) {
         const data = response.features.map(f => ({
-          //ubigeo: f.attributes.UBIGEO,
-          ubigeo: this.ubigeoSrv.getNombre(f.attributes.UBIGEO),
+          ubigeo: f.attributes.UBIGEO,
           ddescr: f.attributes.DDESCR,
           parcelas: f.attributes.PARCELAS
         }));
@@ -163,10 +162,8 @@ export class IndiceTamanioParceComponent implements OnInit {
           agrupadoPorUbigeo[item.ubigeo] += item.parcelas;
         });
         this.tablaDatos = Object.entries(agrupadoPorUbigeo).map(([ubigeo, parcelas]) => {
-          const codigo = ubigeo;
-          const nombre = this.ubigeoSrv.getNombre(ubigeo);
-          console.log("NOMbre ------->----->", nombre);
-          //const nombre = codigo;
+          const codigo = String(ubigeo);
+          const nombre = this.ubigeoSrv.getNombre(codigo);
           return { ubigeo: nombre, parcelas };
         });
 
@@ -192,62 +189,6 @@ export class IndiceTamanioParceComponent implements OnInit {
       console.error("Error al consultar ArcGIS", err);
     }
   }
-
-  /*public async cargarDatos() {
-    const q = new Query({
-      where: "INDICE = 'TAMPARC' AND CAPA = 1",
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        // Mapeo inicial
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          nombre: this.ubigeoSrv.getNombre(f.attributes.UBIGEO),
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        // Agrupar por UBIGEO (para la tabla)
-        const agrupadoPorUbigeo: Record<string, number> = {};
-        data.forEach(item => {
-          if (!agrupadoPorUbigeo[item.ubigeo]) agrupadoPorUbigeo[item.ubigeo] = 0;
-          agrupadoPorUbigeo[item.ubigeo] += item.parcelas;
-        });
-
-        this.tablaDatos = Object.entries(agrupadoPorUbigeo).map(([ubigeo, parcelas]) => ({
-          ubigeo,
-          nombre: this.ubigeoSrv.getNombre(ubigeo),
-          parcelas
-        }));
-
-        // Agrupar por DDESCR (para el gráfico)
-        const agrupadoPorTam: Record<string, number> = {};
-        data.forEach(item => {
-          const clave = item.ddescr || "No definido";
-          if (!agrupadoPorTam[clave]) agrupadoPorTam[clave] = 0;
-          agrupadoPorTam[clave] += item.parcelas;
-        });
-
-        this.categorias = Object.keys(agrupadoPorTam);
-        this.valores = Object.values(agrupadoPorTam);
-
-        // Crear gráfico
-        this.crearGrafico();
-      } else {
-        this.tablaDatos = [];
-        this.categorias = [];
-        this.valores = [];
-        this.crearGrafico();
-      }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS", err);
-    }
-  }*/
 
 
   public async cargarDatosByDpto(ubigeo: string) {

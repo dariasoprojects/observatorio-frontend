@@ -29,6 +29,7 @@
   padding-bottom:8px;
   margin-bottom:8px;
   background:#fff;
+  margin-top: 10px;
 }
 
 /* Botón de colapso del sidebar */
@@ -60,8 +61,13 @@
 .logo-midagri{ height:44px; width:auto; object-fit:contain; }
 
 .brand-row{
-  display:flex; align-items:center; justify-content:flex-start;
-  gap:12px; width:100%; flex-wrap:nowrap;
+  display:flex; 
+  align-items:center; 
+  justify-content:flex-start;
+  gap:12px; 
+  width:100%; 
+  flex-wrap:nowrap;
+  margin-top: 15px;
 }
 .brand-row svg, .logo-siea{
   height:40px; width:auto; display:block; flex:0 0 72px; margin-top:1px;
