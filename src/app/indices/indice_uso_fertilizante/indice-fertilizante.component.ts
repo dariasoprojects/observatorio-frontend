@@ -213,7 +213,7 @@ export class IndiceFertilizanteComponent implements OnInit {
   //  PROCESAR Y AGRUPAR
   // ---------------------------------------------------
   private prepararDatos(data: any[]) {
-    //console.log("prepararDatos ..XXXXXXX. ", data);
+    console.log("prepararDatos ..XXXXXXX. ", data);
 
     // Agrupar para el gráfico (por tipo de fertilizante)
     const agrGrafico: Record<string, number> = {};
@@ -229,9 +229,7 @@ export class IndiceFertilizanteComponent implements OnInit {
     // Guardar la tabla base con ubigeo, ddescr y parcelas (ordenada alfabéticamente)
     const tablaOrdenada = data
       .map(d => ({
-        //ubigeo: this.ubigeoSrv.getNombre(d.ubigeo),
-        ubigeo: this.ubigeoSrv.getNombre("14"),
-        //ubigeo: d.ubigeo,
+        ubigeo: this.ubigeoSrv.getNombre(d.ubigeo),
         parcelas: d.parcelas,
         ddescr: d.ddescr || "No definido",
         codubi: d.ubigeo

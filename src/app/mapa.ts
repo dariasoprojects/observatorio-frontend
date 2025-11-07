@@ -789,6 +789,27 @@ export class Mapa {
       };
 
 
+      // Botón Multi
+      const btnAnalisis = document.createElement("div");
+      btnAnalisis.className = "esri-widget esri-widget--button esri-interactive";
+      btnAnalisis.innerHTML = '<span class="esri-icon-globe" title="Analizar"></span>';
+      btnAnalisis.style.margin = "5px";
+
+      btnAnalisis.onclick = () => {
+        if (!this.mapView) return;
+
+        const miDiv = document.getElementById("divDragConsultaMulti");
+        if (!miDiv) return;
+
+        // alternar visibilidad
+        if (miDiv.style.display === "none") {
+          miDiv.style.display = "block"; // mostrar
+        } else {
+          miDiv.style.display = "none";  // ocultar
+        }
+      };
+ 
+
       if (this.mapView) {        
         this.mapView.ui.add(legendToggleBtn, 'top-right');      
         this.mapView.ui.add(toc_ToggleBtn, 'top-right'); 
@@ -805,6 +826,9 @@ export class Mapa {
         //this.currentView.ui.add(this.printWidget, "top-right");
         this.currentView.ui.add(printBtn, "top-right");
         this.currentView.ui.add(multiQyBtn, "top-right");
+
+        this.currentView.ui.add(btnAnalisis, "top-left");
+
         
 
         // if (this.printWidget) {
