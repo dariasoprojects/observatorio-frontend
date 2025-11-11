@@ -31,8 +31,9 @@ import { IndiceFertilizanteComponent  } from '../../indices/indice_uso_fertiliza
 
 import { SumatoriasComponent  } from '../../sumatorias/sumatorias.component';
 import { ConsultaMultipleComponent  } from '../../consulta_multiple/consulta-multiple.component';
-//import { AnalisisEspacialComponent  } from '../../analisis-espacial/analisis-espacial.component';
 
+//
+import { AnalisisEspacialComponent  } from '../../analisis-espacial/analisis-espacial.component';
 
 
 import { MapCommService } from '../../services/map-comm.service';
@@ -53,7 +54,7 @@ import {LayoutVerticalComponent} from './components/layout-vertical/layout-verti
     IndiceTipoActividadComponent, IndiceSuperfiAgriComponent, IndiceSuperfiSembComponent, IndiceTamanioParceComponent,
     IndiceRegimenTenenComponent,IndicePrincipalesCultivosComponent,IndiceCultivosTransitComponent,IndiceCultivosPermaComponent,
     IndiceFertilizanteComponent, SumatoriasComponent,
-    ConsultaMultipleComponent, SidebarComponent]
+    ConsultaMultipleComponent, AnalisisEspacialComponent, SidebarComponent]
 })
 export class VisorComponent implements OnInit {
 
@@ -130,6 +131,10 @@ export class VisorComponent implements OnInit {
 
   @ViewChild(ConsultaMultipleComponent) consultaMultipleComponent!: ConsultaMultipleComponent;
 
+  @ViewChild(AnalisisEspacialComponent) analisisEspacialComponent!: AnalisisEspacialComponent;
+
+  
+
 
   constructor(private http: HttpClient, private comm: MapCommService) {
     //this.comm = new MapCommService();
@@ -150,7 +155,7 @@ export class VisorComponent implements OnInit {
         console.error("Error al iniciar el mapa:", err);  // Manejo del error
       });
 
-    this.seccionActiva = 'sec_padron_pa';
+    // this.seccionActiva = 'sec_padron_pa';
 
 
   }

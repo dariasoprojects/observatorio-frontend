@@ -9,6 +9,8 @@ import {TagModule} from 'primeng/tag';
 import {Router} from '@angular/router';
 import {SidebarComponent} from './components/sidebar/sidebar.component';
 import {SideRightComponent} from './components/side-right/side-right.component';
+import {MapaComponent} from './components/mapa/mapa.component';
+import {ConsultaMultipleComponent} from '../../../consulta_multiple/consulta-multiple.component';
 
 @Component({
   selector: 'app-visor',
@@ -21,7 +23,9 @@ import {SideRightComponent} from './components/side-right/side-right.component';
     CardModule,
     TagModule,
     SidebarComponent,
-    SideRightComponent
+    SideRightComponent,
+    MapaComponent,
+    ConsultaMultipleComponent
   ],
   templateUrl: './visor.component.html',
   styleUrl: './visor.component.css'
@@ -36,8 +40,6 @@ export class VisorComponent {
     return this.isCollapsed;
   }
 
-  // @ViewChild(IndiceCentrosEmpadronamientoComponent) indiceCentrosEmpadronamiento!: IndiceCentrosEmpadronamientoComponent;
-  //
 
   isCollapsed = false;
   activeSection: string | null = null;
@@ -46,13 +48,12 @@ export class VisorComponent {
    // this.activeSection = 'sec_padron_pa';
   }
   onSelectSection(section: string) {
-    this.activeSection = section;
-    console.log(this.activeSection);
+     this.activeSection = section;
     const el = this.elRef.nativeElement as HTMLElement;
     el.style.setProperty('--right-w', '450px');
   }
 
   onLogout(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/visor-2']);
   }
 }
