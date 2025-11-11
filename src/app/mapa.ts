@@ -52,7 +52,9 @@ export class Mapa {
   private legendContainer!: HTMLDivElement;
   private tocContainer!: HTMLDivElement;
   private identifyActive = false;
-  private sketsch: Sketch | null = null;
+  private sketsch!: Sketch;            // el "!" dice “no será null cuando lo use”
+  private drawLayer!: GraphicsLayer;  // idem
+
   private drawActive = false;
   private medirWidget: DistanceMeasurement2D | null = null;
   private medirAreaWidget: AreaMeasurement2D | null = null;
@@ -64,6 +66,8 @@ export class Mapa {
   constructor(divId: string, private comm: MapCommService) {
     this.divId = divId;
     this.resultsLayer = new GraphicsLayer();
+
+    this.drawLayer = new GraphicsLayer(); 
 
     // suscripción al servicio
     this.comm.zoomRequest$.subscribe(objectId => {
@@ -93,6 +97,33 @@ export class Mapa {
     });
 
 
+    this.comm.drawRequest$.subscribe((active) => {
+      if (active) {
+        this.activarDibujoAnalisis();
+      } else {
+        this.sketsch!.cancel();
+      }
+    });
+
+
+  }
+
+
+  private activarDibujoAnalisis() {
+    // limpiar capa si deseas
+    this.drawLayer.removeAll();
+
+    // usar el mismo Sketch existente
+    this.sketsch!.create('polygon');
+
+    // escuchar una sola vez el evento
+    const handler = this.sketsch!.on('create', (evt) => {
+      if (evt.state === 'complete') {
+        const geom = evt.graphic.geometry as Polygon;
+        this.comm.sendGeometry(geom);  // mandar al panel
+        handler.remove();                 // limpiar listener
+      }
+    });
   }
 
 
@@ -789,7 +820,8 @@ export class Mapa {
       };
 
 
-      // Botón Multi
+
+       // Botón Analisis
       const btnAnalisis = document.createElement("div");
       btnAnalisis.className = "esri-widget esri-widget--button esri-interactive";
       btnAnalisis.innerHTML = '<span class="esri-icon-globe" title="Analizar"></span>';
@@ -798,7 +830,7 @@ export class Mapa {
       btnAnalisis.onclick = () => {
         if (!this.mapView) return;
 
-        const miDiv = document.getElementById("divDragConsultaMulti");
+        const miDiv = document.getElementById("divDragAnalisis");
         if (!miDiv) return;
 
         // alternar visibilidad
@@ -809,6 +841,9 @@ export class Mapa {
         }
       };
  
+
+
+
 
       if (this.mapView) {        
         this.mapView.ui.add(legendToggleBtn, 'top-right');      
@@ -827,8 +862,7 @@ export class Mapa {
         this.currentView.ui.add(printBtn, "top-right");
         this.currentView.ui.add(multiQyBtn, "top-right");
 
-        this.currentView.ui.add(btnAnalisis, "top-left");
-
+         this.currentView.ui.add(btnAnalisis, "top-left");
         
 
         // if (this.printWidget) {

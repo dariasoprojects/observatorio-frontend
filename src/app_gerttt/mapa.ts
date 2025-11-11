@@ -705,10 +705,6 @@ export class Mapa {
       };
 
 
-      
-
-
-
       if (this.mapView) {        
         this.mapView.ui.add(legendToggleBtn, 'top-right');      
         this.mapView.ui.add(toc_ToggleBtn, 'top-right'); 
@@ -725,8 +721,6 @@ export class Mapa {
         //this.currentView.ui.add(this.printWidget, "top-right");
         this.currentView.ui.add(printBtn, "top-right");
         this.currentView.ui.add(multiQyBtn, "top-right");
-       
-        
         
 
         // if (this.printWidget) {

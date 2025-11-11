@@ -19,7 +19,7 @@
   gap: 10px;
 
   /* alto máximo calculado con los tokens del padre */
-  max-height: calc(100vh - var(--hdr-h) - (2 * var(--pad)) - var(--gap));
+  /*max-height: calc(100vh - (2 * var(--pad)) - var(--gap));*/
   overflow: auto;
 }
 

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { CommonModule } from '@angular/common'; 
 import { Subscription, firstValueFrom } from 'rxjs';
 import Polygon from '@arcgis/core/geometry/Polygon';
 import Query from '@arcgis/core/rest/support/Query';
@@ -11,13 +12,13 @@ import { DraggableDirective } from '../directivas/draggable.directive';
 @Component({
   selector: 'app-analisis-espacial',
   standalone: true,
-  imports: [ DraggableDirective],
+  imports: [ DraggableDirective, CommonModule],
   templateUrl: './analisis-espacial.component.html',
   styleUrls: ['./analisis-espacial.component.css']
 })
 export class AnalisisEspacialComponent implements OnInit, OnDestroy {
   // configura estos dos desde el padre o aquí mismo:
-  @Input() mapServerUrl = 'https://servidor/rest/services/TuServicio/MapServer';
+  @Input() mapServerUrl = 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer';
   @Input() layerId = 0; // <-- pon el layer id de análisis
 
   coberturaPolygon: Polygon | null = null;
@@ -32,10 +33,9 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // recibir geometría desde el mapa
     this.subs.push(
-      this.mapComm.geometry$.subscribe((geom) => {
+      this.mapComm.geometry$.subscribe((geom: Polygon | null) => {
         if (geom && geom.type === 'polygon') {
           this.coberturaPolygon = geom as Polygon;
-          // opcional: feedback visual/toast
           // console.log('Cobertura OK', this.coberturaPolygon);
         }
       })
@@ -54,7 +54,8 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
 
   dibujar() {
     // pedir al mapa que habilite el Sketch polygon
-    this.mapComm.requestFilter('draw');
+    //this.mapComm.requestFilter('draw');
+    this.mapComm.requestDraw(true);
   }
 
   async analizar() {
