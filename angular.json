@@ -116,7 +116,16 @@
                 { "type": "anyComponentStyle", "maximumWarning": "10kB", "maximumError": "15kB" }
               ],
               "outputHashing": "all",
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "fonts": {
+                  "inline": false
+                }
+              },
               "sourceMap": false,
               "baseHref": "/"
             },

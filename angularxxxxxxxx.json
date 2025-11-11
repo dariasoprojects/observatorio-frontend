@@ -1,0 +1,161 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "angularweb": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:application",
+          "options": {
+            "outputPath": "dist/angularweb",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": ["zone.js"],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "/assets" },
+              { "glob": "**/*", "input": "public" },
+              { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/fonts", "output": "/assets/esri/fonts" },
+              { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/images", "output": "/assets/esri/images" }
+            ],
+            "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "primeicons/primeicons.css",
+              "primeflex/primeflex.css",
+              "src/assets/esri/themes/light/main.css",
+              "src/styles.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                { "type": "initial", "maximumWarning": "10mb", "maximumError": "12MB" },
+                { "type": "anyComponentStyle", "maximumWarning": "10kB", "maximumError": "15kB" }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": { "buildTarget": "angularweb:build:production" },
+            "development": { "buildTarget": "angularweb:build:development" }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": { "builder": "@angular-devkit/build-angular:extract-i18n" },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "/assets" },
+              { "glob": "**/*", "input": "public" }
+            ],
+            "styles": [
+              "src/styles.css",
+              "src/assets/esri/themes/light/main.css"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    },
+
+    "apollo-ng": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:application",
+          "options": {
+            "outputPath": "dist/apollo-ng",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": ["zone.js"],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "/assets" },
+              { "glob": "**/*", "input": "public" },
+              { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/fonts", "output": "/assets/esri/fonts" },
+              { "glob": "**/*", "input": "node_modules/@arcgis/core/assets/esri/themes/light/images", "output": "/assets/esri/images" }
+            ],
+            "styles":  [
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "primeicons/primeicons.css",
+              "primeflex/primeflex.css",
+              "src/assets/esri/themes/light/main.css",
+              "src/styles.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                { "type": "initial", "maximumWarning": "10mb", "maximumError": "12MB" },
+                { "type": "anyComponentStyle", "maximumWarning": "10kB", "maximumError": "15kB" }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false,
+              "baseHref": "/"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": { "buildTarget": "apollo-ng:build:production" },
+            "development": { "buildTarget": "apollo-ng:build:development" }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": { "builder": "@angular-devkit/build-angular:extract-i18n" },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "/assets" },
+              { "glob": "**/*", "input": "public" }
+            ],
+            "styles": [
+              "src/styles.css",
+              "src/assets/esri/themes/light/main.css"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    }
+  },
+  "cli": { "analytics": false },
+  "defaultProject": "apollo-ng"
+}
