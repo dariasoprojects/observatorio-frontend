@@ -46,7 +46,7 @@ export class IndicePadronProdComponent implements OnInit {
     this.chart = Highcharts.chart('container-padronp', {
       chart: {
         type: 'bar',
-        height: 500,
+        height: 900,
         animation: { duration: 800 }
       },
       title: { text: 'Cantidad de Productores Agrarios' },
@@ -71,20 +71,21 @@ export class IndicePadronProdComponent implements OnInit {
         {
           name: 'Hectáreas',
           type: 'bar',
-          data: this.tablaDatos.map(d => d.hectarea)
-        },
-        {
-          name: 'Parcelas',
-          type: 'bar',
-          data: this.tablaDatos.map(d => d.parcelas)
+          data: this.tablaDatos.map(d => d.productores)
         }
+        // ,
+        // {
+        //   name: 'Parcelas',
+        //   type: 'bar',
+        //   data: this.tablaDatos.map(d => d.parcelas)
+        // }
       ]
     });
   }
 
   public async cargarDatos() {
     const q = new Query({
-      where: "INDICE = 'SUPSEMB' AND CAPA = 1",
+      where: "INDICE = 'PADRONPPA' AND CAPA = 1",
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
@@ -98,7 +99,7 @@ export class IndicePadronProdComponent implements OnInit {
           productores: f.attributes.PRODUCTORES,
           hectarea: f.attributes.HECTAREA,
           parcelas: f.attributes.PARCELAS
-        }));
+        })).sort((a, b) => b.productores - a.productores);
 
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
@@ -115,8 +116,10 @@ export class IndicePadronProdComponent implements OnInit {
 
   public async cargarDatosByDpto(ubigeo: string) {
 
+    //alert(ubigeo);
+
     const q = new Query({
-      where: `INDICE = 'SUPSEMB' AND CAPA = 2 AND UBIGEO = '${ubigeo}'`,
+      where: `INDICE = 'PADRONPPA' AND CAPA = 2 AND UBIGEO like '${ubigeo}%'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
@@ -148,7 +151,7 @@ export class IndicePadronProdComponent implements OnInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'SUPSEMB' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
+      where: `INDICE = 'PADRONPPA' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });

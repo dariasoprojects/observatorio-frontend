@@ -1,8 +1,16 @@
 <div id="divDragAnalisis" class="analisis-panel" style="display:none" appDraggable>
 
-  <div class="panel-header">
+  <!-- <div class="panel-header">
     <span> Análisis Espacial</span>
     <button class="close-btn" (click)="cerrar()">x</button>
+  </div>
+ -->
+
+ <!-- cabecera movible -->
+  <div class="drag-handle legend-title2" 
+       style="padding:5px; cursor:move;">
+    Análisis Espacial
+    <button (click)="closeVentana()" class="close-btn">×</button>
   </div>
 
   <div class="panel-body">
