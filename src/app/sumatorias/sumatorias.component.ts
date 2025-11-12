@@ -78,8 +78,14 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
         // console.log("XXXX PRODUCTORES:", resConteo.features[0].attributes.PRODUCTORES);
         this.nroProductores = conteoRegistros.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
+        
+        //this.nroParcelas = conteoTotal.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
         this.nroParcelas = conteoTotal.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         this.totHectareas = sumaHectareas.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+
+
 
 
 
