@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
+import { FormsModule } from '@angular/forms';  
 import { Subscription, firstValueFrom } from 'rxjs';
 import Polygon from '@arcgis/core/geometry/Polygon';
 import Query from '@arcgis/core/rest/support/Query';
@@ -12,7 +13,7 @@ import { DraggableDirective } from '../directivas/draggable.directive';
 @Component({
   selector: 'app-analisis-espacial',
   standalone: true,
-  imports: [ DraggableDirective, CommonModule],
+  imports: [ FormsModule,DraggableDirective, CommonModule],
   templateUrl: './analisis-espacial.component.html',
   styleUrls: ['./analisis-espacial.component.css']
 })
@@ -95,4 +96,16 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
     // this.gridData = []; this.displayedColumns = []; this.coberturaPolygon = null;
     // this.mapComm.requestFilter(null);
   }
+
+
+  closeVentana(){
+
+        const miDiv = document.getElementById("divDragAnalisis");
+        if (!miDiv) return;
+       
+        miDiv.style.display = "none";        
+
+  }
+
+
 }

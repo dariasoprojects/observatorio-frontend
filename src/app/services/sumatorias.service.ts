@@ -46,6 +46,35 @@ export class SumatoriasService {
       body.toString(),
       { headers }
     );
+
+    // const body = new HttpParams({
+    //   fromObject: {
+    //     f: 'json',
+    //     where: "INDICE = 'SUMAS' AND CAPA = 1",
+    //     outFields: ["PRODUCTORES"],
+    //     //groupByFieldsForStatistics: 'NOMBRES,APELLIDOPA',
+    //     // outStatistics: JSON.stringify([
+    //     //   {
+    //     //     statisticType: 'count',
+    //     //     onStatisticField: 'OBJECTID',
+    //     //     outStatisticFieldName: 'conteo_registros', // <- respeta minúsculas
+    //     //   },
+    //     // ]),
+    //     returnGeometry: 'false',
+    //   },
+    // });
+
+    // const headers = new HttpHeaders({
+    //   'Content-Type': 'application/x-www-form-urlencoded',
+    // });
+
+    // return this.http.post<ProductoresSumatoriaResponse>(
+    //   this.urlIndice,
+    //   body.toString(),
+    //   { headers }
+    // );
+
+
   }
 
   getParcelas(): Observable<ParcelasSumatoriaResponse> {

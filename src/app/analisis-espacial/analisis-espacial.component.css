@@ -1,7 +1,7 @@
 .analisis-panel {
   position: absolute;
-  top: 90px;
-  right: 20px;
+  top: 110px;
+  left: 400px;
   width: 330px;
   background: #ffffff;
   border-radius: 8px;
@@ -117,3 +117,79 @@ td {
   color: #777;
   padding: 5px;
 }
+
+
+
+
+.legend-title2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: green;
+  color: #fff;
+  padding: 6px 12px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Botón de cierre */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #f87171; /* rojo claro al pasar el mouse */
+}
+
+
+
+.cd-acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Estilo base */
+.cd-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Botones verdes */
+.cd-success {
+  background-color: #22c55e; /* verde */
+  color: #fff;
+}
+
+.cd-success:hover {
+  background-color: #16a34a; /* verde más oscuro */
+}
+
+/* Botón blanco */
+.cd-light {
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.cd-light:hover {
+  background-color: #f9fafb;
+}
+
+
