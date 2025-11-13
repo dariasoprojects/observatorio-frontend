@@ -1,0 +1,88 @@
+<div class="landing-container">
+  <!-- CABECERA -->
+  <header class="header">
+    <div class="logo-slogan">
+      <!-- <img src="assets/logo_midagri.png" alt="Logo" class="logo"> -->
+      <img src="assets/logo_midagri_portada.png" alt="Logo" class="logo">
+      <div class="slogan">
+        <div class="slogan-title">OBSERVATORIO</div>
+        <div class="slogan-sub-title ">Sistema de Información Geoespacial Agrícola</div>
+      </div>
+    </div>
+    <button class="btn-login">Iniciar sesión</button>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content">
+    <!-- IZQUIERDA -->
+    <section class="left-section">
+      <div class="banner">
+        <span>Accede al Padrón de <br>Productores Agrarios</span>
+      </div>
+      <span class="subtitle">Consulta, analiza y sigue la poducción agraria con información<br> actualizada en tiempo real </span>
+
+      <div class="video-container">
+        <iframe
+          src="https://www.youtube.com/embed/VuqAojmGlwQ"
+          title="#HistoriasDelAgro | Manuel Dioses, agricultor de banano de Tumbes"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+
+      <div class="buttons">
+        <button [routerLink]="['/visor']" class="btn-primary">
+          Ingresar al Observatorio
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- DERECHA -->
+    <section class="right-section">
+
+      <div class="data-panel">
+        <!-- Encabezado del panel -->
+        <div class="panel-title">
+          <svg class="menu-icon-stats" viewBox="0 0 24 24" stroke-width="2" fill="none" width="48" height="48">
+            <!-- barras de colores -->
+            <path d="M4 20v-4" stroke="#4f8ef7" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M9 20v-8" stroke="#4CAF50" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M14 20v-6" stroke="#FF9800" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M19 20v-10" stroke="#F44336" stroke-linecap="round" stroke-linejoin="round"></path>
+            <!-- línea de tendencia -->
+            <path d="M3 12l4-3 5 2 4-4 5 3" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span class="banner2">Datos</span>
+        </div>
+
+        <!-- Subtítulo -->
+        <span class="subtitle-2">Consulta las estadísticas más recientes del sector agrario</span>
+
+        <!-- Cajas de datos -->
+        <div class="data-boxes">
+          <div class="data-box">
+            <span class="value">{{nroProductores}}</span>
+            <span class="label">Productores</span>
+          </div>
+          <div class="data-box">
+            <span class="value">{{nroParcelas}}</span>
+            <span class="label">Parcelas</span>
+          </div>
+          <div class="data-box">
+            <span class="value">{{nroHectareas}}</span>
+            <span class="label">Hectáreas</span>
+          </div>
+        </div>
+      </div>
+
+
+    </section>
+  </main>
+</div>

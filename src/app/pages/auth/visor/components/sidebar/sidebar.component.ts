@@ -1,6 +1,12 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {PanelModule} from 'primeng/panel';
 import {CommonModule} from '@angular/common';
+import {ButtonModule } from 'primeng/button';
+import {CardModule } from 'primeng/card';
+import {DividerModule} from 'primeng/divider';
+import {ProductorService} from '../../../../../services/productor.service';
+import {ProductorAttributes} from '../../../../../models/productor/productor.model';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
 export interface Item { title: string; section: string; icon: string; }
 interface PanelGroup { title: string; icon: string; collapsed: boolean; items: Item[]; }
@@ -10,7 +16,11 @@ interface PanelGroup { title: string; icon: string; collapsed: boolean; items: I
   standalone: true,
   imports: [
     CommonModule,
-    PanelModule
+    PanelModule,
+    ButtonModule,
+    CardModule,
+    DividerModule,
+    ReactiveFormsModule
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
@@ -90,6 +100,29 @@ export class SidebarComponent {
     },
   ];
 
+  productor: ProductorAttributes | null = null;
+
+  formBusqueda!: FormGroup;
+  mostrarProductor:boolean=false;
+
+  constructor(
+    private productorService: ProductorService,
+    private fb: FormBuilder
+  ) {
+    this.formBusqueda = this.fb.group({
+      dni: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.maxLength(8),
+          Validators.pattern(/^\d+$/) // solo números
+        ]
+      ]
+    });
+
+  }
+
   toggleLeft(): void {
     this.isCollapsed = !this.isCollapsed;
     this.isCollapsedChange.emit(this.isCollapsed);  // <-- clave para two-way
@@ -101,5 +134,31 @@ export class SidebarComponent {
 
 
   trackByItem  = (_: number, it: Item) => it.section;
+
+
+  onSearchDni(): void {
+    const dniControl = this.formBusqueda.get('dni');
+    this.mostrarProductor =true;
+
+    if (dniControl?.invalid) {
+      dniControl.markAsTouched();
+      return;
+    }
+
+    const dni = dniControl?.value;
+
+    this.productorService.getProductor(dni).subscribe(rows => {
+      this.productor = rows.features[0]?.attributes ?? null;
+    });
+  }
+
+  onClearDni(): void {
+    this.formBusqueda.get('dni')?.setValue('');
+    this.productor =null;
+  }
+
+  onVerPaneles():void{
+    this.mostrarProductor =false;
+  }
 
 }
