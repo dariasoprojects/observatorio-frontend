@@ -649,21 +649,21 @@ export class Mapa {
 
 
     if (this.mapView) {
-      this.mapView.ui.add(legendToggleBtn, 'bottom-right');
-      this.mapView.ui.add(toc_ToggleBtn, 'bottom-right');
-      this.mapView.ui.add(toc_IndetifiBtn, 'bottom-right');
-      this.mapView.ui.add(toc_Draw, 'bottom-right');
-      this.mapView.ui.add(this.sketsch, "bottom-right");
-      this.mapView.ui.add(toc_MedirRegla, "bottom-right");
-      this.mapView.ui.add(toc_MedirArea, "bottom-right");
-      this.mapView.ui.add(toc_3D, "bottom-right");
+      this.mapView.ui.add(legendToggleBtn, 'top-right');
+      this.mapView.ui.add(toc_ToggleBtn, 'top-right');
+      this.mapView.ui.add(toc_IndetifiBtn, 'top-right');
+      this.mapView.ui.add(toc_Draw, 'top-right');
+      this.mapView.ui.add(this.sketsch, "top-right");
+      this.mapView.ui.add(toc_MedirRegla, "top-right");
+      this.mapView.ui.add(toc_MedirArea, "top-right");
+      this.mapView.ui.add(toc_3D, "top-right");
       // this.currentView.ui.add(basemapBtn, "top-right");
       // this.currentView.ui.add(basemapMenu, "top-right");
-      this.currentView.ui.add(basemapContainer, "bottom-right");
+      this.currentView.ui.add(basemapContainer, "top-right");
 
       //this.currentView.ui.add(this.printWidget, "top-right");
-      this.currentView.ui.add(printBtn, "bottom-right");
-      this.currentView.ui.add(multiQyBtn, "bottom-right");
+      this.currentView.ui.add(printBtn, "top-right");
+      this.currentView.ui.add(multiQyBtn, "top-right");
 
 
       // if (this.printWidget) {

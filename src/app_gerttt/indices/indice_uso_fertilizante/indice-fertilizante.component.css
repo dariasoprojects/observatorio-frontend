@@ -1,0 +1,42 @@
+.indice-fertilizante {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+#container-fertilizante {
+  width: 100%;
+  max-width: 900px;
+}
+
+.tabla-wrapper {
+  width: 100%;
+  max-width: 600px;
+  overflow-x: auto;
+}
+
+.tabla-fertilizante {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 14px;
+}
+
+.tabla-fertilizante thead {
+  background-color: #f2f2f2;
+}
+
+.tabla-fertilizante th, 
+.tabla-fertilizante td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.tabla-fertilizante tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.tabla-fertilizante tr:hover {
+  background-color: #f1f1f1;
+}

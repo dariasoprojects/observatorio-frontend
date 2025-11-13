@@ -1,0 +1,115 @@
+.indice-sumatoria {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+#container-sumatoria {
+  width: 100%;
+  max-width: 900px;
+}
+
+.tabla-wrapper {
+  width: 100%;
+  max-width: 600px;
+  overflow-x: auto;
+}
+
+.tabla-sumatoria {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 14px;
+}
+
+.tabla-sumatoria thead {
+  background-color: #f2f2f2;
+}
+
+.tabla-sumatoria th,
+.tabla-sumatoria td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.tabla-sumatoria tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.tabla-sumatoria tr:hover {
+  background-color: #f1f1f1;
+}
+ /*  Nuevo */
+/* Contenedor de la sección (respetando tu guía 24/32 y spacing 24) */
+.BotonDatos{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;      /* top-left */
+  gap:24px;                    /* item spacing */
+  /*padding:24px 32px;         */
+  box-sizing:border-box;
+  width:100%;
+  max-width:420px;
+  text-align: center;
+}
+
+/* Base de cada “píldora” */
+.data-card{
+  position:relative;
+  width:100%;
+  color:#fff;
+  border-radius:20px;          /* píldora */
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.15);
+  overflow:hidden;
+}
+
+/* Brillo superior suave */
+.data-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom, rgba(255,255,255,.18), rgba(255,255,255,0) 45%);
+  pointer-events:none;
+}
+
+/* “Orejas” laterales para el look del mockup */
+.data-card::after{
+  content:"";
+  position:absolute;
+  top:14px; bottom:14px;
+  left:-28px; right:-28px;
+  background:
+    radial-gradient(42px 42px at left 50%, rgba(255,255,255,.18), transparent 60%),
+    radial-gradient(42px 42px at right 50%, rgba(255,255,255,.18), transparent 60%);
+  pointer-events:none;
+}
+
+/* Colores como en la imagen */
+.data-card.green  { background:#76BC21; }  /* lima */
+.data-card.blue   { background:#00B2E3; }  /* celeste intenso */
+.data-card.orange { background:#DA8824; }  /* naranja */
+
+/* Tipografía (número grande, etiqueta debajo) */
+.data-value{
+  font-size:2rem;              /* 1,247 / 3,245 / 45,230 */
+
+  line-height:1.1;
+}
+
+.data-value {
+  padding-top: 5px;  /* espacio a la derecha */
+}
+
+.data-label{
+  padding-bottom: 5px;  /* espacio a la derecha */
+}
+
+.data-label{
+  margin-top:2px;
+  font-size:1rem;
+  opacity:.95;
+}
