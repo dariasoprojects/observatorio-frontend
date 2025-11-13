@@ -3,8 +3,8 @@
 
   /* ===== Tokens globales (usados por todo el layout) ===== */
   /* --hdr-h: 56px;*/
-  --gap: 12px;
-  --pad: 12px;
+  --gap: 5px;
+  --pad: 5px;
   --left-w: 260px;
   --right-w: 250px;
 }
@@ -21,7 +21,9 @@
   padding: var(--pad);
   box-sizing: border-box;
   min-height: calc(100vh  - (2 * var(--pad)));
-  background: #f4f6f8;
+  background:
+    url("/assets/img/fondo.avif") center/cover no-repeat,
+    linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%);
   overflow-x: clip;
 }
 
@@ -32,10 +34,24 @@
 }
 
 /* ===== Áreas del grid ===== */
-app-sidebar { grid-area: left; }
 .top-wide   { grid-area: top; }
 .center-map { grid-area: map; }
-.side-right { grid-area: right; } /* solo define el área, no su estilo */
+
+app-sidebar {
+  grid-area: left;
+  display: block;       /* los custom elements son inline por defecto */
+  align-self: stretch;  /* ocupa toda la pista vertical */
+  height: 100%;         /* permite que el hijo use height:100% */
+  min-height: 0;        /* evita que el grid limite el flex interno */
+}
+
+app-side-right {
+  grid-area: right;
+  display: block;       /* los custom elements son inline por defecto */
+  align-self: stretch;  /* ocupa toda la pista vertical */
+  height: 100%;         /* permite que el hijo use height:100% */
+  min-height: 0;        /* que el grid no limite el flex interno */
+}
 
 /* ===== CONTENEDORES (otros paneles del layout) ===== */
 .top-wide {
@@ -101,7 +117,7 @@ app-sidebar { grid-area: left; }
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-  padding: 6px;
+  padding: 1px;
   display: flex;
   min-height: 0;
   position: relative;
@@ -113,7 +129,6 @@ app-sidebar { grid-area: left; }
   height: 100%;
   border-radius: 8px;
   overflow: hidden;
-  background: #0b3d59;
 }
 
 .map-tools {
@@ -190,23 +205,63 @@ app-sidebar { grid-area: left; }
     "left map right" !important;
 }
 
-/* Mantiene sticky global cuando se usa desktop-lock */
-.desktop-lock .right-sticky {
-  position: sticky;
-  top: var(--pad);
-  /*max-height: calc(100vh - (2 * var(--pad)));*/
-  overflow: auto;
+.content-grid.desktop-lock app-side-right {
+  max-height: calc(100vh - (2 * var(--pad)));
+  overflow: hidden;  /* scroll interno lo hace el hijo (.right-scroll) */
 }
 
-app-sidebar {
-  grid-area: left;
-  display: block;       /* los custom elements son inline por defecto */
-  align-self: stretch;  /* ocupa toda la pista vertical */
-  height: 100%;         /* permite que el hijo use height:100% */
-  min-height: 0;        /* evita que el grid limite el flex interno */
+.content-grid.desktop-lock app-sidebar {
+  max-height: calc(100vh - (2 * var(--pad)));
+  overflow: hidden;  /* scroll interno lo hace el hijo (.right-scroll) */
 }
+
 
 @media (min-width: 700px) {
+
+  /* ===== Si tu layout tiene header/padding fuera del mapa ===== */
+  :host {
+    /* Ajusta según tu layout global */
+    --vh-offset: 0px; /* ej.: calc(var(--hdr-h) + (2 * var(--pad)) + var(--gap)) */
+  }
+
+  .content-grid {
+    /* la rejilla completa mide el alto del viewport */
+    height: calc(100vh);
+    overflow: hidden;
+  }
+
+  @supports (height: 100svh) {
+    .content-grid {
+      height: calc(100svh );
+    }
+  }
+  @supports (height: 100dvh) {
+    .content-grid {
+      height: calc(100dvh );
+    }
+  }
+
+  /* PANEL DERECHO COMO TRACK DEL GRID */
+  app-side-right {
+    grid-area: right;
+    display: block;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+
+    overflow: hidden;
+  }
+
+  app-sidebar {
+    grid-area: left;
+    display: block;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+
+    overflow: hidden;
+  }
+
   .center-map {
     display: flex;
     min-height: 0; /* importante cuando el padre usa grid/flex */
@@ -236,11 +291,7 @@ app-sidebar {
     }
   }
 
-  /* ===== Si tu layout tiene header/padding fuera del mapa ===== */
-  :host {
-    /* Ajusta según tu layout global */
-    --vh-offset: 0px; /* ej.: calc(var(--hdr-h) + (2 * var(--pad)) + var(--gap)) */
-  }
+
 
   /* ===== Angular: asegurar que el componente llene el contenedor ===== */
   .center-map .map app-mapa,

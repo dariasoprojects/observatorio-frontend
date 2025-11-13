@@ -37,35 +37,130 @@
       </button>
     </div>
 
-    <div class="search"
-         *ngIf="!isCollapsed" [attr.aria-hidden]="isCollapsed">
-      <i class="pi pi-search"></i>
-      <input pInputText type="text" placeholder="Ingresar número DNI" />
+    <div class="side-left__scroll">
+      <form [formGroup]="formBusqueda">
+        <div class="search"
+             *ngIf="!isCollapsed" [attr.aria-hidden]="isCollapsed">
+          <i class="pi pi-search icon-left"
+             role="button"
+             tabindex="0"
+             (click)="onSearchDni()">
+          </i>
+
+          <input
+            pInputText
+            type="text"
+            formControlName="dni"
+            placeholder="Ingresar número DNI"
+            maxlength="8"
+            (keydown.enter)="onSearchDni()" />
+
+          <i class="pi pi-times icon-right"
+             role="button"
+             tabindex="0"
+             (click)="onClearDni()">
+          </i>
+        </div>
+        <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched && formBusqueda.get('dni')?.invalid && this.mostrarProductor">
+
+          <div *ngIf="formBusqueda.get('dni')?.errors?.['required']">
+             DNI no debe estar vacío.
+          </div>
+
+          <div *ngIf="formBusqueda.get('dni')?.errors?.['minlength'] || formBusqueda.get('dni')?.errors?.['maxlength']">
+             DNI debe tener 8 dígitos.
+          </div>
+
+          <div *ngIf="formBusqueda.get('dni')?.errors?.['pattern']">
+            Solo se permiten números.
+          </div>
+
+        </div>
+      </form>
+
+
+      <ng-container *ngIf="!isCollapsed">
+        <ng-container *ngIf="!mostrarProductor">
+          <p-panel *ngFor="let p of panels" [toggleable]="true" [collapsed]="p.collapsed" styleClass="panel-tight">
+            <ng-template pTemplate="header">
+              <div class="hdr">
+                <i class="pi" [ngClass]="p.icon"></i>
+                <span>{{ p.title }}</span>
+              </div>
+            </ng-template>
+
+            <ul class="list">
+              <li *ngFor="let it of p.items; trackBy: trackByItem">
+                <button
+                  class="link"
+                  [class.active]="it.section === activeSection"
+                  [attr.aria-current]="it.section === activeSection ? 'page' : null"
+                  [attr.aria-pressed]="it.section === activeSection ? 'true' : 'false'"
+                  (click)="selectSection(it.section)">
+                  <i *ngIf="it.icon" class="pi" [ngClass]="it.icon" style="margin-right: 6px;"></i>
+                  {{ it.title }}
+                </button>
+              </li>
+
+            </ul>
+          </p-panel>
+        </ng-container>
+
+        <ng-container *ngIf="mostrarProductor">
+          <p-panel styleClass="producer-panel" [toggleable]="false">
+
+
+
+            <!-- BODY -->
+
+            <div class="panel-body">
+              <div class="panel-header">
+                <span class="section-title">Datos del Productor</span>
+
+                <span class="header-icon">
+                <i class="pi pi-info-circle"></i>
+              </span>
+              </div>
+
+              <div class="field-row"><span class="field-label">DNI: {{productor?.TXT_NRODOC??''}}</span></div>
+              <div class="field-row"><span class="field-label">Apellidos: {{productor?.APELLIDOPA??''}}</span></div>
+              <div class="field-row"><span class="field-label">Nombres: {{productor?.NOMBRES??''}}</span></div>
+
+              <p-divider></p-divider>
+
+              <div class="panel-header">
+                <span class="section-title">Ubicación parcela principal del productor</span>
+              </div>
+
+              <div class="field-row"><span class="field-label">Región:</span></div>
+              <div class="field-row"><span class="field-label">Provincia:</span></div>
+              <div class="field-row"><span class="field-label">Distrito:</span></div>
+              <div class="field-row"><span class="field-label">Rég. tenencia:</span></div>
+              <div class="field-row"><span class="field-label">Área (ha) declarada</span></div>
+              <div class="field-row"><span class="field-label">Total parcelas:</span></div>
+
+            </div>
+
+
+
+            <!-- FOOTER -->
+            <ng-template pTemplate="footer">
+              <div class="panel-footer">
+                <button type="button" pButton label="Ver ubicación en el mapa" class="map-btn"></button>
+                <button type="button" pButton label="Cerrar" class="close-btn p-button-outlined"
+                        (click)="onVerPaneles()"
+                ></button>
+              </div>
+            </ng-template>
+
+          </p-panel>
+        </ng-container>
+
+
+
+
+
+      </ng-container>
     </div>
 
-    <ng-container *ngIf="!isCollapsed">
-      <p-panel *ngFor="let p of panels" [toggleable]="true" [collapsed]="p.collapsed" styleClass="panel-tight">
-        <ng-template pTemplate="header">
-          <div class="hdr">
-            <i class="pi" [ngClass]="p.icon"></i>
-            <span>{{ p.title }}</span>
-          </div>
-        </ng-template>
-
-        <ul class="list">
-          <li *ngFor="let it of p.items; trackBy: trackByItem">
-            <button
-              class="link"
-              [class.active]="it.section === activeSection"
-              [attr.aria-current]="it.section === activeSection ? 'page' : null"
-              [attr.aria-pressed]="it.section === activeSection ? 'true' : 'false'"
-              (click)="selectSection(it.section)">
-              <i *ngIf="it.icon" class="pi" [ngClass]="it.icon" style="margin-right: 6px;"></i>
-              {{ it.title }}
-            </button>
-          </li>
-
-        </ul>
-      </p-panel>
-    </ng-container>
   </aside>
