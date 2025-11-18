@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {ParcelasSumatoriaResponse} from '../models/Sumatorias/parcelas-sumatoria.model';
-import {ProductorResponse} from '../models/productor/productor.model';
+import {BehaviorSubject, catchError, from, map, of, throwError} from 'rxjs';
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 
 @Injectable({
   providedIn: 'root'
@@ -10,28 +8,32 @@ import {ProductorResponse} from '../models/productor/productor.model';
 export class ProductorService {
 
   private readonly urlProductor =
-    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0/query';
+    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0';
 
-  constructor(private http: HttpClient) {}
+  private productorSubject = new BehaviorSubject<__esri.Graphic[] | null>(null);
+  productor$ = this.productorSubject.asObservable();
 
-  getProductor(dni:string): Observable<ProductorResponse> {
-    const body = new HttpParams({
-      fromObject: {
-        f: 'json',
-        where: `TXT_NRODOC =${dni}`,
-        outFields: '*',
-        returnGeometry: 'false',
-      },
+  getProductor(dni: string): void  {
+    const fl = new FeatureLayer({ url: this.urlProductor });
+
+    const q = fl.createQuery();
+    q.where = `TXT_NRODOC = ${dni}`;
+    q.outFields = ['*'];
+    q.returnGeometry = true;
+
+    from(fl.queryFeatures(q)).pipe(
+      map(res => res.features as __esri.Graphic[]),
+      catchError(err => {
+        console.error(' Error en queryFeatures:', err);
+        if (err?.details) {
+          console.error('Detalles server:', err.details);
+        }
+        this.productorSubject.next([]);
+        return throwError(() => err);
+      })
+    ).subscribe(features => {
+      this.productorSubject.next(features);
     });
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/x-www-form-urlencoded',
-    });
-
-    return this.http.post<ProductorResponse>(
-      this.urlProductor,
-      body.toString(),
-      { headers }
-    );
   }
+
 }

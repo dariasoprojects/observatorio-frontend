@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {SumatoriasService} from '../../services/sumatorias.service';
 import {Router} from '@angular/router';
+import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import {FormatUtil} from '../../../app_gerttt/shared/utils/format.util';
 
 @Component({
   selector: 'app-landing',
@@ -21,25 +23,21 @@ export class LandingComponent {
   ) {}
 
   ngOnInit(): void {
-    this.sumatoriasService.getProductores().subscribe(
-      (rows) => (
-          this.nroProductores = rows.features.length.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-      ),
-    );
+    this.getDatosIndicadores();
+  }
 
-    this.sumatoriasService.getParcelas().subscribe(
-      (rows) => (
-        this.nroParcelas = rows.features[0].attributes.CONTEO_TOTAL.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-      ),
-    );
-
-    this.sumatoriasService.getHectarias().subscribe(
-      (rows) => (
-        this.nroHectareas = rows.features[0].attributes.SUMA_HECTAREAS.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-      ),
-    );
-
-
+  getDatosIndicadores():void  {
+    this.sumatoriasService.getDatosIndicadores().subscribe({
+      next: (rows: IndicadoresSumatoriaResponse) => {
+        const feature = rows?.features?.[0];
+        this.nroProductores = FormatUtil.formatInteger( feature?.attributes?.PRODUCTORES ?? 0);
+        this.nroParcelas = FormatUtil.formatInteger( feature?.attributes?.PARCELAS ?? 0);
+        this.nroHectareas = FormatUtil.formatInteger( feature?.attributes?.HECTAREA ?? 0);
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
+      }
+    });
   }
 
   onLogin() {

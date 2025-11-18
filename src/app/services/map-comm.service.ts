@@ -24,6 +24,9 @@ export class MapCommService {
   private drawRequestSource = new Subject<boolean>();
   drawRequest$ = this.drawRequestSource.asObservable();
 
+  private zoomRequestGraphicSource = new Subject<__esri.Graphic>();
+  zoomRequestGraphic$ = this.zoomRequestGraphicSource.asObservable();
+
   requestZoom(objectId: number) {
     this.zoomRequestSource.next(objectId);
   }
@@ -47,5 +50,9 @@ export class MapCommService {
   requestDraw(active: boolean) {
     this.drawRequestSource.next(active);
   }
+
+  requestZoomGraphic(feature: __esri.Graphic) {
+  this.zoomRequestGraphicSource.next(feature);
+}
   
 }

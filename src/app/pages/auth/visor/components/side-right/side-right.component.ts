@@ -1,5 +1,5 @@
-import {Component, Input} from '@angular/core';
-import {CommonModule, DecimalPipe} from "@angular/common";
+import {Component, Input, ViewChild} from '@angular/core';
+import {CommonModule} from "@angular/common";
 import {DropdownModule} from "primeng/dropdown";
 import {
     IndicePadronProdComponent
@@ -52,6 +52,9 @@ import {ProvinciasResponse} from '../../../../../models/ubigeos/provincias.model
 import {SumatoriasService} from '../../../../../services/sumatorias.service';
 import {IndicadoresSumatoriaResponse} from '../../../../../models/Sumatorias/indicadores-sumatoria.model';
 import {FormatUtil} from '../../../../../shared/utils/format.util';
+import {MapaService} from '../../../../../services/mapa.service';
+import {DepartamentoGraficoResponse} from '../../../../../models/mapa/departamento-grafico.model';
+import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
 
 export interface Departamento {
   code: string;
@@ -134,15 +137,33 @@ export class SideRightComponent {
   nroParcelas: string = '';
   nroHectareas: string = '';
   departamentoCodigo: string = '';
+  provinciaCodigo: string = '';
 
   kpi = { productores: 1247, parcelas: 3245, hectareas: 45230 };
   provincias: Provincia[] = [];
 
   @Input()  activeSection: string | null = null;
+  @ViewChild(IndicePadronProdComponent) indicePadronProdComponent!: IndicePadronProdComponent;
+  @ViewChild(IndiceCentrosEmpadronamientoComponent) indiceCentrosEmpadronamiento!: IndiceCentrosEmpadronamientoComponent;
+  @ViewChild(IndiceTipoActividadComponent) indiceTipoActividadComponent!: IndiceTipoActividadComponent;
+  @ViewChild(IndiceFuenteIngresoComponent) indiceFuenteIngresoComponent!: IndiceFuenteIngresoComponent;
+  @ViewChild(IndiceSegunRegionNaturalComponent) indiceSegunRegionNaturalComponent!: IndiceSegunRegionNaturalComponent;
+  @ViewChild(IndiceNivelEstudioComponent) indiceNivelEstudioComponent!: IndiceNivelEstudioComponent;
+  @ViewChild(IndiceGeneroComponent) indiceGeneroComponent!: IndiceGeneroComponent;
+  @ViewChild(IndiceTipoOrgComponent) indiceTipoOrgComponent!: IndiceTipoOrgComponent;
+  @ViewChild(IndiceSuperfiAgriComponent) indiceSuperfiAgriComponent!: IndiceSuperfiAgriComponent;
+  @ViewChild(IndiceSuperfiSembComponent) indiceSuperfiSembComponent!: IndiceSuperfiSembComponent;
+  @ViewChild(IndiceTamanioParceComponent) indiceTamanioParceComponent!: IndiceTamanioParceComponent;
+  @ViewChild(IndiceRegimenTenenComponent) indiceRegimenTenenComponent!: IndiceRegimenTenenComponent;
+  @ViewChild(IndicePrincipalesCultivosComponent) indicePrincipalesCultivosComponent!: IndicePrincipalesCultivosComponent;
+  @ViewChild(IndiceCultivosTransitComponent) indiceCultivosTransitComponent!: IndiceCultivosTransitComponent;
+  @ViewChild(IndiceCultivosPermaComponent) indiceCultivosPermaComponent!: IndiceCultivosPermaComponent;
+  @ViewChild(IndiceFertilizanteComponent) indiceFertilizanteComponent!: IndiceFertilizanteComponent;
 
   constructor(
     private ubigeoService: UbigeoService,
     private sumatoriasService: SumatoriasService,
+    private filtroUbigeoService: FiltroUbigeoService
   ) {}
 
   ngOnInit(): void {
@@ -154,9 +175,26 @@ export class SideRightComponent {
   }
 
   onDepartamentoChange(event: any) {
-    const selectedValue = event.value;
+    const selectedValue = event.value??'00';
+    const selectedText = event.text;
     this.departamentoCodigo =selectedValue;
     this.provincias = [];
+
+    this.valorSeleccionadoProv = null;
+    this.valorSeleccionadoProvText = null;
+    this.valorSeleccionado=selectedValue;
+    this.valorSeleccionadoText=selectedText;
+
+    if( this.departamentoCodigo==="00" ){
+      this.valorSeleccionado = null;
+      this.valorSeleccionadoText = null;
+    }
+
+
+    this.filtroUbigeoService.setFiltros({
+      departamento: this.departamentoCodigo,
+      provincia: null    // al cambiar depto, limpias provincia
+    });
 
     this.ubigeoService.getProvinciabyCodigo(selectedValue).subscribe({
       next: (rows: ProvinciasResponse) => {
@@ -181,12 +219,272 @@ export class SideRightComponent {
     }else{
       this.getDatosIndicadoresbyDepartamento(selectedValue);
     }
+
+
+    const departamento2 = this.getNombreDepartamento (this.departamentoCodigo);
+
+    try {
+      if(this.indicePadronProdComponent){
+
+        console.log('indicePadronProdComponent cargados');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+           this.indicePadronProdComponent.cargarDatos();
+        }else{
+           this.indicePadronProdComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indicePadronProdComponent:', err);
+    }
+
+    try {
+      if(this.indiceCentrosEmpadronamiento){
+
+        console.log('indiceCentrosEmpadronamiento cargados');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceCentrosEmpadronamiento.cargarDatos();
+        }else{
+          this.indiceCentrosEmpadronamiento.cargarDatosByDpto(departamento2);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceCentrosEmpadronamiento:', err);
+    }
+
+
+    try {
+      if(this.indiceTipoActividadComponent){
+
+        console.log('indiceTipoActividadComponent cargados');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceTipoActividadComponent.cargarDatos();
+        }else{
+          this.indiceTipoActividadComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceTipoActividadComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceNivelEstudioComponent){
+
+        console.log('indiceNivelEstudioComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          console.log("ingreso al if if if");
+          this.indiceNivelEstudioComponent.cargarDatos();
+        }else{
+          this.indiceNivelEstudioComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceNivelEstudioComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceSegunRegionNaturalComponent){
+
+        console.log('indiceSegunRegionNaturalComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceSegunRegionNaturalComponent.cargarDatos();
+        }else{
+          this.indiceSegunRegionNaturalComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceSegunRegionNaturalComponent:', err);
+    }
+
+
+    try {
+      if (this.indiceFuenteIngresoComponent){
+
+        console.log('indiceFuenteIngresoComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceFuenteIngresoComponent.cargarDatos();
+        }else{
+          this.indiceFuenteIngresoComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceFuenteIngresoComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceGeneroComponent){
+        //alert(departamento);
+        //alert(departamento2);
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceGeneroComponent.cargarDatos();
+        }else{
+          this.indiceGeneroComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+
+        console.log('indiceGeneroComponent cargado');
+      }
+    } catch (err) {
+      console.warn(' Error en indiceGeneroComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceTipoOrgComponent){
+
+        console.log('indiceTipoOrgComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceTipoOrgComponent.cargarDatos();
+        }else{
+          this.indiceTipoOrgComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceTipoOrgComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceSuperfiAgriComponent){
+
+        console.log('indiceSuperfiAgriComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceSuperfiAgriComponent.cargarDatos();
+        }else{
+          this.indiceSuperfiAgriComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceSuperfiAgriComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceSuperfiSembComponent){
+
+        console.log('indiceSuperfiSembComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceSuperfiSembComponent.cargarDatos();
+        }else{
+          this.indiceSuperfiSembComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceSuperfiSembComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceTamanioParceComponent){
+
+        console.log('indiceTamanioParceComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceTamanioParceComponent.cargarDatos();
+        }else{
+          this.indiceTamanioParceComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceTamanioParceComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceRegimenTenenComponent){
+
+        console.log('indiceRegimenTenenComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceRegimenTenenComponent.cargarDatos();
+        }else{
+          this.indiceRegimenTenenComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceRegimenTenenComponent:', err);
+    }
+
+
+    try {
+      if(this.indicePrincipalesCultivosComponent){
+
+        console.log('indicePrincipalesCultivosComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indicePrincipalesCultivosComponent.cargarDatos();
+        }else{
+          this.indicePrincipalesCultivosComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indicePrincipalesCultivosComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceCultivosTransitComponent){
+
+        console.log('indiceCultivosTransitComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceCultivosTransitComponent.cargarDatos();
+        }else{
+          this.indiceCultivosTransitComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceCultivosTransitComponent:', err);
+    }
+
+
+    try {
+      if(this.indiceCultivosPermaComponent){
+
+        console.log('indiceCultivosPermaComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceCultivosPermaComponent.cargarDatos();
+        }else{
+          this.indiceCultivosPermaComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceCultivosPermaComponent:', err);
+    }
+
+
+
+    try {
+      if(this.indiceFertilizanteComponent){
+
+        console.log('indiceFertilizanteComponent cargado');
+        if(this.departamentoCodigo==="00" || this.departamentoCodigo===null){
+          this.indiceFertilizanteComponent.cargarDatos();
+        }else{
+          this.indiceFertilizanteComponent.cargarDatosByDpto(this.departamentoCodigo);
+        }
+      }
+    } catch (err) {
+      console.warn(' Error en indiceFertilizanteComponent:', err);
+    }
+
+
+
   }
 
   onProvinciaChange(event: any) {
-    const selectedValue = event.value;
+    const selectedValue = event.value??'00';
+    const selectedText = event.text;
+    this.provinciaCodigo = selectedValue;
+    const provincia2 = selectedText;
+
+
+    this.filtroUbigeoService.setFiltros({
+      provincia: selectedValue ?? '00'
+    });
+
+    this.valorSeleccionadoProv = selectedValue;
+    this.valorSeleccionadoProvText = selectedText;
+
+
     if(selectedValue ==null || selectedValue == '00'){
-      console.log(this.departamentoCodigo);
       if(this.departamentoCodigo == '00' || this.departamentoCodigo == null){
         this.getDatosIndicadores();
       }else{
@@ -195,6 +493,168 @@ export class SideRightComponent {
     }else{
       this.getDatosIndicadoresbyProvincia(selectedValue);
     }
+
+
+    if(this.indicePadronProdComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indicePadronProdComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indicePadronProdComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indicePadronProdComponent.cargarDatosByProv(provincia);
+    }
+
+
+
+    if(this.indiceCentrosEmpadronamiento){
+      if(this.provinciaCodigo==="00"){
+        this.indiceCentrosEmpadronamiento.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);
+      }
+      //this.indiceCentrosEmpadronamiento.cargarDatosByProv(provincia2);
+    }
+
+
+    if(this.indiceTipoActividadComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceTipoActividadComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceTipoActividadComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceTipoActividadComponent.cargarDatosByProv(provincia);
+
+    }
+
+
+    if(this.indiceNivelEstudioComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceNivelEstudioComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceNivelEstudioComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceNivelEstudioComponent.cargarDatosByProv(provincia);
+    }
+
+    if(this.indiceSegunRegionNaturalComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceSegunRegionNaturalComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceSegunRegionNaturalComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceSegunRegionNaturalComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceFuenteIngresoComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceFuenteIngresoComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceFuenteIngresoComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceFuenteIngresoComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceGeneroComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceGeneroComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceGeneroComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceGeneroComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceTipoOrgComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceTipoOrgComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceTipoOrgComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceTipoOrgComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceSuperfiAgriComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceSuperfiAgriComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceSuperfiAgriComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceSuperfiAgriComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceSuperfiSembComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceSuperfiSembComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceSuperfiSembComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceSuperfiSembComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceTamanioParceComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceTamanioParceComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceTamanioParceComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceTamanioParceComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceRegimenTenenComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceRegimenTenenComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceRegimenTenenComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceRegimenTenenComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indicePrincipalesCultivosComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indicePrincipalesCultivosComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indicePrincipalesCultivosComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indicePrincipalesCultivosComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceCultivosTransitComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceCultivosTransitComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceCultivosTransitComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceCultivosTransitComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceCultivosPermaComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceCultivosPermaComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceCultivosPermaComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceCultivosPermaComponent.cargarDatosByProv(provincia);
+    }
+
+
+    if(this.indiceFertilizanteComponent){
+      if(this.provinciaCodigo==="00"){
+        this.indiceFertilizanteComponent.cargarDatosByDpto(this.departamentoCodigo);
+      }else{
+        this.indiceFertilizanteComponent.cargarDatosByProv(this.provinciaCodigo);
+      }
+      //this.indiceFertilizanteComponent.cargarDatosByProv(provincia);
+    }
+
   }
 
   getDatosIndicadores():void  {
@@ -239,11 +699,47 @@ export class SideRightComponent {
     });
   }
 
+
   private toPascalCase(text: string): string {
     if (!text) return '';
     return text
       .toLowerCase()
       .replace(/\b\w/g, char => char.toUpperCase());
   }
+
+  getNombreDepartamento(ubigeo: string | number): string {
+    const departamentos: Record<string, string> = {
+      "01": "Amazonas",
+      "02": "Áncash",
+      "03": "Apurímac",
+      "04": "Arequipa",
+      "05": "Ayacucho",
+      "06": "Cajamarca",
+      "07": "Callao",
+      "08": "Cusco",
+      "09": "Huancavelica",
+      "10": "Huánuco",
+      "11": "Ica",
+      "12": "Junín",
+      "13": "La Libertad",
+      "14": "Lambayeque",
+      "15": "Lima",
+      "16": "Loreto",
+      "17": "Madre de Dios",
+      "18": "Moquegua",
+      "19": "Pasco",
+      "20": "Piura",
+      "21": "Puno",
+      "22": "San Martín",
+      "23": "Tacna",
+      "24": "Tumbes",
+      "25": "Ucayali"
+    };
+
+    const ubigeoStr = ubigeo.toString().padStart(2, "0");
+    const clave = ubigeoStr.substring(0, 2);
+    return (departamentos[clave] || "Desconocido").toUpperCase();
+  }
+
 
 }
