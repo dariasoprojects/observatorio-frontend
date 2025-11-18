@@ -7,6 +7,7 @@ import {SidebarComponent} from "../../auth/visor/components/sidebar/sidebar.comp
 import {Router} from '@angular/router';
 import {Dialog} from 'primeng/dialog';
 import {LoginComponent} from '../../login/login.component';
+import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-espacial.component';
 
 @Component({
   selector: 'app-visor',
@@ -17,7 +18,8 @@ import {LoginComponent} from '../../login/login.component';
     SideRightComponent,
     SidebarComponent,
     Dialog,
-    LoginComponent
+    LoginComponent,
+    AnalisisEspacialComponent
   ],
   templateUrl: './visor.component.html',
   styleUrl: './visor.component.css'
@@ -43,7 +45,11 @@ export class VisorComponent {
   onSelectSection(section: string) {
     this.activeSection = section;
     const el = this.elRef.nativeElement as HTMLElement;
-    el.style.setProperty('--right-w', '450px');
+    if(this.activeSection==""){
+      el.style.setProperty('--right-w', '250px');
+    }else{
+      el.style.setProperty('--right-w', '450px');
+    }
   }
 
   onLogin(): void {
