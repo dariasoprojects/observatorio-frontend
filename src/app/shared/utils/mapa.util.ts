@@ -14,6 +14,7 @@ import Sketch from '@arcgis/core/widgets/Sketch';
 import DistanceMeasurement2D from '@arcgis/core/widgets/DistanceMeasurement2D';
 import AreaMeasurement2D from '@arcgis/core/widgets/AreaMeasurement2D';
 import Print from '@arcgis/core/widgets/Print';
+import Extent from '@arcgis/core/geometry/Extent';
 
 export class Mapa {
 
@@ -760,7 +761,113 @@ export class Mapa {
     }
   }
 
+  queryByDepartamento(ubigeo: string, features: __esri.Graphic[]):void {
+    this.addResultsToMap(features);
 
+    //this.setSubLayerVisibility(this.capaMapServer, [0]); // Muestra solo las capas 0 y 2
+
+    if (this.capaMapServer) {
+      this.setSubLayerVisibility(this.capaMapServer, [0]);
+
+      this.setSubLayerFilters(this.capaMapServer, {
+        0: `coddep = '${ubigeo}'`
+      });
+    }
+  }
+
+  queryByProvincia(ubigeo: string, features: __esri.Graphic[]):void {
+    this.addResultsToMap(features);
+
+    if (this.capaMapServer) {
+
+      this.setSubLayerVisibility(this.capaMapServer, [0,1]);
+
+      const coddep = ubigeo.slice(0, 2); // solo los 2 primeros caracteres
+      console.log("coddep : ", coddep);
+
+      this.setSubLayerFilters(this.capaMapServer, {
+        0: `IDDPTO = '${coddep}'`,
+        1: `IDPROV  = '${ubigeo}'`
+      });
+    }
+
+  }
+
+
+
+  private addResultsToMap(features: __esri.Graphic[]): void {
+      if (!this.resultsLayer) {
+      console.error("No se encontró la capa de resultados.");
+      return;
+    }
+
+    this.resultsLayer.removeAll(); // Limpia los resultados anteriores
+
+    // Define el símbolo utilizando SimpleFillSymbol
+    const symbol = new SimpleFillSymbol({
+      color: [0, 255, 255, 0], // Fondo semitransparente (marrón claro con opacidad 30%)
+      outline: {
+        color: [0, 255, 255], // Borde más luminoso (naranja claro con opacidad 80%)
+        width: 3, // Ancho del borde
+      },
+    });
+
+    // Asigna el símbolo a cada gráfico
+    const updatedFeatures = features.map((feature) => {
+      feature.symbol = symbol; // Asigna el símbolo creado
+      return feature;
+    });
+
+    this.resultsLayer.addMany(updatedFeatures); // Agrega las nuevas geometrías al mapa
+
+    if (features.length > 0 && this.mapView) {
+      this.mapView.goTo(features); // Ajusta la vista al área de los resultados
+    }
+  }
+
+  setSubLayerVisibility(layer: MapImageLayer, visibleIds: number[]): void {
+    if (layer.sublayers) {
+      layer.sublayers.forEach((sublayer) => {
+        sublayer.visible = visibleIds.includes(sublayer.id);
+      });
+    }
+  }
+
+  setSubLayerFilters(layer: MapImageLayer, filters: { [sublayerId: number]: string }): void {
+
+    if (layer.sublayers) {
+      layer.sublayers.forEach((sublayer) => {
+        if (filters[sublayer.id] !== undefined) {
+          sublayer.definitionExpression = filters[sublayer.id];
+        } else {
+          sublayer.definitionExpression = ""; // Sin filtro si no está en el objeto
+        }
+      });
+    }
+  }
+
+  async mostrarParcela(features: __esri.Graphic[]) {
+
+    let extent: Extent | undefined;
+    features.forEach((f) => {
+      if (f.geometry && f.geometry.extent) {
+        extent = extent ? extent.union(f.geometry.extent) : f.geometry.extent.clone();
+      }
+    });
+
+    if (extent) {
+      await this.mapView?.goTo(extent.expand(10));
+    }
+  }
+
+   async zoomToGraphic(graphic: __esri.Graphic) {
+    if (!this.mapView || !graphic.geometry) return;
+
+    // Zoom a la geometría
+    const target = (graphic.geometry as any).extent ?? graphic.geometry;
+    await this.mapView.goTo(target, { duration: 1000 });
+
+  }
 
 
 }

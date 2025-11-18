@@ -1,12 +1,17 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {PanelModule} from 'primeng/panel';
 import {CommonModule} from '@angular/common';
 import {ButtonModule } from 'primeng/button';
 import {CardModule } from 'primeng/card';
 import {DividerModule} from 'primeng/divider';
 import {ProductorService} from '../../../../../services/productor.service';
-import {ProductorAttributes} from '../../../../../models/productor/productor.model';
+import {Feature, ProductorAttributes} from '../../../../../models/productor/productor.model';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+import {MapCommService} from '../../../../../services/map-comm.service';
+import {FormatUtil} from '../../../../../shared/utils/format.util';
+import {UbigeoService} from '../../../../../services/ubigeo.service';
 
 export interface Item { title: string; section: string; icon: string; }
 interface PanelGroup { title: string; icon: string; collapsed: boolean; items: Item[]; }
@@ -25,7 +30,7 @@ interface PanelGroup { title: string; icon: string; collapsed: boolean; items: I
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent  implements OnInit, OnDestroy{
 
 
   @Input()  isCollapsed = false;                       // no nullable
@@ -101,13 +106,21 @@ export class SidebarComponent {
   ];
 
   productor: ProductorAttributes | null = null;
+  parcelas: Feature []=[];
 
   formBusqueda!: FormGroup;
   mostrarProductor:boolean=false;
+  existeProductor:boolean=false;
+  @Output() buscarDni = new EventEmitter<void>();
+  @Output() limpiarDni = new EventEmitter<void>();
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private productorService: ProductorService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private comm: MapCommService,
+    readonly ubigeoService: UbigeoService
   ) {
     this.formBusqueda = this.fb.group({
       dni: [
@@ -121,6 +134,31 @@ export class SidebarComponent {
       ]
     });
 
+  }
+
+  ngOnInit(): void {
+    this.productorService.productor$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(features => {
+
+        if (!features || features.length === 0) {
+          this.productor = null;
+          this.parcelas = [];
+          this.existeProductor = false;
+          return;
+        }
+
+        const parcelas = features as unknown as Feature[];
+
+        this.productor = parcelas[0]?.attributes ?? null;
+        this.parcelas = parcelas;
+        this.existeProductor = !!this.productor;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   toggleLeft(): void {
@@ -139,6 +177,7 @@ export class SidebarComponent {
   onSearchDni(): void {
     const dniControl = this.formBusqueda.get('dni');
     this.mostrarProductor =true;
+    this.existeProductor=true;
 
     if (dniControl?.invalid) {
       dniControl.markAsTouched();
@@ -147,18 +186,33 @@ export class SidebarComponent {
 
     const dni = dniControl?.value;
 
-    this.productorService.getProductor(dni).subscribe(rows => {
-      this.productor = rows.features[0]?.attributes ?? null;
-    });
+    this.productorService.getProductor(dni);
+    this.buscarDni.emit();
+
   }
 
   onClearDni(): void {
     this.formBusqueda.get('dni')?.setValue('');
     this.productor =null;
+    this.parcelas=[];
+    this.limpiarDni.emit();
   }
 
   onVerPaneles():void{
     this.mostrarProductor =false;
+    this.limpiarDni.emit();
   }
 
+  verParcela(fila: any): void {
+    if (!fila || !fila.geometry) {
+      console.warn('La fila no tiene geometría', fila);
+      return;
+    }
+
+    // Si 'fila' ES un __esri.Graphic:
+    this.comm.requestZoomGraphic(fila);
+  }
+
+
+  protected readonly FormatUtil = FormatUtil;
 }
