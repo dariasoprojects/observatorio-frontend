@@ -9,6 +9,16 @@
   --right-w: 250px;
 }
 
+/* ====== Para pantallas mayores a 1400px ====== */
+@media (min-width: 1400px) {
+  :host {
+    --gap: 10px;
+    --pad: 10px;
+    --left-w: 360px;
+    --right-w: 450px;
+  }
+}
+
 /* ===== GRID PRINCIPAL ===== */
 .content-grid {
   display: grid;

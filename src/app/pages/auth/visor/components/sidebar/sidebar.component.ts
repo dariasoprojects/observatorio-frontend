@@ -188,6 +188,7 @@ export class SidebarComponent  implements OnInit, OnDestroy{
 
     this.productorService.getProductor(dni);
     this.buscarDni.emit();
+    this.sectionSelected.emit("");
 
   }
 

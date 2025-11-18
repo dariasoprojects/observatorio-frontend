@@ -15,6 +15,7 @@ import DistanceMeasurement2D from '@arcgis/core/widgets/DistanceMeasurement2D';
 import AreaMeasurement2D from '@arcgis/core/widgets/AreaMeasurement2D';
 import Print from '@arcgis/core/widgets/Print';
 import Extent from '@arcgis/core/geometry/Extent';
+import Polygon from '@arcgis/core/geometry/Polygon';
 
 export class Mapa {
 
@@ -66,6 +67,11 @@ export class Mapa {
     this.comm.filterRequestPpa$
       .pipe(takeUntil(this.destroyed$))
       .subscribe(reg => reg ? this.filtrarClusterPorRegPpa(reg) : this.desactivarClusterPpa());
+
+    this.comm.drawRequest$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(reg => reg ? this.activarDibujoAnalisis() : this.sketsch!.cancel());
+
   }
 
   async zoomToObjectId(objectId: number) {
@@ -648,6 +654,25 @@ export class Mapa {
       }
     };
 
+    const btnAnalisis = document.createElement("div");
+    btnAnalisis.className = "esri-widget esri-widget--button esri-interactive";
+    btnAnalisis.innerHTML = '<span class="esri-icon-globe" title="Analizar"></span>';
+    btnAnalisis.style.margin = "5px";
+
+    btnAnalisis.onclick = () => {
+      if (!this.mapView) return;
+
+      const miDiv = document.getElementById("divDragAnalisis");
+      if (!miDiv) return;
+
+      // alternar visibilidad
+      if (miDiv.style.display === "none") {
+        miDiv.style.display = "block"; // mostrar
+      } else {
+        miDiv.style.display = "none";  // ocultar
+      }
+    };
+
 
     if (this.mapView) {
       this.mapView.ui.add(legendToggleBtn, 'top-right');
@@ -665,6 +690,8 @@ export class Mapa {
       //this.currentView.ui.add(this.printWidget, "top-right");
       this.currentView.ui.add(printBtn, "top-right");
       this.currentView.ui.add(multiQyBtn, "top-right");
+
+      this.currentView.ui.add(btnAnalisis, "top-left");
 
 
       // if (this.printWidget) {
@@ -867,6 +894,23 @@ export class Mapa {
     const target = (graphic.geometry as any).extent ?? graphic.geometry;
     await this.mapView.goTo(target, { duration: 1000 });
 
+  }
+
+  private activarDibujoAnalisis() {
+    // limpiar capa si deseas
+   // this.drawLayer.removeAll();
+
+    // usar el mismo Sketch existente
+    this.sketsch!.create('polygon');
+
+    // escuchar una sola vez el evento
+    const handler = this.sketsch!.on('create', (evt) => {
+      if (evt.state === 'complete') {
+        const geom = evt.graphic.geometry as Polygon;
+        this.comm.sendGeometry(geom);  // mandar al panel
+        handler.remove();                 // limpiar listener
+      }
+    });
   }
 
 

@@ -1,0 +1,158 @@
+<div class="p-fluid analisis-espacial">
+
+  <!-- 1. Definir cobertura -->
+  <p-card class="step-card">
+    <ng-template pTemplate="title">
+      <span class="step-title">1. Definir cobertura</span>
+    </ng-template>
+
+    <!-- Cargar KML -->
+    <div class="p-field">
+      <label class="field-title">Cargar KML</label>
+
+      <p-fileUpload
+        name="kml"
+        mode="advanced"
+        [showUploadButton]="false"
+        [showCancelButton]="false"
+        [auto]="true"
+        chooseLabel="Subir documento"
+        accept=".kml"
+        (onSelect)="onKmlSelect($event)"
+        (onClear)="onKmlClear()"
+        styleClass="file-drop"
+      >
+        <ng-template pTemplate="content">
+          <div class="file-drop-text">
+            Arrastra el archivo a este espacio o
+            cárgalo desde tu computadora
+          </div>
+        </ng-template>
+      </p-fileUpload>
+
+      <small class="p-text-secondary">
+        Formato permitido: .KML
+      </small>
+    </div>
+
+    <!-- Archivo KML cargado -->
+    <div class="p-field" *ngIf="kmlFile">
+      <div class="file-card">
+        <span class="file-chip">.KML</span>
+        <span class="file-name">{{ kmlFile.name }}</span>
+
+        <button
+          pButton
+          type="button"
+          icon="pi pi-trash"
+          class="p-button-rounded p-button-text p-button-danger file-remove"
+          (click)="onKmlClear()"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Cargar Shapefile -->
+    <div class="p-field">
+      <label class="field-title">Cargar Shapefile (.zip)</label>
+
+      <p-fileUpload
+        name="shp"
+        mode="advanced"
+        [showUploadButton]="false"
+        [showCancelButton]="false"
+        [auto]="true"
+        chooseLabel="Subir documento"
+        accept=".zip"
+        (onSelect)="onShpSelect($event)"
+        (onClear)="onShpClear()"
+        styleClass="file-drop"
+      >
+        <ng-template pTemplate="content">
+          <div class="file-drop-text">
+            Arrastra el archivo a este espacio o
+            cárgalo desde tu computadora
+          </div>
+        </ng-template>
+      </p-fileUpload>
+
+      <small class="p-text-secondary">
+        Formato permitido: .zip
+      </small>
+    </div>
+
+    <!-- Botón Dibujar polígono -->
+    <div class="p-field">
+      <button
+        pButton
+        type="button"
+        label="Dibujar polígono"
+        class="p-button-outlined p-button-success w-full"
+        (click)="onDrawPolygon()"
+      ></button>
+    </div>
+  </p-card>
+
+  <!-- 2. Ejecutar análisis -->
+  <p-card class="step-card">
+    <ng-template pTemplate="title">
+      <span class="step-number">2.</span>
+      <span class="step-title">Ejecutar análisis</span>
+    </ng-template>
+
+    <button
+      pButton
+      type="button"
+      label="Ejecutar superposición"
+      class="p-button-success w-full"
+      (click)="onRunAnalysis()"
+    ></button>
+  </p-card>
+
+  <!-- 3. Resultados -->
+  <p-card class="step-card">
+    <ng-template pTemplate="title">
+      <span class="step-number">3.</span>
+      <span class="step-title">Resultados</span>
+    </ng-template>
+
+    <p-table
+      [value]="resultados"
+      [paginator]="true"
+      [rows]="5"
+      styleClass="p-datatable-sm resultados-table"
+      *ngIf="resultados?.length"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>OBJECTID</th>
+          <th>TXT_NRO DOC</th>
+          <th>NOMBRES</th>
+          <th>APELLIDOS</th>
+          <th style="width: 3rem;"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ row.OBJECTID }}</td>
+          <td>{{ row.TXT_NRODOC }}</td>
+          <td>{{ row.NOMBRES }}</td>
+          <td>{{ row.APELLIDOS }}</td>
+          <td class="text-center">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-ellipsis-v"
+              class="p-button-text p-button-rounded p-button-sm"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div class="p-text-center p-text-secondary" *ngIf="!resultados?.length">
+      No hay resultados para mostrar.
+    </div>
+  </p-card>
+
+</div>
