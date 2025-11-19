@@ -66,6 +66,7 @@ export class Mapa {
   private capaSeleccionada: string | null = null;
   private queryTask: any;
   private modoConsulta = false;
+  private highlightLayerKml: GraphicsLayer = new GraphicsLayer();
 
  
   
@@ -74,6 +75,24 @@ export class Mapa {
     this.resultsLayer = new GraphicsLayer();
 
     this.drawLayer = new GraphicsLayer(); 
+
+
+    // this.comm.geometry$.subscribe(geom => {
+    //   if (geom) {
+    //     this.dibujarGeometry(geom);
+    //   }
+    // });
+
+
+    this.comm.geometry$.subscribe(geom => {
+      console.log(" Geometría recibida en map.ts:", geom);
+
+      if (geom) {
+        this.dibujarGeometry(geom);
+      }
+    });
+
+
 
     // suscripción al servicio
     this.comm.zoomRequest$.subscribe(objectId => {
@@ -136,6 +155,37 @@ export class Mapa {
 
 
 
+  }
+
+
+  private dibujarGeometry(geom: Polygon) {
+
+    if (!this.map) return;
+
+    // agregar layer si no existe
+    if (!this.map.layers.includes(this.highlightLayerKml)) {
+      this.map.add(this.highlightLayerKml);
+    }
+
+    // limpiar anteriores
+    this.highlightLayerKml.removeAll();
+
+    const g = new Graphic({
+      geometry: geom,
+      symbol: {
+        type: "simple-fill",
+        color: [255, 0, 255, 0.1],     // magenta suave transparente
+        outline: {
+          color: [255, 0, 255, 1],
+          width: 3
+        }
+      }
+    });
+
+    this.highlightLayerKml.add(g);
+
+    // zoom a geometría
+    this.mapView?.goTo(geom);
   }
 
 

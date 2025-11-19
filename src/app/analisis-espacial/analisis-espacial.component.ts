@@ -70,10 +70,76 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
   }
 
   // botones del HTML:
-  onFileSelect(evt: Event, type: 'kml' | 'shape') {
-    // pendiente: parsear y luego mapComm.sendGeometry(geom) si quieres reutilizar canal
-    alert(`Carga de ${type.toUpperCase()} pendiente de implementar`);
+  async onFileSelect(evt: Event, type: 'kml' | 'shape') {
+    const input = evt.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    if (type === 'kml') {
+      this.cargarKML(file);
+    } else {
+      alert('Carga de SHP aún no implementada');
+    }
   }
+
+
+  private cargarKML(file: File) {
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      const text = e.target.result;
+
+      // Parsear XML del KML
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, "text/xml");
+
+      // Buscar todos los <coordinates>
+      const coordsNodes = xml.getElementsByTagName("coordinates");
+
+      if (!coordsNodes || coordsNodes.length === 0) {
+        alert("No se encontraron coordenadas en el KML");
+        return;
+      }
+
+      // Tomamos solo la primera geometría
+      const coordsText = coordsNodes[0].textContent!.trim();
+
+      // Procesar coordenadas "lon,lat,alt lon,lat,alt ..."
+      const coordsArray = coordsText
+        .split(/\s+/)
+        .map(pair => {
+          const [lon, lat] = pair.split(",").map(Number);
+          return [lon, lat];
+        });
+
+      // Cerrar polígono si es necesario
+      const first = coordsArray[0];
+      const last = coordsArray[coordsArray.length - 1];
+      if (first[0] !== last[0] || first[1] !== last[1]) {
+        coordsArray.push(first);
+      }
+
+      // Crear polígono ArcGIS
+      const polygon = new Polygon({
+        rings: [coordsArray],
+        spatialReference: { wkid: 4326 }
+      });
+
+      // Guardarlo en el componente
+      this.coberturaPolygon = polygon;
+
+      // Enviarlo al mapa → highlight automático
+      this.mapComm.sendGeometry(polygon);
+
+      alert("KML cargado correctamente");
+    };
+
+    reader.readAsText(file);
+  }
+
+
+
 
   dibujar() {
     // pedir al mapa que habilite el Sketch polygon
