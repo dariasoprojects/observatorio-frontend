@@ -742,4 +742,47 @@ export class SideRightComponent {
   }
 
 
+  resetFiltros(): void {
+
+    this.selectedDep = null;
+    this.selectedProv = null;
+
+    this.valorSeleccionado = null;
+    this.valorSeleccionadoText = null;
+
+    this.valorSeleccionadoProv = null;
+    this.valorSeleccionadoProvText = null;
+
+    this.departamentoCodigo = '';
+    this.provinciaCodigo = '';
+
+    this.provincias = [];
+
+    this.filtroUbigeoService.setFiltros({
+      departamento: null,
+      provincia: null
+    });
+
+    this.getDatosIndicadores();
+
+    try { this.indicePadronProdComponent?.cargarDatos(); } catch {}
+    try { this.indiceCentrosEmpadronamiento?.cargarDatos(); } catch {}
+    try { this.indiceTipoActividadComponent?.cargarDatos(); } catch {}
+    try { this.indiceNivelEstudioComponent?.cargarDatos(); } catch {}
+    try { this.indiceSegunRegionNaturalComponent?.cargarDatos(); } catch {}
+    try { this.indiceFuenteIngresoComponent?.cargarDatos(); } catch {}
+    try { this.indiceGeneroComponent?.cargarDatos(); } catch {}
+    try { this.indiceTipoOrgComponent?.cargarDatos(); } catch {}
+    try { this.indiceSuperfiAgriComponent?.cargarDatos(); } catch {}
+    try { this.indiceSuperfiSembComponent?.cargarDatos(); } catch {}
+    try { this.indiceTamanioParceComponent?.cargarDatos(); } catch {}
+    try { this.indiceRegimenTenenComponent?.cargarDatos(); } catch {}
+    try { this.indicePrincipalesCultivosComponent?.cargarDatos(); } catch {}
+    try { this.indiceCultivosTransitComponent?.cargarDatos(); } catch {}
+    try { this.indiceCultivosPermaComponent?.cargarDatos(); } catch {}
+    try { this.indiceFertilizanteComponent?.cargarDatos(); } catch {}
+
+  }
+
+
 }

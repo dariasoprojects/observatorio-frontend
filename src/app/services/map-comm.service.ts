@@ -46,6 +46,9 @@ export class MapCommService {
 
   private zoomRequestGraphicSource = new Subject<__esri.Graphic>();
   zoomRequestGraphic$ = this.zoomRequestGraphicSource.asObservable();
+  
+  private resetViewSource = new Subject<void>();
+  resetView$ = this.resetViewSource.asObservable();
 
   requestZoom(objectId: number) {
     this.zoomRequestSource.next(objectId);
@@ -72,7 +75,11 @@ export class MapCommService {
   }
 
   requestZoomGraphic(feature: __esri.Graphic) {
-  this.zoomRequestGraphicSource.next(feature);
-}
+    this.zoomRequestGraphicSource.next(feature);
+  }
+
+  resetView(): void {
+    this.resetViewSource.next();
+  }
   
 }

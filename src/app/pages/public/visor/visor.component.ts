@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostBinding} from '@angular/core';
+import {Component, ElementRef, HostBinding, ViewChild} from '@angular/core';
 import {Avatar} from "primeng/avatar";
 import {ConsultaMultipleComponent} from "../../../consulta_multiple/consulta-multiple.component";
 import {MapaComponent} from "../../auth/visor/components/mapa/mapa.component";
@@ -8,6 +8,9 @@ import {Router} from '@angular/router';
 import {Dialog} from 'primeng/dialog';
 import {LoginComponent} from '../../login/login.component';
 import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-espacial.component';
+import {Menu} from 'primeng/menu';
+import {MenuItem} from 'primeng/api';
+import {MapCommService} from '../../../services/map-comm.service';
 
 @Component({
   selector: 'app-visor',
@@ -19,7 +22,8 @@ import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-esp
     SidebarComponent,
     Dialog,
     LoginComponent,
-    AnalisisEspacialComponent
+    AnalisisEspacialComponent,
+    Menu
   ],
   templateUrl: './visor.component.html',
   styleUrl: './visor.component.css'
@@ -27,7 +31,9 @@ import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-esp
 export class VisorComponent {
 
   constructor(private router: Router,
-              private elRef: ElementRef) {}
+              private elRef: ElementRef,
+              private comm: MapCommService
+  ) {}
 
   // Aplica la clase al contenedor raíz para estrechar la 1ª columna
   @HostBinding('class.left-collapsed') get leftCollapsed() {
@@ -38,9 +44,23 @@ export class VisorComponent {
   isCollapsed = false;
   activeSection: string | null = null;
   showLoginDialog = false;
+  items: MenuItem[] | undefined;
+  @ViewChild('sidebar') sidebar!: SidebarComponent;
+  @ViewChild('sideright') sideright!: SideRightComponent;
 
   ngOnInit(): void {
-    // this.activeSection = 'sec_padron_pa';
+    this.items = [
+      {
+        label: 'Opciones',
+        items: [
+          {
+            label: 'Limpiar',
+            icon: 'pi pi-refresh',
+            command: () => this.onClear()
+          },
+        ]
+      }
+    ];
   }
   onSelectSection(section: string) {
     this.activeSection = section;
@@ -64,6 +84,17 @@ export class VisorComponent {
   onLimpiarDni(): void {
     const el = this.elRef.nativeElement as HTMLElement;
     el.style.setProperty('--left-w', '260px');
+  }
+
+  onClear(): void {
+    this.activeSection ="";
+    const el = this.elRef.nativeElement as HTMLElement;
+    el.style.setProperty('--right-w', '250px');
+    this.comm.resetView();
+    el.style.setProperty('--left-w', '260px');
+    this.sidebar.onClearDni();
+    this.sidebar.onVerPaneles();
+    this.sideright.resetFiltros();
   }
 
 }

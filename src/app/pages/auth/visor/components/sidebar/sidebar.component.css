@@ -37,7 +37,7 @@
 .side-left__toggle {
   position: absolute;
   left: -14px;
-  top: 8px;
+  top: 16px;
   width: 28px;
   height: 28px;
   border: none;
@@ -86,7 +86,7 @@
 /* ===== BUSCADOR ===== */
 .search {
   position: relative;
-  margin: 6px 0 10px;
+  margin: 6px 0 0 10px;
 }
 
 .search .icon-left,
@@ -124,7 +124,7 @@
 .link:hover{ background:#f3f4f6; }
 
 /* ===== ENCABEZADOS DE PANEL (PrimeNG) ===== */
-.hdr{ display:flex; align-items:center; gap:8px; color:#111827; font-weight:700; }
+.hdr{ display:flex; align-items:center; gap:8px; color:#111827;  }
 .hdr .pi{ font-size:14px; color:#374151; }
 .panel-tight .p-panel-content{ padding:8px 10px !important; }
 
