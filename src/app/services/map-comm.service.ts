@@ -14,7 +14,7 @@ export class MapCommService {
     this.selectLayerSource.next(layer);
   }
 
-  
+
 
   //  NUEVO canal para devolver feature seleccionado
   private featureSelectedSource = new Subject<__esri.Graphic>();
@@ -40,7 +40,7 @@ export class MapCommService {
   geometry$ = this.geometrySource.asObservable();
 
 
-  // 🔹 NUEVO canal exclusivo para dibujo
+  //  NUEVO canal exclusivo para dibujo
   private drawRequestSource = new Subject<boolean>();
   drawRequest$ = this.drawRequestSource.asObservable();
 
@@ -69,7 +69,7 @@ export class MapCommService {
     this.geometrySource.next(geom);
   }
 
-  // 🔹 NUEVO método para activar/desactivar modo dibujo
+  //  NUEVO método para activar/desactivar modo dibujo
   requestDraw(active: boolean) {
     this.drawRequestSource.next(active);
   }
