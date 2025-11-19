@@ -16,6 +16,7 @@ import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-esp
 import {MenuItem} from 'primeng/api';
 import {Menu} from 'primeng/menu';
 import {MapCommService} from '../../../services/map-comm.service';
+import {LoaderComponent} from '../../loader/loader.component';
 
 @Component({
   selector: 'app-visor',
@@ -34,6 +35,7 @@ import {MapCommService} from '../../../services/map-comm.service';
     AnalisisEspacialComponent,
     DialogModule,
     Menu,
+    LoaderComponent,
 
   ],
   templateUrl: './visor.component.html',

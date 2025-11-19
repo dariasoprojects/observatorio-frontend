@@ -23,9 +23,9 @@
       </div>
       <span class="subtitle">Consulta, analiza y sigue la poducción agraria con información actualizada en tiempo real. </span>
 
-      <div class="video-container">
+      <div class="video-container" *ngIf="videoPortada">
         <iframe
-          src="https://www.youtube.com/embed/VuqAojmGlwQ"
+          [src]="videoPortada | safeUrl"
           title="#HistoriasDelAgro | Manuel Dioses, agricultor de banano de Tumbes"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -108,3 +108,4 @@
 
   </a>
 </div>
+<app-loader></app-loader>

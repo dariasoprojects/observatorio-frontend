@@ -6,6 +6,8 @@ import Aura from '@primeng/themes/aura';
 
 import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
+import {provideHttpClient, withInterceptors} from '@angular/common/http';
+import {loaderInterceptor} from './app/interceptors/loader.interceptor';
 
 const merged = mergeApplicationConfig(appConfig, {
   providers: [
@@ -15,7 +17,8 @@ const merged = mergeApplicationConfig(appConfig, {
         preset: Aura,
         options: { darkModeSelector: 'html.__never__dark__' } // bloquea dark
       }
-    })
+    }),
+    provideHttpClient(withInterceptors([loaderInterceptor]))
   ]
 });
 
