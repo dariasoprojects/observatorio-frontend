@@ -1,0 +1,141 @@
+/* Contenedor general */
+.analisis-espacial {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+/* ===== TARJETAS (PASOS) ===== */
+.step-card {
+  border-radius: 0.75rem;
+  box-shadow: 0 0 0 1px #e5e7eb;
+}
+
+.step-card .p-card-body {
+  padding-top: 0.75rem;
+}
+
+/* Título del paso */
+.step-card .p-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #16a34a;      /* verde */
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.step-title {
+  font-weight: 600;
+}
+
+/* ===== CAMPOS ===== */
+.p-field {
+  margin-bottom: 0.75rem;
+}
+
+.field-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.p-text-secondary {
+  font-size: 0.75rem;
+}
+
+/* ===== ÁREA DE DROP / UPLOAD ===== */
+.file-drop {
+  width: 100%;
+}
+
+.file-drop .p-fileupload-content {
+  border: 1px dashed #9ca3af;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  text-align: center;
+  background-color: #f9fafb;
+}
+
+.file-drop-text {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.file-drop .p-fileupload-choose {
+  margin-top: 0.5rem;
+}
+
+/* Tarjeta de archivo cargado */
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f3f4f6;
+  font-size: 0.8rem;
+}
+
+.file-chip {
+  background: #111827;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.7rem;
+}
+
+.file-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Botón borrar archivo */
+.file-remove.p-button {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Botones ancho completo */
+.w-full {
+  width: 100%;
+}
+
+/* ===== TABLA DE RESULTADOS ===== */
+.resultados-table {
+  font-size: 0.78rem;
+}
+
+.resultados-table thead th {
+  white-space: nowrap;
+}
+
+.resultados-table tbody td {
+  padding: 0.35rem 0.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Ajuste para pantallas pequeñas (como el mockup) */
+@media (max-width: 480px) {
+  .analisis-espacial {
+    padding: 0.5rem;
+  }
+}
