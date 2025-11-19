@@ -137,16 +137,25 @@
   .brand-small.centered .brand-title{ font-size:16px; }
 }
 
-.list .link{
-  width: 100%;
-  text-align: left;
+.list .link {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  column-gap: 8px;
+
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid transparent;
   background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  text-align: left;
   color: #374151;
   cursor: pointer;
 }
+
+.list .link i {
+  display: block; /* ocupa su espacio completo */
+}
+
 
 .list .link:hover{
   background: #f3f4f6;

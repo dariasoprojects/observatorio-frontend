@@ -55,6 +55,8 @@ import {FormatUtil} from '../../../../../shared/utils/format.util';
 import {MapaService} from '../../../../../services/mapa.service';
 import {DepartamentoGraficoResponse} from '../../../../../models/mapa/departamento-grafico.model';
 import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
+import {finalize} from 'rxjs';
+import {LoaderService} from '../../../../../services/state/loader.service';
 
 export interface Departamento {
   code: string;
@@ -163,7 +165,8 @@ export class SideRightComponent {
   constructor(
     private ubigeoService: UbigeoService,
     private sumatoriasService: SumatoriasService,
-    private filtroUbigeoService: FiltroUbigeoService
+    private filtroUbigeoService: FiltroUbigeoService,
+    private loader: LoaderService
   ) {}
 
   ngOnInit(): void {
@@ -195,8 +198,12 @@ export class SideRightComponent {
       departamento: this.departamentoCodigo,
       provincia: null    // al cambiar depto, limpias provincia
     });
-
-    this.ubigeoService.getProvinciabyCodigo(selectedValue).subscribe({
+    this.loader.show();
+    this.ubigeoService.getProvinciabyCodigo(selectedValue)
+      .pipe(
+        finalize(() => this.loader.hide())   // 👈 SIEMPRE se ejecuta, éxito o error
+      )
+      .subscribe({
       next: (rows: ProvinciasResponse) => {
         const lista = (rows?.features ?? []).map(f => ({
           code: f.attributes.IDPROV,
