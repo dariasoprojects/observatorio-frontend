@@ -144,15 +144,15 @@ export class Mapa {
     let url = "";
 
     if (layer === "junta") {
-      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/0";
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/6";
     } else if (layer === "comite") {
-      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/ComisionesRiego/MapServer/0";
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/7";
     }else if (layer === "unidadhidro") {
-      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/UnidadHidrografica/MapServer/0";
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/10";
     }else if (layer === "sectores") {
-      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/SectoresEstadisticos/MapServer/0";
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/9";
     }else if (layer === "microcuencas") {
-      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Microcuencas/MapServer/0";
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/8";
     }
 
 
@@ -420,33 +420,73 @@ export class Mapa {
 
       this.capaParcelasPadron = new MapImageLayer({        
         url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/",
-        title: "Parcelas Productores"
+        title: "Parcelas Productores",
+        sublayers: [
+          {
+            id: 0,
+            visible: true
+          }
+        ]    
       }); 
 
       this.capaMapServer = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/SectoresEstadisticos/MapServer/",
-        visible: false
+        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer",
+        visible: false,
+        title: "Sectores Estadísticos",
+        sublayers: [
+          {
+            id: 9,
+            visible: true
+          }
+        ]    
       });
 
       this.rasterBosqueAmazonico= new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/UnidadHidrografica/MapServer/",
-        visible: false
-        
+        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer",
+        visible: false,
+        title: "Unidad Hidrográfica",
+        sublayers: [
+          {
+            id: 10,
+            visible: true
+          }
+        ]        
       });
 
       this.capaClusterAlertas = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Microcuencas/MapServer/",
-        visible: false
+        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer",
+        visible: false,
+        title: "Microcuencas",
+        sublayers: [
+          {
+            id: 8,
+            visible: true
+          }
+        ]        
       });
 
       this.capaJuntausuario = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/",
-        visible: false
+        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer",
+        visible: false,
+        title: "Juntas de Usuarios",
+        sublayers: [
+          {
+            id: 6,
+            visible: true
+          }
+        ]        
       });
 
       this.capaComiteRiego = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/ComisionesRiego/MapServer/",
-        visible: false
+        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer",
+        visible: false,
+        title: "Comisiones de Usuarios",
+        sublayers: [
+          {
+            id: 7,
+            visible: true
+          }
+        ]        
       });
 
       this.capaAntenasCelular = new MapImageLayer({
