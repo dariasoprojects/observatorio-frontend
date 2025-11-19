@@ -101,6 +101,39 @@ export class ConsultaMultipleComponent implements OnInit {
     await this.cargarCSV();
   }
 
+
+  private traducirValor(campo: string, valor: any): any {
+    if (valor === null || valor === undefined) {
+      return valor;
+    }
+
+    const campoUpper = campo.toUpperCase();
+    const campoLower = campo.toLowerCase();
+
+    // 1) Buscar en la configuración cargada (case-insensitive + nombres alternos)
+    const conf = this.configuracion.find(d => {
+      const campoConfig =
+        (d.CAMPO_BUSQUEDA ?? d.campo_busqueda ?? '').toString().toUpperCase();
+      const idValorConfig = (d.IDVALOR ?? d.idvalor ?? '').toString();
+      return campoConfig === campoUpper && idValorConfig === valor.toString();
+    });
+
+    if (conf && (conf.VALOR ?? conf.valor)) {
+      return conf.VALOR ?? conf.valor;  // usa el nombre legible del catálogo
+    }
+
+    // 2) Buscar en camposLegibles (usando el nombre del campo en minúsculas)
+    const tablaCampo = this.camposLegibles[campoLower];
+    if (tablaCampo && tablaCampo[valor] !== undefined) {
+      return tablaCampo[valor];
+    }
+
+    // 3) Si no hay traducción, devolvemos tal cual
+    return valor;
+  }
+
+
+
   private async cargarCSV() {
     const q = new Query({
       where: "1=1",
@@ -162,23 +195,39 @@ export class ConsultaMultipleComponent implements OnInit {
     try {
       const response = await query.executeQueryJSON(this.urlShape, q);
 
+      // this.resultados = response.features.map(f => {
+      //   const attr = f.attributes;
+      //   const atributosLegibles: { [key: string]: string | number } = {};
+
+      //   Object.keys(attr).forEach(campo => {
+      //     const conf = this.configuracion.find(c => c.CAMPO_BUSQUEDA === campo && c.IDVALOR === attr[campo]);
+      //     if (conf) {
+      //       atributosLegibles[campo] = conf.VALOR;
+      //     } 
+      //     else if (this.camposLegibles[campo] && this.camposLegibles[campo][attr[campo]] !== undefined) {
+      //       atributosLegibles[campo] = this.camposLegibles[campo][attr[campo]];
+      //     } 
+      //     else {
+      //       atributosLegibles[campo] = attr[campo];
+      //     }
+      //   });
+
+
+      //   return {
+      //     fid: attr.OBJECTID,
+      //     attributes: atributosLegibles,
+      //     geometry: f.geometry
+      //   };
+      // });
+
       this.resultados = response.features.map(f => {
         const attr = f.attributes;
-        const atributosLegibles: { [key: string]: string | number } = {};
+
+        const atributosLegibles: { [key: string]: any } = {};
 
         Object.keys(attr).forEach(campo => {
-          const conf = this.configuracion.find(c => c.CAMPO_BUSQUEDA === campo && c.IDVALOR === attr[campo]);
-          if (conf) {
-            atributosLegibles[campo] = conf.VALOR;
-          } 
-          else if (this.camposLegibles[campo] && this.camposLegibles[campo][attr[campo]] !== undefined) {
-            atributosLegibles[campo] = this.camposLegibles[campo][attr[campo]];
-          } 
-          else {
-            atributosLegibles[campo] = attr[campo];
-          }
+          atributosLegibles[campo] = this.traducirValor(campo, attr[campo]);
         });
-
 
         return {
           fid: attr.OBJECTID,
@@ -186,6 +235,8 @@ export class ConsultaMultipleComponent implements OnInit {
           geometry: f.geometry
         };
       });
+
+
 
       console.log("Resultados mapeados:", this.resultados);
 
