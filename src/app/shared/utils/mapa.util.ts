@@ -74,6 +74,11 @@ export class Mapa {
       .pipe(takeUntil(this.destroyed$))
       .subscribe(reg => reg ? this.activarDibujoAnalisis() : this.sketsch!.cancel());
 
+
+    this.comm.resetView$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(id => this.aplicarEstadoInicial());
+
   }
 
   async zoomToObjectId(objectId: number) {
@@ -348,6 +353,8 @@ export class Mapa {
       this.currentView = this.mapView; // para el toggle 2D/3D
 
       this.agregarBotones();
+      this.aplicarEstadoInicial();
+
       this.isReady = true;
 
       return 'Mapa cargado con éxito';
@@ -356,6 +363,41 @@ export class Mapa {
       throw error; // deja que el caller haga catch
     }
   }
+
+  private aplicarEstadoInicial(): void {
+    // Visibilidad inicial de capas
+    if (this.capaParcelasPadron) this.capaParcelasPadron.visible = true;
+    if (this.capaMapServer) this.capaMapServer.visible = false;
+    if (this.rasterBosqueAmazonico) this.rasterBosqueAmazonico.visible = false;
+    if (this.capaClusterAlertas) this.capaClusterAlertas.visible = false;
+    if (this.capaJuntausuario) this.capaJuntausuario.visible = false;
+    if (this.capaComiteRiego) this.capaComiteRiego.visible = false;
+    if (this.capaAntenasCelular) this.capaAntenasCelular.visible = false;
+    if (this.capaCluster) this.capaCluster.visible = false;
+    if (this.capaClusterPpa) this.capaClusterPpa.visible = false;
+
+    // Limpiar resultados y resaltar
+    this.resultsLayer?.removeAll();
+    this.highlightLayer?.removeAll();
+
+    // Centrar y zoom inicial
+    if (this.mapView) {
+      this.mapView.popup?.close();
+      this.mapView.goTo({
+        center: [-75.015, -9.19],
+        zoom: 6
+      });
+    }
+
+    // Ocultar paneles de leyenda y TOC
+    if (this.legendContainer) {
+      this.legendContainer.style.display = 'none';
+    }
+    if (this.tocContainer) {
+      this.tocContainer.style.display = 'none';
+    }
+  }
+
 
 
   agregarBotones() {
@@ -658,7 +700,7 @@ export class Mapa {
 
     const btnAnalisis = document.createElement("div");
     btnAnalisis.className = "esri-widget esri-widget--button esri-interactive";
-    btnAnalisis.innerHTML = '<span class="esri-icon-globe" title="Analizar"></span>';
+    btnAnalisis.innerHTML = '<span class="esri-icon-configure-popup" title="Analizar"></span>';
     btnAnalisis.style.margin = "5px";
 
     btnAnalisis.onclick = () => {
@@ -693,7 +735,7 @@ export class Mapa {
       this.currentView.ui.add(printBtn, "top-right");
       this.currentView.ui.add(multiQyBtn, "top-right");
 
-      this.currentView.ui.add(btnAnalisis, "top-left");
+      this.currentView.ui.add(btnAnalisis, "top-right");
 
 
       // if (this.printWidget) {

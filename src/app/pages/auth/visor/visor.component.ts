@@ -13,6 +13,9 @@ import {MapaComponent} from './components/mapa/mapa.component';
 import {ConsultaMultipleComponent} from '../../../consulta_multiple/consulta-multiple.component';
 import {DialogModule} from 'primeng/dialog';
 import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-espacial.component';
+import {MenuItem} from 'primeng/api';
+import {Menu} from 'primeng/menu';
+import {MapCommService} from '../../../services/map-comm.service';
 
 @Component({
   selector: 'app-visor',
@@ -29,7 +32,9 @@ import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-esp
     MapaComponent,
     ConsultaMultipleComponent,
     AnalisisEspacialComponent,
-    DialogModule
+    DialogModule,
+    Menu,
+
   ],
   templateUrl: './visor.component.html',
   styleUrl: './visor.component.css'
@@ -37,7 +42,9 @@ import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-esp
 export class VisorComponent {
 
   constructor(private router: Router,
-              private elRef: ElementRef) {}
+              private elRef: ElementRef,
+              private comm: MapCommService
+              ) {}
 
   // Aplica la clase al contenedor raíz para estrechar la 1ª columna
   @HostBinding('class.left-collapsed') get leftCollapsed() {
@@ -48,10 +55,29 @@ export class VisorComponent {
   isCollapsed = false;
   activeSection: string | null = null;
   dialogVisible = false;
+  items: MenuItem[] | undefined;
+  @ViewChild('sidebar') sidebar!: SidebarComponent;
+  @ViewChild('sideright') sideright!: SideRightComponent;
 
   ngOnInit(): void {
-   // this.activeSection = 'sec_padron_pa';
     this.dialogVisible = true;
+    this.items = [
+      {
+        label: 'Opciones',
+        items: [
+          {
+            label: 'Limpiar',
+            icon: 'pi pi-refresh',
+            command: () => this.onClear()
+          },
+          {
+            label: 'Salir',
+            icon: 'pi pi-sign-out',
+            command: () => this.onLogout()
+          }
+        ]
+      }
+    ];
   }
   onSelectSection(section: string) {
      this.activeSection = section;
@@ -73,8 +99,18 @@ export class VisorComponent {
     el.style.setProperty('--left-w', '260px');
   }
 
-
   onLogout(): void {
-    this.router.navigate(['/visor-2']);
+    this.router.navigate(['/visor']);
+  }
+
+  onClear(): void {
+    this.activeSection ="";
+    const el = this.elRef.nativeElement as HTMLElement;
+    el.style.setProperty('--right-w', '250px');
+    this.comm.resetView();
+    el.style.setProperty('--left-w', '260px');
+    this.sidebar.onClearDni();
+    this.sidebar.onVerPaneles();
+    this.sideright.resetFiltros();
   }
 }

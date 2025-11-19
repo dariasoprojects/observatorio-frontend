@@ -3,6 +3,7 @@
   <!-- IZQUIERDA -->
 
   <app-sidebar
+    #sidebar
     [(isCollapsed)]="isCollapsed"
     [activeSection]="activeSection"
     (buscarDni)="onBuscarDni()"
@@ -16,7 +17,8 @@
       <div class="topbar-right">
 
         <!-- Ícono genérico o avatar vacío -->
-        <p-avatar icon="pi pi-user" shape="circle" styleClass="usr-avatar"></p-avatar>
+        <p-avatar icon="pi pi-user" shape="circle" styleClass="usr-avatar" (click)="menu.toggle($event)"></p-avatar>
+        <p-menu #menu [model]="items" [popup]="true" />
 
         <div class="usr-info">
           <div class="usr-name">Invitado</div>
@@ -45,6 +47,7 @@
 
   <!-- DERECHA -->
   <app-side-right
+    #sideright
     [activeSection]="activeSection"
   >
   </app-side-right>
