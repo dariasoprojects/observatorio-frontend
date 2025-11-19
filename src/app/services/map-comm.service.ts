@@ -6,6 +6,26 @@ import Polygon from '@arcgis/core/geometry/Polygon';
 @Injectable({ providedIn: 'root' })
 export class MapCommService {
 
+
+  private selectLayerSource = new Subject<string | null>();
+  selectLayer$ = this.selectLayerSource.asObservable();
+
+  selectLayer(layer: string | null) {
+    this.selectLayerSource.next(layer);
+  }
+
+  
+
+  //  NUEVO canal para devolver feature seleccionado
+  private featureSelectedSource = new Subject<__esri.Graphic>();
+  featureSelected$ = this.featureSelectedSource.asObservable();
+
+  sendFeatureSelected(feature: __esri.Graphic) {
+    this.featureSelectedSource.next(feature);
+  }
+
+
+
   private zoomRequestSource = new Subject<number>();
   zoomRequest$ = this.zoomRequestSource.asObservable();
 
@@ -23,6 +43,9 @@ export class MapCommService {
   // 🔹 NUEVO canal exclusivo para dibujo
   private drawRequestSource = new Subject<boolean>();
   drawRequest$ = this.drawRequestSource.asObservable();
+
+  private zoomRequestGraphicSource = new Subject<__esri.Graphic>();
+  zoomRequestGraphic$ = this.zoomRequestGraphicSource.asObservable();
 
   requestZoom(objectId: number) {
     this.zoomRequestSource.next(objectId);
@@ -47,5 +70,9 @@ export class MapCommService {
   requestDraw(active: boolean) {
     this.drawRequestSource.next(active);
   }
+
+  requestZoomGraphic(feature: __esri.Graphic) {
+  this.zoomRequestGraphicSource.next(feature);
+}
   
 }

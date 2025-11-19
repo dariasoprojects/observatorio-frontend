@@ -5,9 +5,10 @@
   <app-sidebar
     [(isCollapsed)]="isCollapsed"
     [activeSection]="activeSection"
+    (buscarDni)="onBuscarDni()"
+    (limpiarDni)="onLimpiarDni()"
     (sectionSelected)="onSelectSection($event)">
   </app-sidebar>
-
 
   <!-- TOP-WIDE -->
   <section class="top-wide">

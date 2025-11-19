@@ -61,6 +61,12 @@ export class Mapa {
   private currentView!: MapView | SceneView;
   private printWidget: Print | null = null;
   private highlightLayer: GraphicsLayer | null = null;
+
+
+  private capaSeleccionada: string | null = null;
+  private queryTask: any;
+  private modoConsulta = false;
+
  
   
   constructor(divId: string, private comm: MapCommService) {
@@ -106,7 +112,51 @@ export class Mapa {
     });
 
 
+    this.comm.selectLayer$.subscribe(layer => {
+      console.log("Capa seleccionada:", layer);
+
+      if (!layer) {
+        this.modoConsulta = false;
+        return;
+      }
+
+      this.modoConsulta = true;
+
+      // guardar qué capa se seleccionó
+      this.capaSeleccionada = layer;
+
+      // configurar queryTask dinámico
+      this.configurarQueryTask(layer);
+
+      // activar cursor especial
+      if (this.mapView?.container) {
+        this.mapView.container.style.cursor = "crosshair";
+      }
+    });
+
+
+
   }
+
+
+
+  private configurarQueryTask(layer: string) {
+    let url = "";
+
+    if (layer === "junta") {
+      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/0";
+    } else if (layer === "comite") {
+      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/ComisionesRiego/MapServer/0";
+    }
+
+    this.queryTask = new FeatureLayer({
+      url,
+      outFields: ["*"]
+    });
+
+    console.log("QueryTask configurado:", url);
+  }
+
 
 
   private activarDibujoAnalisis() {
@@ -505,7 +555,20 @@ export class Mapa {
       this.mapView.ui.add(this.tocContainer, 'bottom-right');
            
       await this.mapView.when();
-      this.agregarBotones();      
+      this.agregarBotones();   
+
+
+
+
+      // =============================
+      // CAPTURAR CLIC PARA CONSULTA
+      // =============================
+      this.mapView.on("click", (event) => {
+        if (!this.modoConsulta || !this.queryTask) return;
+
+        this.buscarEntidad(event.mapPoint);
+      });
+   
 
 
       console.log("Mapa inicializado");
@@ -518,6 +581,55 @@ export class Mapa {
 
     }
   }
+
+
+  private async buscarEntidad(mapPoint: any) {
+    try {
+      const query = this.queryTask.createQuery();
+      query.geometry = mapPoint;
+      query.spatialRelationship = "intersects";
+      query.returnGeometry = true;
+
+      const res = await this.queryTask.queryFeatures(query);
+
+      if (!res.features.length) {
+        console.warn("No se encontró entidad.");
+        return;
+      }
+
+      const feature = res.features[0];
+
+      // Dibujar
+      this.resultsLayer?.removeAll();
+      // this.resultsLayer?.add(feature);
+      // Crear un símbolo personalizado
+      feature.symbol = {
+        type: "simple-fill",
+        color: [0, 0, 0, 0],            // fondo transparente
+        outline: {
+          color: [255, 0, 255, 1],     // borde dorado
+          width: 4
+        }
+      };
+
+      // Agregar al mapa
+      this.resultsLayer?.add(feature);
+
+
+      // Zoom
+      this.mapView?.goTo(feature.geometry);
+
+      // Enviar evento para panel u otro componente
+      this.comm.sendFeatureSelected(feature);
+      this.comm.sendGeometry(feature.geometry); 
+
+      console.log("OBJECTID encontrado:", feature.attributes.OBJECTID);
+
+    } catch (err) {
+      console.error("Error al consultar la capa seleccionada:", err);
+    }
+  }
+
 
 
 
@@ -878,13 +990,16 @@ export class Mapa {
   async zoomToObjectId(objectId: number) {
 
     //alert("fgttttttttt");
+
+
+
     try {
       const featureLayer = new FeatureLayer({
-        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/ppa/Capa_Observatorio/MapServer/0"
+        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0"
       });
 
       const query = featureLayer.createQuery();
-      query.where = `FID = ${objectId}`;
+      query.where = `OBJECTID = ${objectId}`;
       query.outFields = ["*"];
       query.returnGeometry = true;
 

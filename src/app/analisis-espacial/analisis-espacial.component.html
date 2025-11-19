@@ -32,6 +32,20 @@
     <!-- OPCIÓN DIBUJAR -->
     <button class="btn-primary" (click)="dibujar()"> Dibujar polígono</button>
 
+
+     <!-- OPCIÓN SHAPE -->
+    <div class="input-group">
+      <label>Seleccionar Capa</label>
+      <select [(ngModel)]="capaSeleccionada" (change)="onCapaChange()">
+        <option value="">-- Seleccione capa --</option>
+        <option value="junta">Junta de Usuarios</option>
+        <option value="comite">Comité / Comisión de Riego</option>
+      </select>
+    </div>
+
+
+
+
     <hr>
 
     <label class="section-title">2. Ejecutar análisis</label>

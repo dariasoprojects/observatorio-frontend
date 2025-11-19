@@ -76,6 +76,13 @@
           </div>
 
         </div>
+        <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched  && this.mostrarProductor && !this.existeProductor">
+
+          <div >
+            Dni no encontrado.
+          </div>
+
+        </div>
       </form>
 
 
@@ -132,12 +139,28 @@
                 <span class="section-title">Ubicación parcela principal del productor</span>
               </div>
 
-              <div class="field-row"><span class="field-label">Región:</span></div>
-              <div class="field-row"><span class="field-label">Provincia:</span></div>
-              <div class="field-row"><span class="field-label">Distrito:</span></div>
-              <div class="field-row"><span class="field-label">Rég. tenencia:</span></div>
-              <div class="field-row"><span class="field-label">Área (ha) declarada</span></div>
-              <div class="field-row"><span class="field-label">Total parcelas:</span></div>
+
+              <table class="tabla-region">
+                <thead>
+                <tr>
+                  <th>Latitud</th>
+                  <th>Longitud</th>
+                  <th>Ubigeo</th>
+                  <th>Ubicación</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let fila of parcelas">
+                  <td>{{ FormatUtil.formatInteger2Digitos (fila.attributes.LAT ) }}</td>
+                  <td>{{ FormatUtil.formatInteger2Digitos (fila.attributes.LONG_) }}</td>
+                  <td>{{ ubigeoService.getNombre(fila.attributes.UBIGEO3)  }}</td>
+                  <td class="cell-center">
+                    <i class="pi pi-search" (click)="verParcela(fila)"></i>
+                  </td>
+
+                </tr>
+                </tbody>
+              </table>
 
             </div>
 
@@ -146,7 +169,6 @@
             <!-- FOOTER -->
             <ng-template pTemplate="footer">
               <div class="panel-footer">
-                <button type="button" pButton label="Ver ubicación en el mapa" class="map-btn"></button>
                 <button type="button" pButton label="Cerrar" class="close-btn p-button-outlined"
                         (click)="onVerPaneles()"
                 ></button>

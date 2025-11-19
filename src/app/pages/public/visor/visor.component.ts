@@ -49,4 +49,15 @@ export class VisorComponent {
   onLogin(): void {
     this.showLoginDialog = true;
   }
+
+  onBuscarDni(): void {
+    const el = this.elRef.nativeElement as HTMLElement;
+    el.style.setProperty('--left-w', '360px');
+  }
+
+  onLimpiarDni(): void {
+    const el = this.elRef.nativeElement as HTMLElement;
+    el.style.setProperty('--left-w', '260px');
+  }
+
 }

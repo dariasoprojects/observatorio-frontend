@@ -53,6 +53,17 @@ export class VisorComponent {
     el.style.setProperty('--right-w', '450px');
   }
 
+  onBuscarDni(): void {
+    const el = this.elRef.nativeElement as HTMLElement;
+    el.style.setProperty('--left-w', '360px');
+  }
+
+  onLimpiarDni(): void {
+    const el = this.elRef.nativeElement as HTMLElement;
+    el.style.setProperty('--left-w', '260px');
+  }
+
+
   onLogout(): void {
     this.router.navigate(['/visor-2']);
   }

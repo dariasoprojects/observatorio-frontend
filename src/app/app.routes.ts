@@ -7,8 +7,8 @@ import { VisorComponent as PublicVisorComponent  } from './pages/public/visor/vi
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
-  { path: 'visor', component: VisorComponent },
+  { path: 'visor-2', component: VisorComponent },
   { path: 'login', component: LoginComponent },
   { path: 'auth/visor', component: AuthVisorComponent },
-  { path: 'visor-2', component: PublicVisorComponent },
+  { path: 'visor', component: PublicVisorComponent },
 ];
