@@ -147,7 +147,16 @@ export class Mapa {
       url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/0";
     } else if (layer === "comite") {
       url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/ComisionesRiego/MapServer/0";
+    }else if (layer === "unidadhidro") {
+      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/UnidadHidrografica/MapServer/0";
+    }else if (layer === "sectores") {
+      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/SectoresEstadisticos/MapServer/0";
+    }else if (layer === "microcuencas") {
+      url = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Microcuencas/MapServer/0";
     }
+
+
+
 
     this.queryTask = new FeatureLayer({
       url,
