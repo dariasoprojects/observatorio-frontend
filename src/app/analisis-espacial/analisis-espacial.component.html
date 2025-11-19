@@ -18,17 +18,17 @@
     <label class="section-title">1. Definir Cobertura</label>
 
     <!-- OPCIÓN KML -->
-    <div class="input-group">
+    <!-- <div class="input-group">
       <label>Cargar KML</label>
       <input type="file" (change)="onFileSelect($event, 'kml')" accept=".kml">
     </div>
-
+ -->
     <!-- OPCIÓN SHAPE -->
-    <div class="input-group">
+    <!-- <div class="input-group">
       <label>Cargar Shapefile (.zip)</label>
       <input type="file" (change)="onFileSelect($event, 'shape')" accept=".zip">
     </div>
-
+ -->
     <!-- OPCIÓN DIBUJAR -->
     <button class="btn-primary" (click)="dibujar()"> Dibujar polígono</button>
 
@@ -38,8 +38,11 @@
       <label>Seleccionar Capa</label>
       <select [(ngModel)]="capaSeleccionada" (change)="onCapaChange()">
         <option value="">-- Seleccione capa --</option>
+        <option value="unidadhidro">Unidad Hidrográfica</option>
+        <option value="sectores">Sectores Estadísticos</option>
+        <option value="microcuencas">Microcuencas</option>        
         <option value="junta">Junta de Usuarios</option>
-        <option value="comite">Comité / Comisión de Riego</option>
+        <option value="comite">Comisión de Riego</option>
       </select>
     </div>
 
