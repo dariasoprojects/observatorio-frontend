@@ -24,10 +24,22 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
 
   coberturaPolygon: Polygon | null = null;
 
+
   gridData: any[] = [];
   displayedColumns: string[] = [];
 
   private subs: Subscription[] = [];
+
+
+  capaSeleccionada: string | null = null;
+ 
+
+  urlJunta = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/0";
+  urlComite = "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/ComisionesRiego/MapServer/0";
+
+
+
+
 
   constructor(private mapComm: MapCommService) {}
 
@@ -42,6 +54,16 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
       })
     );
   }
+
+
+
+  onCapaChange() {
+    this.mapComm.selectLayer(this.capaSeleccionada);
+  }
+
+
+
+
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());

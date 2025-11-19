@@ -3,6 +3,7 @@
   overflow-y: auto;        /* scroll vertical */
   display: block;
   border: 1px solid #ccc;  /* borde general del contenedor */
+  width: 880px;
 }
 
 .tabla-resultados table {

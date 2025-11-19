@@ -6,6 +6,26 @@ import Polygon from '@arcgis/core/geometry/Polygon';
 @Injectable({ providedIn: 'root' })
 export class MapCommService {
 
+
+  private selectLayerSource = new Subject<string | null>();
+  selectLayer$ = this.selectLayerSource.asObservable();
+
+  selectLayer(layer: string | null) {
+    this.selectLayerSource.next(layer);
+  }
+
+  
+
+  //  NUEVO canal para devolver feature seleccionado
+  private featureSelectedSource = new Subject<__esri.Graphic>();
+  featureSelected$ = this.featureSelectedSource.asObservable();
+
+  sendFeatureSelected(feature: __esri.Graphic) {
+    this.featureSelectedSource.next(feature);
+  }
+
+
+
   private zoomRequestSource = new Subject<number>();
   zoomRequest$ = this.zoomRequestSource.asObservable();
 

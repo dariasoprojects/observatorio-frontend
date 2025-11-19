@@ -104,8 +104,8 @@
 
 
                             <div class="tabla-resultados">
-                              <div class="tabla-resultados">
-  <table class="table table-bordered">
+                              <div >
+  <!-- <table class="table table-bordered">
     <thead>
       <tr>
         <th>FID</th>
@@ -120,11 +120,11 @@
     <tbody>
       <tr *ngFor="let r of resultados">
         <td>{{ r.fid }}</td>
-        <td>{{ r.attributes.tdoc }}</td>
-        <td>{{ r.attributes.genero }}</td>
-        <td>{{ r.attributes.edad }}</td>
-        <td>{{ r.attributes.ecivil }}</td>
-        <td>{{ r.attributes.grado }}</td>
+        <td>{{ r.attributes.TDOC }}</td>
+        <td>{{ r.attributes.GENERO }}</td>
+        <td>{{ r.attributes.EDAD }}</td>
+        <td>{{ r.attributes.ECIVIL }}</td>
+        <td>{{ r.attributes.GRADO }}</td>
         <td>
           <button (click)="onZoom(r.fid)" class="btn btn-sm btn-primary"></button>
         </td>
@@ -133,7 +133,66 @@
         <td colspan="7" class="text-center">No hay resultados</td>
       </tr>
     </tbody>
-  </table>
+  </table> -->
+  <table class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Zoom</th>
+      <th>Tipo Doc</th>
+      <th>Género</th>
+      <th>Edad</th>
+      <th>Estado Civil</th>
+      <th>Grado Estudios</th>
+      <th>Región</th>
+      <th>Provincia</th>
+      <th>Distrito</th>
+      <th>CC.PP.</th>
+      <th>Comunidad</th>
+      <th>Comunidad Nativa</th>
+      <th>Idioma</th>
+      <th>Miembros Hogar Agrario</th>
+      <th>Parcelas</th>
+      <th>Sup. Total (ha)</th>
+      <th>Financiamiento</th>
+      <th>Régimen Tenencia</th>
+      
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let r of resultados">
+     <td>
+        <button (click)="onZoom(r.fid)" class="btn btn-sm btn-primary">🔍</button>
+      </td>
+      <td>{{ r.attributes.TDOC }}</td>
+      <td>{{ r.attributes.GENERO }}</td>
+      <td>{{ r.attributes.EDAD }}</td>
+      <td>{{ r.attributes.ECIVIL }}</td>
+      <td>{{ r.attributes.GRADO }}</td>
+      <td>{{ r.attributes.REG }}</td>
+      <td>{{ r.attributes.PROV }}</td>
+      <td>{{ r.attributes.DIST }}</td>
+      <td>{{ r.attributes.CCMP }}</td>
+      <td>{{ r.attributes.CORG }}</td>
+      <td>{{ r.attributes.CNAT }}</td>
+      <td>{{ r.attributes.LENG }}</td>
+      <td>{{ r.attributes.CMH }}</td>
+      <td>{{ r.attributes.NPAR }}</td>
+      <td>{{ r.attributes.SUPA }}</td>
+      <td>{{ r.attributes.RFNA }}</td>
+      <td>{{ r.attributes.TENP }}</td>
+
+      
+    </tr>
+
+    <tr *ngIf="resultados.length === 0">
+      <td colspan="19" class="text-center">No hay resultados</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
 </div>
 
                             </div>

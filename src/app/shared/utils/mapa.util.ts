@@ -15,7 +15,9 @@ import DistanceMeasurement2D from '@arcgis/core/widgets/DistanceMeasurement2D';
 import AreaMeasurement2D from '@arcgis/core/widgets/AreaMeasurement2D';
 import Print from '@arcgis/core/widgets/Print';
 import Extent from '@arcgis/core/geometry/Extent';
+
 import Polygon from '@arcgis/core/geometry/Polygon';
+
 
 export class Mapa {
 
@@ -896,6 +898,7 @@ export class Mapa {
 
   }
 
+
   private activarDibujoAnalisis() {
     // limpiar capa si deseas
    // this.drawLayer.removeAll();
@@ -912,6 +915,7 @@ export class Mapa {
       }
     });
   }
+
 
 
 }
