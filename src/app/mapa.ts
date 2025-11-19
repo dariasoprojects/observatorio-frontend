@@ -598,6 +598,8 @@ export class Mapa {
       query.geometry = mapPoint;
       query.spatialRelationship = "intersects";
       query.returnGeometry = true;
+      query.maxAllowableOffset = 30;  // recomendado
+      query.geometryPrecision = 4; 
 
       const res = await this.queryTask.queryFeatures(query);
 
