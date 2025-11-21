@@ -1,12 +1,21 @@
-/* Contenedor general */
+/* ======================================
+   ANALISIS ESPACIAL — CONTENEDOR GENERAL
+   ====================================== */
 .analisis-espacial {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding: 0.75rem;
+  font-size: smaller !important; /* Todo más pequeño */
 }
 
-/* ===== TARJETAS (PASOS) ===== */
+/* Todos los botones dentro del módulo */
+.analisis-espacial .p-button {
+  font-size: smaller !important; /* No grandes */
+}
+
+
+/* ===== Tarjetas (pasos) ===== */
 .step-card {
   border-radius: 0.75rem;
   box-shadow: 0 0 0 1px #e5e7eb;
@@ -16,109 +25,97 @@
   padding-top: 0.75rem;
 }
 
-/* Título del paso */
 .step-card .p-card-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.95rem;
+  font-size: smaller !important; /* Mantiene escala */
 }
 
 .step-number {
   display: inline-flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   width: 1.5rem;
   height: 1.5rem;
+  background: #0d6638;
+  color: white;
   border-radius: 999px;
-  background: #16a34a;      /* verde */
-  color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .step-title {
-  font-weight: 600;
+  font-size: smaller !important;
 }
 
-/* ===== CAMPOS ===== */
+
+/* ===== Campos ===== */
 .p-field {
   margin-bottom: 0.75rem;
 }
 
 .field-title {
-  display: block;
-  font-weight: 600;
   margin-bottom: 0.25rem;
-  font-size: 0.85rem;
+  font-size: smaller !important;
 }
 
 .p-text-secondary {
   font-size: 0.75rem;
 }
 
-/* ===== ÁREA DE DROP / UPLOAD ===== */
-.file-drop {
-  width: 100%;
-}
 
+/* ===== Dropzone / upload ===== */
 .file-drop .p-fileupload-content {
   border: 1px dashed #9ca3af;
   border-radius: 0.75rem;
   padding: 0.75rem;
+  background: #f9fafb;
   text-align: center;
-  background-color: #f9fafb;
 }
 
 .file-drop-text {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #6b7280;
 }
 
-.file-drop .p-fileupload-choose {
-  margin-top: 0.5rem;
-}
-
-/* Tarjeta de archivo cargado */
 .file-card {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 0.75rem;
   border: 1px solid #e5e7eb;
-  background-color: #f3f4f6;
-  font-size: 0.8rem;
+  border-radius: 0.75rem;
+  background: #f3f4f6;
 }
 
 .file-chip {
   background: #111827;
-  color: #fff;
-  border-radius: 999px;
+  color: white;
   padding: 0.1rem 0.5rem;
+  border-radius: 999px;
   font-size: 0.7rem;
 }
 
 .file-name {
   flex: 1;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Botón borrar archivo */
 .file-remove.p-button {
   width: 2rem;
   height: 2rem;
 }
 
-/* Botones ancho completo */
 .w-full {
   width: 100%;
 }
 
-/* ===== TABLA DE RESULTADOS ===== */
+
+/* ===== Tabla de resultados ===== */
 .resultados-table {
-  font-size: 0.78rem;
+  font-size: smaller !important;
 }
 
 .resultados-table thead th {
@@ -133,7 +130,107 @@
   text-align: center;
 }
 
-/* Ajuste para pantallas pequeñas (como el mockup) */
+
+/* ===== Botón Ejecutar análisis ===== */
+.btn-analisis {
+  background-color: #0d6638 !important;
+  border-color: #16a34a !important;
+  color: #fff !important;
+  font-size: smaller !important;
+  font-weight: 300 !important;
+}
+
+.btn-analisis:hover {
+  background-color: #15803d !important;
+  border-color: #15803d !important;
+}
+
+/* Botón Dibujar Polígono */
+.btn-dibujar {
+  border: 1px solid #15803d !important; /* borde verde */
+  background: transparent !important;   /* sin fondo */
+  color: #15803d !important;            /* texto verde */
+  font-weight: 300 !important;
+  font-size: smaller !important;
+  padding: 0.45rem 0.75rem !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Hover */
+.btn-dibujar:hover {
+  background: #15803d !important;
+  color: white !important;
+  border-color: #16a34a !important;
+}
+
+
+/* ======================================
+   FIX: Campo Departamento (alineación)
+   ====================================== */
+
+.analisis-espacial .p-field label {
+  display: block;
+  margin-bottom: 0.15rem; /* más pegado */
+  font-size: smaller !important;
+}
+
+/* Ajusta el tamaño del dropdown */
+.analisis-espacial .p-dropdown {
+  width: 100%;
+  font-size: smaller !important;
+}
+
+/* Reduce altura visual del dropdown */
+.analisis-espacial .p-dropdown .p-inputtext {
+  padding: 0.35rem 0.5rem !important; /* más compacto */
+  font-size: smaller !important;
+}
+
+/* Centrado vertical del texto */
+.analisis-espacial .p-dropdown-label {
+  display: flex;
+  align-items: center;
+}
+
+/* Botón del ícono (flecha) más pequeño */
+.analisis-espacial .p-dropdown-trigger {
+  width: 2rem !important;
+}
+
+.step-card .p-card-body {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+}
+
+
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 20px;
+}
+
+.detalle-grid strong {
+  display: block;
+  color: #374151;
+  margin-bottom: 3px;
+}
+
+.detalle-grid span {
+  padding: 6px;
+  display: block;
+  font-size: 0.75rem;
+}
+
+.wrap-scroll {
+  max-height: 75vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+
+
+/* Mobile */
 @media (max-width: 480px) {
   .analisis-espacial {
     padding: 0.5rem;

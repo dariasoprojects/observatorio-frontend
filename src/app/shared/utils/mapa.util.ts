@@ -704,19 +704,8 @@ export class Mapa {
     btnAnalisis.style.margin = "5px";
 
     btnAnalisis.onclick = () => {
-      if (!this.mapView) return;
-
-      const miDiv = document.getElementById("divDragAnalisis");
-      if (!miDiv) return;
-
-      // alternar visibilidad
-      if (miDiv.style.display === "none") {
-        miDiv.style.display = "block"; // mostrar
-      } else {
-        miDiv.style.display = "none";  // ocultar
-      }
+      this.comm.abrirDialogAnalisis();
     };
-
 
     if (this.mapView) {
       this.mapView.ui.add(legendToggleBtn, 'top-right');
@@ -735,7 +724,7 @@ export class Mapa {
       this.currentView.ui.add(printBtn, "top-right");
       this.currentView.ui.add(multiQyBtn, "top-right");
 
-      this.currentView.ui.add(btnAnalisis, "top-right");
+      this.currentView.ui.add(btnAnalisis, "top-left");
 
 
       // if (this.printWidget) {

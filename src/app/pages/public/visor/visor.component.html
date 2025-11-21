@@ -42,7 +42,6 @@
 
     </div>
     <app-consulta-multiple ></app-consulta-multiple>
-    <app-analisis-espacial></app-analisis-espacial>
   </main>
 
   <!-- DERECHA -->
@@ -64,9 +63,20 @@
     [style]="{ width: '100vw', height: '100vh', maxWidth: '100vw', margin: '0', top: '0', left: '0', borderRadius: '0' }"
     contentStyle="height: calc(100vh - 60px); overflow-y: auto;"
   >
+    <app-login></app-login>
+  </p-dialog>
 
-<app-login></app-login>
-
+  <p-dialog
+    header="Análisis espacial"
+    [(visible)]="dialogVisible"
+    [modal]="false"
+    [style]="{ width: '630px' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <app-analisis-espacial
+      (close)="dialogVisible = false"
+    ></app-analisis-espacial>
   </p-dialog>
 </div>
 <app-loader></app-loader>
