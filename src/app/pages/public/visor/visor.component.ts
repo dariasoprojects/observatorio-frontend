@@ -7,26 +7,27 @@ import {SidebarComponent} from "../../auth/visor/components/sidebar/sidebar.comp
 import {Router} from '@angular/router';
 import {Dialog} from 'primeng/dialog';
 import {LoginComponent} from '../../login/login.component';
-import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-espacial.component';
 import {Menu} from 'primeng/menu';
 import {MenuItem} from 'primeng/api';
 import {MapCommService} from '../../../services/map-comm.service';
 import {LoaderComponent} from '../../loader/loader.component';
+import {AnalisisEspacialComponent} from "../../auth/visor/components/analisis-espacial/analisis-espacial.component";
 
 @Component({
   selector: 'app-visor',
-  imports: [
-    Avatar,
-    ConsultaMultipleComponent,
-    MapaComponent,
-    SideRightComponent,
-    SidebarComponent,
-    Dialog,
-    LoginComponent,
-    AnalisisEspacialComponent,
-    Menu,
-    LoaderComponent
-  ],
+    imports: [
+        Avatar,
+        ConsultaMultipleComponent,
+        MapaComponent,
+        SideRightComponent,
+        SidebarComponent,
+        Dialog,
+        LoginComponent,
+        AnalisisEspacialComponent,
+        Menu,
+        LoaderComponent,
+        AnalisisEspacialComponent
+    ],
   templateUrl: './visor.component.html',
   styleUrl: './visor.component.css'
 })
@@ -47,6 +48,7 @@ export class VisorComponent {
   activeSection: string | null = null;
   showLoginDialog = false;
   items: MenuItem[] | undefined;
+  dialogVisible = false;
   @ViewChild('sidebar') sidebar!: SidebarComponent;
   @ViewChild('sideright') sideright!: SideRightComponent;
 
@@ -63,6 +65,10 @@ export class VisorComponent {
         ]
       }
     ];
+    this.comm.abrirAnalisisDialog$
+      .subscribe(() => {
+        this.dialogVisible = true;
+      });
   }
   onSelectSection(section: string) {
     this.activeSection = section;

@@ -12,11 +12,11 @@ import {SideRightComponent} from './components/side-right/side-right.component';
 import {MapaComponent} from './components/mapa/mapa.component';
 import {ConsultaMultipleComponent} from '../../../consulta_multiple/consulta-multiple.component';
 import {DialogModule} from 'primeng/dialog';
-import {AnalisisEspacialComponent} from '../../../analisis-espacial/analisis-espacial.component';
 import {MenuItem} from 'primeng/api';
 import {Menu} from 'primeng/menu';
 import {MapCommService} from '../../../services/map-comm.service';
 import {LoaderComponent} from '../../loader/loader.component';
+import {AnalisisEspacialComponent} from './components/analisis-espacial/analisis-espacial.component';
 
 @Component({
   selector: 'app-visor',
@@ -36,6 +36,7 @@ import {LoaderComponent} from '../../loader/loader.component';
     DialogModule,
     Menu,
     LoaderComponent,
+    AnalisisEspacialComponent,
 
   ],
   templateUrl: './visor.component.html',
@@ -62,7 +63,6 @@ export class VisorComponent {
   @ViewChild('sideright') sideright!: SideRightComponent;
 
   ngOnInit(): void {
-    this.dialogVisible = true;
     this.items = [
       {
         label: 'Opciones',
@@ -80,6 +80,11 @@ export class VisorComponent {
         ]
       }
     ];
+    this.comm.abrirAnalisisDialog$
+      .subscribe(() => {
+        this.dialogVisible = true;
+      });
+
   }
   onSelectSection(section: string) {
      this.activeSection = section;

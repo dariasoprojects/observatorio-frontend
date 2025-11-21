@@ -286,6 +286,16 @@ app-side-right {
     height: 100vh;
   }
 
+  ::ng-deep .p-dialog .p-dialog-header {
+    justify-content: center !important;
+  }
+
+  ::ng-deep .p-dialog .p-dialog-title {
+    width: 100%;
+    text-align: center !important;
+  }
+
+
   /* ===== Usar el viewport real cuando la pantalla es alta (>=700px) ===== */
   @media (min-height: 700px) {
     .center-map .map {

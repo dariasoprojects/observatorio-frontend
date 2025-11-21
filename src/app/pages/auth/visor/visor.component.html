@@ -35,7 +35,6 @@
 
     </div>
     <app-consulta-multiple ></app-consulta-multiple>
-    <app-analisis-espacial></app-analisis-espacial>
   </main>
 
   <!-- DERECHA -->
@@ -45,6 +44,17 @@
   >
   </app-side-right>
 
-
+  <p-dialog
+    header="Análisis espacial"
+    [(visible)]="dialogVisible"
+    [modal]="false"
+    [style]="{ width: '630px' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <app-analisis-espacial
+      (close)="dialogVisible = false"
+    ></app-analisis-espacial>
+  </p-dialog>
 </div>
 <app-loader></app-loader>
