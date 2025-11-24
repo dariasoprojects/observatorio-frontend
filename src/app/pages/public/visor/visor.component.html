@@ -41,7 +41,6 @@
       <app-mapa></app-mapa>
 
     </div>
-    <app-consulta-multiple ></app-consulta-multiple>
   </main>
 
   <!-- DERECHA -->
@@ -77,6 +76,17 @@
     <app-analisis-espacial
       (close)="dialogVisible = false"
     ></app-analisis-espacial>
+  </p-dialog>
+
+  <p-dialog
+    header="Consulta Múltiple"
+    [(visible)]="dialogVisibleConsultaMultiple"
+    [modal]="false"
+    [style]="{ width: '830px' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <app-consulta-multiple ></app-consulta-multiple>
   </p-dialog>
 </div>
 <app-loader></app-loader>

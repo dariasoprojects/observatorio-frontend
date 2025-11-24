@@ -54,6 +54,10 @@ export class MapCommService {
   abrirAnalisisDialog$ = this.abrirAnalisisDialogSource.asObservable();
 
 
+  private abrirConsultasMultipleDialogSource = new Subject<void>();
+  abrirConsultasMultipleDialog$ = this.abrirConsultasMultipleDialogSource.asObservable();
+
+
   requestZoom(objectId: number) {
     this.zoomRequestSource.next(objectId);
   }
@@ -90,4 +94,7 @@ export class MapCommService {
     this.abrirAnalisisDialogSource.next();
   }
 
+  abrirDialogConsultaMultiple() {
+    this.abrirConsultasMultipleDialogSource.next();
+  }
 }

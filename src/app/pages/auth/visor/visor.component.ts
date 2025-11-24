@@ -10,13 +10,13 @@ import {Router} from '@angular/router';
 import {SidebarComponent} from './components/sidebar/sidebar.component';
 import {SideRightComponent} from './components/side-right/side-right.component';
 import {MapaComponent} from './components/mapa/mapa.component';
-import {ConsultaMultipleComponent} from '../../../consulta_multiple/consulta-multiple.component';
 import {DialogModule} from 'primeng/dialog';
 import {MenuItem} from 'primeng/api';
 import {Menu} from 'primeng/menu';
 import {MapCommService} from '../../../services/map-comm.service';
 import {LoaderComponent} from '../../loader/loader.component';
 import {AnalisisEspacialComponent} from './components/analisis-espacial/analisis-espacial.component';
+import {ConsultaMultipleComponent} from './components/consulta-multiple/consulta-multiple.component';
 
 @Component({
   selector: 'app-visor',
@@ -37,6 +37,7 @@ import {AnalisisEspacialComponent} from './components/analisis-espacial/analisis
     Menu,
     LoaderComponent,
     AnalisisEspacialComponent,
+    ConsultaMultipleComponent,
 
   ],
   templateUrl: './visor.component.html',
@@ -58,6 +59,7 @@ export class VisorComponent {
   isCollapsed = false;
   activeSection: string | null = null;
   dialogVisible = false;
+  dialogVisibleConsultaMultiple = false;
   items: MenuItem[] | undefined;
   @ViewChild('sidebar') sidebar!: SidebarComponent;
   @ViewChild('sideright') sideright!: SideRightComponent;
@@ -83,6 +85,10 @@ export class VisorComponent {
     this.comm.abrirAnalisisDialog$
       .subscribe(() => {
         this.dialogVisible = true;
+      });
+    this.comm.abrirConsultasMultipleDialog$
+      .subscribe(() => {
+        this.dialogVisibleConsultaMultiple = true;
       });
 
   }
