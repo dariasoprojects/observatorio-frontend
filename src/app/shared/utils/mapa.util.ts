@@ -681,21 +681,11 @@ export class Mapa {
     // Botón Multi
     const multiQyBtn = document.createElement("div");
     multiQyBtn.className = "esri-widget esri-widget--button esri-interactive";
-    multiQyBtn.innerHTML = '<span class="esri-icon-filter" title="Imprimir Mapa"></span>';
+    multiQyBtn.innerHTML = '<span class="esri-icon-filter" title="Consulta múltiple"></span>';
     multiQyBtn.style.margin = "5px";
 
     multiQyBtn.onclick = () => {
-      if (!this.mapView) return;
-      const miDiv = document.getElementById("divDragConsultaMulti");
-      if (!miDiv) return;
-      console.log('aqi 2')
-
-      // alternar visibilidad
-      if (miDiv.style.display === "none") {
-        miDiv.style.display = "block"; // mostrar
-      } else {
-        miDiv.style.display = "none";  // ocultar
-      }
+      this.comm.abrirDialogConsultaMultiple();
     };
 
     const btnAnalisis = document.createElement("div");

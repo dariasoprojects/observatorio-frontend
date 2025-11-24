@@ -1,6 +1,5 @@
 import {Component, ElementRef, HostBinding, ViewChild} from '@angular/core';
 import {Avatar} from "primeng/avatar";
-import {ConsultaMultipleComponent} from "../../../consulta_multiple/consulta-multiple.component";
 import {MapaComponent} from "../../auth/visor/components/mapa/mapa.component";
 import {SideRightComponent} from "../../auth/visor/components/side-right/side-right.component";
 import {SidebarComponent} from "../../auth/visor/components/sidebar/sidebar.component";
@@ -12,6 +11,7 @@ import {MenuItem} from 'primeng/api';
 import {MapCommService} from '../../../services/map-comm.service';
 import {LoaderComponent} from '../../loader/loader.component';
 import {AnalisisEspacialComponent} from "../../auth/visor/components/analisis-espacial/analisis-espacial.component";
+import {ConsultaMultipleComponent} from '../../auth/visor/components/consulta-multiple/consulta-multiple.component';
 
 @Component({
   selector: 'app-visor',
@@ -49,6 +49,7 @@ export class VisorComponent {
   showLoginDialog = false;
   items: MenuItem[] | undefined;
   dialogVisible = false;
+  dialogVisibleConsultaMultiple = false;
   @ViewChild('sidebar') sidebar!: SidebarComponent;
   @ViewChild('sideright') sideright!: SideRightComponent;
 
@@ -68,6 +69,11 @@ export class VisorComponent {
     this.comm.abrirAnalisisDialog$
       .subscribe(() => {
         this.dialogVisible = true;
+      });
+
+    this.comm.abrirConsultasMultipleDialog$
+      .subscribe(() => {
+        this.dialogVisibleConsultaMultiple = true;
       });
   }
   onSelectSection(section: string) {
