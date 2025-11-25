@@ -151,7 +151,7 @@ export class IndicePadronProdComponent implements OnInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'PADRONPPA' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
+      where: `INDICE = 'PADRONPPA' AND CAPA = 3 AND UBIGEO like '${ubigeo}%'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
