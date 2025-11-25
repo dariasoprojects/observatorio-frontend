@@ -3,22 +3,13 @@ import {DropdownModule} from 'primeng/dropdown';
 import {TableModule} from 'primeng/table';
 import {ButtonDirective} from 'primeng/button';
 import {FormsModule} from '@angular/forms';
-import Polygon from '@arcgis/core/geometry/Polygon';
-import {
-  AnalisisGeometricoResponse,
-  PpaFeature
-} from '../../../../../models/analisis-geometrico/analisis-geometrico.model';
-import {UbigeoService} from '../../../../../services/ubigeo.service';
-import {SumatoriasService} from '../../../../../services/sumatorias.service';
-import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
-import {LoaderService} from '../../../../../services/state/loader.service';
+
 import {ConsultaMultipleService} from '../../../../../services/consulta-multiple.service';
 import {
   CategoriaAttributes,
   CategoriaFeature,
   CategoriaResponse
 } from '../../../../../models/consulta-multiple/categoria.model';
-import {ConsultaFeature, ConsultaResponse} from '../../../../../models/consulta-multiple/consulta.model';
 import {map} from 'rxjs';
 import {Card} from 'primeng/card';
 import {KeyValuePipe, NgForOf, NgIf} from '@angular/common';
@@ -66,8 +57,6 @@ interface CamposLegibles {
     ButtonDirective,
     FormsModule,
     Card,
-    KeyValuePipe,
-    NgForOf,
     NgIf
   ],
   templateUrl: './consulta-multiple.component.html',

@@ -681,7 +681,7 @@ export class Mapa {
     // Botón Multi
     const multiQyBtn = document.createElement("div");
     multiQyBtn.className = "esri-widget esri-widget--button esri-interactive";
-    multiQyBtn.innerHTML = '<span class="esri-icon-filter" title="Consulta múltiple"></span>';
+    multiQyBtn.innerHTML = '<span class="esri-icon-filter" title="GeoPerfil"></span>';
     multiQyBtn.style.margin = "5px";
 
     multiQyBtn.onclick = () => {
@@ -690,7 +690,7 @@ export class Mapa {
 
     const btnAnalisis = document.createElement("div");
     btnAnalisis.className = "esri-widget esri-widget--button esri-interactive";
-    btnAnalisis.innerHTML = '<span class="esri-icon-configure-popup" title="Analizar"></span>';
+    btnAnalisis.innerHTML = '<span class="esri-icon-configure-popup" title="GeoAnalítica"></span>';
     btnAnalisis.style.margin = "5px";
 
     btnAnalisis.onclick = () => {
@@ -712,7 +712,7 @@ export class Mapa {
 
       //this.currentView.ui.add(this.printWidget, "top-right");
       this.currentView.ui.add(printBtn, "top-right");
-      this.currentView.ui.add(multiQyBtn, "top-right");
+      this.currentView.ui.add(multiQyBtn, "top-left");
 
       this.currentView.ui.add(btnAnalisis, "top-left");
 
