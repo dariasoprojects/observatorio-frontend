@@ -28,6 +28,38 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
   gridData: any[] = [];
   displayedColumns: string[] = [];
 
+  gridEstadistico: any[] = [];
+  displayedColumnsEst: string[] = [];
+
+  gridAgricola: any[] = [];
+  displayedColumnsAgricola: string[] = [];
+
+  gridPecuario: any[] = [];
+  displayedColumnsPecuario: string[] = [];
+
+  gridForestal: any[] = [];
+  displayedColumnsForestal: string[] = [];
+
+  gridGraved: any[] = [];
+  displayedColumnsGraved: string[] = [];
+
+  gridAspers: any[] = [];
+  displayedColumnsAspers: string[] = [];
+
+  gridGoteo: any[] = [];
+  displayedColumnsGoteo: string[] = [];
+
+
+  gridRiego: any[] = [];
+  displayedColumnsRiego: string[] = [];
+
+  gridProductivo: any[] = [];
+  displayedColumnsProductivo: string[] = [];
+
+
+
+
+
   private subs: Subscription[] = [];
 
 
@@ -58,6 +90,7 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
 
 
   onCapaChange() {
+
     this.mapComm.selectLayer(this.capaSeleccionada);
   }
 
@@ -147,6 +180,8 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
     this.mapComm.requestDraw(true);
   }
 
+  
+
   async analizar() {
     if (!this.coberturaPolygon) {
       alert('Debes definir una cobertura (dibujar/cargar) antes de analizar.');
@@ -163,18 +198,215 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
     });
 
     try {
+      // ----------------------------
+      // 1) CONSULTA ESPACIAL NORMAL
+      // ----------------------------
       const resp = await query.executeQueryJSON(serviceLayerUrl, q);
       this.gridData = (resp.features || []).map((f: any) => f.attributes);
       this.displayedColumns = Object.keys(this.gridData[0] ?? {});
-      if (this.gridData.length === 0) {
-        // opcional: mensaje
-        // console.log('Sin resultados para la cobertura');
-      }
+
+      // ----------------------------
+      // 2) CONSULTA ESTADÍSTICA
+      // ----------------------------
+      const qStats = new Query({
+        geometry: this.coberturaPolygon,
+        spatialRelationship: 'intersects',
+        returnGeometry: false,
+        outFields: ['GENERO'],   // ← NECESARIO
+        groupByFieldsForStatistics: ['GENERO'],
+        outStatistics: [
+          {
+            statisticType: 'sum',
+            onStatisticField: 'GENERO',
+            outStatisticFieldName: 'SUM_GENERO'
+          }
+        ]
+      });
+
+
+
+      const respStats = await query.executeQueryJSON(serviceLayerUrl, qStats);
+
+      // Convertir resultados estadísticos
+      this.gridEstadistico = (respStats.features || []).map((f: any) => {
+
+        // LIMPIAR Y CONVERTIR A NÚMERO
+        const g = Number(String(f.attributes.GENERO).trim());
+
+        return {
+          GENERO: g,
+          DESCRIPCION: g === 1 ? 'MUJER' : g === 2 ? 'HOMBRE' : 'SIN DATA',
+          SUM_GENERO: f.attributes.SUM_GENERO
+        };
+      });
+
+
+
+
+      // Columnas automáticas de la tabla estadística
+      this.displayedColumnsEst = ['GENERO', 'DESCRIPCION', 'SUM_GENERO'];
+
+
+
+      // ----------------------------
+      // A) CONTEO FLG_AGRICO = 1
+      // ----------------------------
+      const qAgrico = new Query({
+        geometry: this.coberturaPolygon,
+        spatialRelationship: 'intersects',
+        returnGeometry: false,
+        where: "FLG_AGRICO = 1",
+        outFields: [],
+        outStatistics: [
+          {
+            statisticType: 'count',
+            onStatisticField: 'FLG_AGRICO',
+            outStatisticFieldName: 'TOTAL_AGRICOLA'
+          }
+        ]
+      });
+      const respAgrico = await query.executeQueryJSON(serviceLayerUrl, qAgrico);
+      const totalAgricola = respAgrico.features?.[0]?.attributes?.TOTAL_AGRICOLA ?? 0;
+
+
+      // ----------------------------
+      // B) CONTEO FLG_PECUAR = 1
+      // ----------------------------
+      const qPecuar = new Query({
+        geometry: this.coberturaPolygon,
+        spatialRelationship: 'intersects',
+        returnGeometry: false,
+        where: "FLG_PECUAR = 1",
+        outFields: [],
+        outStatistics: [
+          {
+            statisticType: 'count',
+            onStatisticField: 'FLG_PECUAR',
+            outStatisticFieldName: 'TOTAL_PECUARIO'
+          }
+        ]
+      });
+      const respPecuar = await query.executeQueryJSON(serviceLayerUrl, qPecuar);
+      const totalPecuario = respPecuar.features?.[0]?.attributes?.TOTAL_PECUARIO ?? 0;
+
+
+      // ----------------------------
+      // C) CONTEO FLG_FOREST = 1
+      // ----------------------------
+      const qForest = new Query({
+        geometry: this.coberturaPolygon,
+        spatialRelationship: 'intersects',
+        returnGeometry: false,
+        where: "FLG_FOREST = 1",
+        outFields: [],
+        outStatistics: [
+          {
+            statisticType: 'count',
+            onStatisticField: 'FLG_FOREST',
+            outStatisticFieldName: 'TOTAL_FORESTAL'
+          }
+        ]
+      });
+      const respForest = await query.executeQueryJSON(serviceLayerUrl, qForest);
+      const totalForestal = respForest.features?.[0]?.attributes?.TOTAL_FORESTAL ?? 0;
+
+
+      // ---------------------------------------
+      //  UNA SOLA TABLA: ACTIVIDAD PRODUCTIVA
+      // ---------------------------------------
+      this.gridProductivo = [
+        { DESCRIPCION: "Agrícola", TOTAL: totalAgricola },
+        { DESCRIPCION: "Pecuario", TOTAL: totalPecuario },
+        { DESCRIPCION: "Forestal", TOTAL: totalForestal }
+      ];
+
+      this.displayedColumnsProductivo = ["DESCRIPCION", "TOTAL"];
+
+
+
+      // ----------------------------
+      // 7) CONTEO FLG_GRAVED = 1
+      // ----------------------------
+      const qGraved = new Query({
+        geometry: this.coberturaPolygon,
+        spatialRelationship: 'intersects',
+        returnGeometry: false,
+        where: "FLG_GRAVED = 1",
+        outFields: [],
+        outStatistics: [
+          {
+            statisticType: 'count',
+            onStatisticField: 'FLG_GRAVED',
+            outStatisticFieldName: 'TOTAL_GRAVED'
+          }
+        ]
+      });
+      const respGraved = await query.executeQueryJSON(serviceLayerUrl, qGraved);
+      const totalGraved = respGraved.features?.[0]?.attributes?.TOTAL_GRAVED ?? 0;
+
+
+      // ----------------------------
+      // 8) CONTEO FLG_ASPERS = 1
+      // ----------------------------
+      const qAspers = new Query({
+        geometry: this.coberturaPolygon,
+        spatialRelationship: 'intersects',
+        returnGeometry: false,
+        where: "FLG_ASPERS = 1",
+        outFields: [],
+        outStatistics: [
+          {
+            statisticType: 'count',
+            onStatisticField: 'FLG_ASPERS',
+            outStatisticFieldName: 'TOTAL_ASPERS'
+          }
+        ]
+      });
+      const respAspers = await query.executeQueryJSON(serviceLayerUrl, qAspers);
+      const totalAspers = respAspers.features?.[0]?.attributes?.TOTAL_ASPERS ?? 0;
+
+
+      // ----------------------------
+      // 9) CONTEO FLG_GOTEO = 1
+      // ----------------------------
+      const qGoteo = new Query({
+        geometry: this.coberturaPolygon,
+        spatialRelationship: 'intersects',
+        returnGeometry: false,
+        where: "FLG_GOTEO = 1",
+        outFields: [],
+        outStatistics: [
+          {
+            statisticType: 'count',
+            onStatisticField: 'FLG_GOTEO',
+            outStatisticFieldName: 'TOTAL_GOTEO'
+          }
+        ]
+      });
+      const respGoteo = await query.executeQueryJSON(serviceLayerUrl, qGoteo);
+      const totalGoteo = respGoteo.features?.[0]?.attributes?.TOTAL_GOTEO ?? 0;
+
+
+      // ---------------------------------------
+      //  UNA SOLA TABLA PARA LOS TRES
+      // ---------------------------------------
+      this.gridRiego = [
+        { DESCRIPCION: "Gravedad", TOTAL: totalGraved },
+        { DESCRIPCION: "Aspersión", TOTAL: totalAspers },
+        { DESCRIPCION: "Goteo", TOTAL: totalGoteo }
+      ];
+
+      this.displayedColumnsRiego = ["DESCRIPCION", "TOTAL"];
+
+
+
+
     } catch (err) {
       console.error('Error en análisis de intersección:', err);
       alert('Ocurrió un error al consultar el servicio.');
     }
   }
+
 
   cerrar() {
     // ocultar el panel (si usas el div externo)

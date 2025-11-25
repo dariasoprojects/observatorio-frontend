@@ -88,6 +88,7 @@ export class AnalisisEspacialComponent {
   }
 
   getDatosAnalisisGeometrico(coberturaPolygon: Polygon):void  {
+    
     this.analisisGeometricoService.getDatosAnalisisGeometrico(coberturaPolygon).subscribe({
       next: (rows: AnalisisGeometricoResponse) => {
         this.resultados = rows?.features?.map((f: PpaFeature) => f.attributes) ?? [];
