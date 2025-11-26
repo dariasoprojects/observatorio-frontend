@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {PanelModule} from 'primeng/panel';
 import {CommonModule} from '@angular/common';
 import {ButtonModule } from 'primeng/button';
@@ -8,13 +8,19 @@ import {ProductorService} from '../../../../../services/productor.service';
 import {Feature, ProductorAttributes} from '../../../../../models/productor/productor.model';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs';
+import {finalize, Subject} from 'rxjs';
 import {MapCommService} from '../../../../../services/map-comm.service';
 import {FormatUtil} from '../../../../../shared/utils/format.util';
 import {UbigeoService} from '../../../../../services/ubigeo.service';
+import {DropdownModule} from 'primeng/dropdown';
+import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
+import {LoaderService} from '../../../../../services/state/loader.service';
+import {ProvinciasResponse} from '../../../../../models/ubigeos/provincias.model';
+import {BusquedaUbigeoComponent} from '../busqueda-ubigeo/busqueda-ubigeo.component';
 
-export interface Item { title: string; section: string; icon: string; }
+interface Item { title: string; section: string; icon: string; }
 interface PanelGroup { title: string; icon: string; collapsed: boolean; items: Item[]; }
+
 
 @Component({
   selector: 'app-sidebar',
@@ -25,7 +31,9 @@ interface PanelGroup { title: string; icon: string; collapsed: boolean; items: I
     ButtonModule,
     CardModule,
     DividerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DropdownModule,
+    BusquedaUbigeoComponent
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
@@ -115,6 +123,10 @@ export class SidebarComponent  implements OnInit, OnDestroy{
   @Output() limpiarDni = new EventEmitter<void>();
 
   private destroy$ = new Subject<void>();
+
+
+
+
 
   constructor(
     private productorService: ProductorService,
@@ -215,7 +227,6 @@ export class SidebarComponent  implements OnInit, OnDestroy{
     // Si 'fila' ES un __esri.Graphic:
     this.comm.requestZoomGraphic(fila);
   }
-
 
   protected readonly FormatUtil = FormatUtil;
 }

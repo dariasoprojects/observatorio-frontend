@@ -1,44 +1,7 @@
 <aside class="side-right">
   <div class="right-sticky">
     <div  class="right-scroll">
-      <p-panel header="Selección geográfica" styleClass="panel-tight" (onCollapse)="onPanelToggle()" (onExpand)="onPanelToggle()">
-        <small class="muted">Consulta las estadísticas más recientes del sector agrario</small>
 
-        <label>Departamento*</label>
-        <p-dropdown
-          [options]="departamentos"
-          [(ngModel)]="selectedDep"
-          optionLabel="name"
-          optionValue="code"
-          placeholder="Departamento"
-          [filter]="true"
-          filterPlaceholder="Buscar departamento"
-          [filterBy]="'name'"
-          [showClear]="true"
-          [appendTo]="'body'"
-          panelStyleClass="dep-panel"
-          (onChange)="onDepartamentoChange($event)"
-        >
-        </p-dropdown>
-
-
-        <label>Provincia*</label>
-        <p-dropdown
-          [options]="provincias"
-          optionLabel="name"
-          optionValue="code"
-          [(ngModel)]="selectedProv"
-          placeholder="Provincia"
-          [showClear]="true"
-          [filter]="true"
-          [appendTo]="'body'"
-          panelStyleClass="dep-panel"
-          (onChange)="onProvinciaChange($event)"
-        >
-        </p-dropdown>
-
-
-      </p-panel>
 
       <div [ngSwitch]="activeSection">
 
