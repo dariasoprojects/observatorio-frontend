@@ -167,3 +167,13 @@
   }
 }
 
+/* Afecta solo al contenido interior sin deformar el panel ni tu grid */
+.panel-tight :global(.p-panel-content) > * {
+  transform: scale(0.90);     /* tamaño 90% */
+  transform-origin: top left; /* mantiene alineación */
+}
+
+/* Ajuste opcional para evitar overflow horizontal */
+.panel-tight :global(.p-panel-content) {
+  overflow-x: hidden;
+}
