@@ -59,7 +59,7 @@
     <label class="section-title">3. Resultado</label>
 
     <!-- TABLA RESULTADO -->
-    <div class="table-container" *ngIf="gridData.length > 0">
+    <div style="display:block" class="table-container" *ngIf="gridData.length > 0">
       <table>
         <thead>
           <tr>
@@ -73,6 +73,70 @@
         </tbody>
       </table>
     </div>
+
+
+
+<div style="height: 500px; overflow-y: auto;">
+    <!-- TABLA ESTADÍSTICA -->
+    <div class="table-container" *ngIf="gridEstadistico.length > 0">
+      <h3>Resumen por Género</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumnsEst">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of gridEstadistico">
+            <td *ngFor="let col of displayedColumnsEst">{{ row[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- TABLA ACTIVIDAD PRODUCTIVA -->
+    <div class="table-container" *ngIf="gridProductivo.length > 0">
+      <h3>Actividad Productiva</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumnsProductivo">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of gridProductivo">
+            <td *ngFor="let col of displayedColumnsProductivo">{{ row[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+
+    <!-- TABLA SISTEMAS DE RIEGO -->
+    <div class="table-container" *ngIf="gridRiego.length > 0">
+      <h3>Sistemas de Riego</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumnsRiego">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of gridRiego">
+            <td *ngFor="let col of displayedColumnsRiego">{{ row[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+  </div>
+
 
     <div *ngIf="gridData.length === 0" class="empty-msg">
       No hay resultados aún.
