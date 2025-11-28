@@ -37,7 +37,73 @@
       </button>
     </div>
 
-    <app-busqueda-ubigeo></app-busqueda-ubigeo>
+    <p-panel header="Filtros activos" styleClass="panel-tight">
+
+      <small class="muted">Ubicación geográfica:</small>
+
+      <!-- ESTADO VACÍO TOTAL -->
+      <div *ngIf="!filtrosUbigeo?.nombreDepartamento && !filtrosUbigeo?.nombreProvincia"
+           class="filter-empty clean">
+
+        <div class="filter-empty-line">
+          <i class="pi pi-filter-slash"></i>
+          <span>No hay filtros aplicados</span>
+        </div>
+
+        <button pButton
+                label="Seleccionar ubicación"
+                icon="pi pi-map-marker"
+                class="btn-ubigeo center"
+                (click)="onOpenUbicacionGeografica()"
+               >
+        </button>
+      </div>
+
+
+      <!-- CHIP DEPARTAMENTO -->
+      <p-chip
+        *ngIf="filtrosUbigeo?.nombreDepartamento"
+        [label]="'Departamento: ' + filtrosUbigeo.nombreDepartamento"
+        styleClass="ppa-chip"
+        removable="true"
+        (onRemove)="onClearDepartamento()">
+      </p-chip>
+
+      <!-- CHIP PROVINCIA -->
+      <p-chip
+        *ngIf="filtrosUbigeo?.nombreProvincia"
+        [label]="'Provincia: ' + filtrosUbigeo.nombreProvincia"
+        styleClass="ppa-chip"
+        removable="true"
+        (onRemove)="onClearProvincia()">
+      </p-chip>
+
+      <!-- ESTADO VACÍO SOLO PARA PROVINCIA -->
+      <div *ngIf="filtrosUbigeo?.nombreDepartamento && !filtrosUbigeo?.nombreProvincia"
+           class="filter-empty clean">
+
+        <div class="filter-empty-line">
+          <i class="pi pi-map-marker"></i>
+          <span>Selecciona una provincia</span>
+        </div>
+
+
+        <button pButton
+                label="Elegir provincia"
+                icon="pi pi-search"
+                class="btn-ubigeo center"
+                (click)="onOpenUbicacionGeografica()"
+                >
+        </button>
+      </div>
+
+
+    </p-panel>
+
+
+
+
+
 
     <div class="side-left__scroll">
       <form [formGroup]="formBusqueda">
@@ -186,5 +252,18 @@
 
       </ng-container>
     </div>
+
+    <p-dialog
+      header="Ubicación geográfica"
+      [(visible)]="ubicacionGeograficaVisible"
+      [modal]="false"
+      [style]="{ width: '430px' }"
+      [draggable]="true"
+      [resizable]="false"
+      (onHide)="onCloseUbicacionGeografica()"
+    >
+      <app-busqueda-ubigeo></app-busqueda-ubigeo>
+    </p-dialog>
+
 
   </aside>

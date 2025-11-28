@@ -8,15 +8,15 @@ import {ProductorService} from '../../../../../services/productor.service';
 import {Feature, ProductorAttributes} from '../../../../../models/productor/productor.model';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {takeUntil} from 'rxjs/operators';
-import {finalize, Subject} from 'rxjs';
 import {MapCommService} from '../../../../../services/map-comm.service';
 import {FormatUtil} from '../../../../../shared/utils/format.util';
 import {UbigeoService} from '../../../../../services/ubigeo.service';
 import {DropdownModule} from 'primeng/dropdown';
-import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
-import {LoaderService} from '../../../../../services/state/loader.service';
-import {ProvinciasResponse} from '../../../../../models/ubigeos/provincias.model';
 import {BusquedaUbigeoComponent} from '../busqueda-ubigeo/busqueda-ubigeo.component';
+import {ChipModule} from 'primeng/chip';
+import {Subject} from 'rxjs';
+import {FiltrosUbigeo, FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
+import {Dialog} from 'primeng/dialog';
 
 interface Item { title: string; section: string; icon: string; }
 interface PanelGroup { title: string; icon: string; collapsed: boolean; items: Item[]; }
@@ -33,7 +33,9 @@ interface PanelGroup { title: string; icon: string; collapsed: boolean; items: I
     DividerModule,
     ReactiveFormsModule,
     DropdownModule,
-    BusquedaUbigeoComponent
+    ChipModule,
+    BusquedaUbigeoComponent,
+    Dialog
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
@@ -121,18 +123,18 @@ export class SidebarComponent  implements OnInit, OnDestroy{
   existeProductor:boolean=false;
   @Output() buscarDni = new EventEmitter<void>();
   @Output() limpiarDni = new EventEmitter<void>();
+  @ViewChild(BusquedaUbigeoComponent)  busquedaUbigeo!: BusquedaUbigeoComponent;
 
   private destroy$ = new Subject<void>();
-
-
-
-
+  filtrosUbigeo!: FiltrosUbigeo;
+  ubicacionGeograficaVisible: boolean = false;
 
   constructor(
     private productorService: ProductorService,
     private fb: FormBuilder,
     private comm: MapCommService,
-    readonly ubigeoService: UbigeoService
+    readonly ubigeoService: UbigeoService,
+    private filtroUbigeoService: FiltroUbigeoService,
   ) {
     this.formBusqueda = this.fb.group({
       dni: [
@@ -166,6 +168,7 @@ export class SidebarComponent  implements OnInit, OnDestroy{
         this.parcelas = parcelas;
         this.existeProductor = !!this.productor;
       });
+    this.filtroUbigeoService.filtrosUbigeo$.subscribe(s => this.filtrosUbigeo = s);
   }
 
   ngOnDestroy(): void {
@@ -226,6 +229,28 @@ export class SidebarComponent  implements OnInit, OnDestroy{
 
     // Si 'fila' ES un __esri.Graphic:
     this.comm.requestZoomGraphic(fila);
+  }
+
+  onClearDepartamento(): void {
+    this.busquedaUbigeo.resetFiltros()
+  }
+
+  onClearProvincia() {
+    this.filtroUbigeoService.setFiltros({
+      provincia: null,
+      nombreProvincia: null
+    });
+
+    this.busquedaUbigeo.form.patchValue({
+      provincia: null
+    });
+  }
+  onOpenUbicacionGeografica() {
+    this.ubicacionGeograficaVisible = true;
+  }
+
+  onCloseUbicacionGeografica() {
+    this.ubicacionGeograficaVisible = false;
   }
 
   protected readonly FormatUtil = FormatUtil;

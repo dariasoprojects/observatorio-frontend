@@ -27,7 +27,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subFiltros = this.filtroUbigeoService.filtros$.subscribe(f => {
+    this.subFiltros = this.filtroUbigeoService.filtrosUbigeo$.subscribe(f => {
       if (!this.mapa) return;
       this.aplicarFiltrosEnMapa(f.departamento, f.provincia);
     });

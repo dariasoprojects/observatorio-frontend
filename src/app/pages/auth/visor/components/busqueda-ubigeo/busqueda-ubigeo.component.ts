@@ -6,6 +6,7 @@ import {ProvinciasResponse} from '../../../../../models/ubigeos/provincias.model
 import {UbigeoService} from '../../../../../services/ubigeo.service';
 import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
 import {LoaderService} from '../../../../../services/state/loader.service';
+import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 
 interface Departamento {
   code: string;
@@ -19,17 +20,16 @@ interface Provincia {
 
 @Component({
   selector: 'app-busqueda-ubigeo',
-    imports: [
-        DropdownModule,
-        Panel
-    ],
+  imports: [
+    DropdownModule,
+    Panel,
+    ReactiveFormsModule
+  ],
   templateUrl: './busqueda-ubigeo.component.html',
   styleUrl: './busqueda-ubigeo.component.css'
 })
 export class BusquedaUbigeoComponent {
 
-  selectedDep:any;
-  selectedProv:any;
   departamentoCodigo: string = '';
   provinciaCodigo: string = '';
 
@@ -63,11 +63,18 @@ export class BusquedaUbigeoComponent {
   ]
   provincias: Provincia[] = [];
 
+  form!: FormGroup;
+
   constructor(
     readonly ubigeoService: UbigeoService,
     private filtroUbigeoService: FiltroUbigeoService,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private fb: FormBuilder,
   ){
+    this.form = this.fb.group({
+      departamento: [null],
+      provincia: [null]
+    });
 
   }
 
@@ -134,12 +141,13 @@ export class BusquedaUbigeoComponent {
   }
 
 
-
-
   resetFiltros(): void {
 
-    this.selectedDep = null;
-    this.selectedProv = null;
+    this.form.patchValue({
+      departamento: null,
+      provincia: null
+    });
+
 
     this.departamentoCodigo = '';
     this.provinciaCodigo = '';
@@ -147,8 +155,10 @@ export class BusquedaUbigeoComponent {
     this.provincias = [];
 
     this.filtroUbigeoService.setFiltros({
-      departamento: null,
-      provincia: null
+      departamento: '00',
+      nombreDepartamento: null,
+      provincia: null,
+      nombreProvincia: null
     });
   }
 

@@ -131,7 +131,7 @@ export class SideRightComponent {
     const ultimoEstado = this.filtroUbigeoService.filtrosActuales;
     this.procesarFiltros(ultimoEstado);
 
-    this.subFiltros = this.filtroUbigeoService.filtros$
+    this.subFiltros = this.filtroUbigeoService.filtrosUbigeo$
       .pipe(
         debounceTime(80),
         distinctUntilChanged((a, b) =>
