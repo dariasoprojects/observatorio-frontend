@@ -106,7 +106,7 @@ export class VisorComponent {
     el.style.setProperty('--right-w', '250px');
     this.comm.resetView();
     el.style.setProperty('--left-w', '260px');
-    this.sidebar.onClearDni();
+   // this.sidebar.onClearDni();
     this.sidebar.onVerPaneles();
     this.sideright.resetFiltros();
   }

@@ -17,6 +17,7 @@ import {MapCommService} from '../../../services/map-comm.service';
 import {LoaderComponent} from '../../loader/loader.component';
 import {AnalisisEspacialComponent} from './components/analisis-espacial/analisis-espacial.component';
 import {ConsultaMultipleComponent} from './components/consulta-multiple/consulta-multiple.component';
+import {BusquedaDniComponent} from './components/busqueda-dni/busqueda-dni.component';
 
 @Component({
   selector: 'app-visor',
@@ -38,6 +39,7 @@ import {ConsultaMultipleComponent} from './components/consulta-multiple/consulta
     LoaderComponent,
     AnalisisEspacialComponent,
     ConsultaMultipleComponent,
+    BusquedaDniComponent,
 
   ],
   templateUrl: './visor.component.html',
@@ -104,12 +106,12 @@ export class VisorComponent {
 
   onBuscarDni(): void {
     const el = this.elRef.nativeElement as HTMLElement;
-    el.style.setProperty('--left-w', '360px');
+  //  el.style.setProperty('--left-w', '360px');
   }
 
   onLimpiarDni(): void {
     const el = this.elRef.nativeElement as HTMLElement;
-    el.style.setProperty('--left-w', '260px');
+  //  el.style.setProperty('--left-w', '260px');
   }
 
   onLogout(): void {
@@ -122,7 +124,7 @@ export class VisorComponent {
     el.style.setProperty('--right-w', '250px');
     this.comm.resetView();
     el.style.setProperty('--left-w', '260px');
-    this.sidebar.onClearDni();
+   // this.sidebar.onClearDni();
     this.sidebar.onVerPaneles();
     this.sideright.resetFiltros();
   }

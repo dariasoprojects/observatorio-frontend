@@ -26,6 +26,8 @@
         </div>
       </div>
 
+
+
       <!-- Botón toggle (sidebar) -->
       <button
         class="side-left__toggle"
@@ -37,7 +39,40 @@
       </button>
     </div>
 
-    <p-panel header="Filtros activos" styleClass="panel-tight">
+    <div class="side-left__head collapsed" *ngIf="isCollapsed">
+      <div class="collapsed-logo">
+        <img
+          src="assets/logo-circle.png"
+          alt="MIDAGRI"
+          class="loader-logo"
+        />
+      </div>
+      <div class="siea-vertical">
+        <!-- Ícono PrimeNG -->
+        <svg class="siea-svg" viewBox="0 0 80 96" xmlns="http://www.w3.org/2000/svg">
+          <!-- Barras -->
+          <rect x="5"  y="55" width="18" height="25" fill="#C6C100"/>
+          <rect x="30" y="20" width="18" height="60" fill="#9B8C71"/>
+          <rect x="55" y="45" width="18" height="35" fill="#B57200"/>
+
+          <!-- Base (bajada 6px → antes 80/90, ahora 86/96) -->
+          <path d="M5 86 H75 L70 96 H10 Z" fill="#9B8C71"/>
+        </svg>
+
+
+        <!-- Texto vertical -->
+        <div class="siea-letters">
+          <span>S</span>
+          <span>I</span>
+          <span>E</span>
+          <span>A</span>
+        </div>
+
+      </div>
+    </div>
+
+
+    <p-panel header="Filtros activos" styleClass="panel-tight" *ngIf="!isCollapsed">
 
       <small class="muted">Ubicación geográfica:</small>
 
@@ -106,56 +141,11 @@
 
 
     <div class="side-left__scroll">
-      <form [formGroup]="formBusqueda">
-        <div class="search"
-             *ngIf="!isCollapsed" [attr.aria-hidden]="isCollapsed">
-          <i class="pi pi-search icon-left"
-             role="button"
-             tabindex="0"
-             (click)="onSearchDni()">
-          </i>
 
-          <input
-            pInputText
-            type="text"
-            formControlName="dni"
-            placeholder="Ingresar número DNI"
-            maxlength="8"
-            (keydown.enter)="onSearchDni()" />
-
-          <i class="pi pi-times icon-right"
-             role="button"
-             tabindex="0"
-             (click)="onClearDni()">
-          </i>
-        </div>
-        <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched && formBusqueda.get('dni')?.invalid && this.mostrarProductor">
-
-          <div *ngIf="formBusqueda.get('dni')?.errors?.['required']">
-             DNI no debe estar vacío.
-          </div>
-
-          <div *ngIf="formBusqueda.get('dni')?.errors?.['minlength'] || formBusqueda.get('dni')?.errors?.['maxlength']">
-             DNI debe tener 8 dígitos.
-          </div>
-
-          <div *ngIf="formBusqueda.get('dni')?.errors?.['pattern']">
-            Solo se permiten números.
-          </div>
-
-        </div>
-        <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched  && this.mostrarProductor && !this.existeProductor">
-
-          <div >
-            Dni no encontrado.
-          </div>
-
-        </div>
-      </form>
 
 
       <ng-container *ngIf="!isCollapsed">
-        <ng-container *ngIf="!mostrarProductor">
+        <ng-container >
           <p-panel *ngFor="let p of panels" [toggleable]="true" [collapsed]="p.collapsed" styleClass="panel-tight">
             <ng-template pTemplate="header">
               <div class="hdr">
@@ -181,70 +171,7 @@
           </p-panel>
         </ng-container>
 
-        <ng-container *ngIf="mostrarProductor">
-          <p-panel styleClass="producer-panel" [toggleable]="false">
 
-
-
-            <!-- BODY -->
-
-            <div class="panel-body">
-              <div class="panel-header">
-                <span class="section-title">Datos del Productor</span>
-
-                <span class="header-icon">
-                <i class="pi pi-info-circle"></i>
-              </span>
-              </div>
-
-              <div class="field-row"><span class="field-label">DNI: {{productor?.TXT_NRODOC??''}}</span></div>
-              <div class="field-row"><span class="field-label">Apellidos: {{productor?.APELLIDOPA??''}}</span></div>
-              <div class="field-row"><span class="field-label">Nombres: {{productor?.NOMBRES??''}}</span></div>
-
-              <p-divider></p-divider>
-
-              <div class="panel-header">
-                <span class="section-title">Ubicación parcela principal del productor</span>
-              </div>
-
-
-              <table class="tabla-region">
-                <thead>
-                <tr>
-                  <th>Latitud</th>
-                  <th>Longitud</th>
-                  <th>Ubigeo</th>
-                  <th>Ubicación</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let fila of parcelas">
-                  <td>{{ FormatUtil.formatInteger2Digitos (fila.attributes.LAT ) }}</td>
-                  <td>{{ FormatUtil.formatInteger2Digitos (fila.attributes.LONG_) }}</td>
-                  <td>{{ ubigeoService.getNombre(fila.attributes.UBIGEO3)  }}</td>
-                  <td class="cell-center">
-                    <i class="pi pi-search" (click)="verParcela(fila)"></i>
-                  </td>
-
-                </tr>
-                </tbody>
-              </table>
-
-            </div>
-
-
-
-            <!-- FOOTER -->
-            <ng-template pTemplate="footer">
-              <div class="panel-footer">
-                <button type="button" pButton label="Cerrar" class="close-btn p-button-outlined"
-                        (click)="onVerPaneles()"
-                ></button>
-              </div>
-            </ng-template>
-
-          </p-panel>
-        </ng-container>
 
 
 
