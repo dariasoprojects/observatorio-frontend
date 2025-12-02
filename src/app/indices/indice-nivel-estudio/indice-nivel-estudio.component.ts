@@ -7,8 +7,6 @@ import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { Input } from '@angular/core';
 import {FormatUtil} from "../../shared/utils/format.util";
-import { MapCommService } from '../../services/map-comm.service';
-
 
 @Component({
   selector: 'app-indice-nivel-estudio',
@@ -35,9 +33,6 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
   // Nueva URL sin tilde en los campos
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
-
-  constructor(private mapComm: MapCommService) {}  // <-- solo para inyectar
-
   ngOnInit() {
     //this.cargarDatos(); // Nacional por defecto
 
@@ -58,13 +53,6 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
 
 
   }
-
-
-  aplicarColoresTematico() {
-    this.mapComm.emitRenderTematico("NIVEST");
-  }
-
-
 
   ngAfterViewInit() {
     this.crearGrafico();

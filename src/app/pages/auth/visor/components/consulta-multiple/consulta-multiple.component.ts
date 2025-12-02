@@ -116,10 +116,6 @@ export class ConsultaMultipleComponent {
     }
   };
 
-  paginaActual: number = 1;
-  pageSize: number = 200;  // puedes subir o bajar este valor
-  resultadosTodos: ResultadoConsulta[] = []; 
-  registrosPorPagina:number = 1000;
 
   constructor(
     private consultaMultipleService: ConsultaMultipleService,
@@ -146,33 +142,22 @@ export class ConsultaMultipleComponent {
     });
   }
 
-  getConsultaDatos(whereFinal: string): void {
+  getConsultaDatos(whereFinal :string):void  {
     this.consultaMultipleService
-        .getConsultaDatos(whereFinal)
-        .pipe(map(result => this.mapResultados(result)))
-        .subscribe({
-          next: lista => {
-            this.resultadosTodos = lista; // guardamos todo
-            this.cargarPagina(1);         // mostramos la primera página
-          },
-          error: err => console.error('Error cargando indicadores:', err)
-        });
+      .getConsultaDatos(whereFinal)
+      .pipe(
+        map(result => this.mapResultados(result))
+      )
+      .subscribe({
+        next: (lista: ResultadoConsulta[]) => {
+          this.resultados = lista;
+          console.log('RESULTADOS:', this.resultados);
+        },
+        error: (err) => {
+          console.error('Error cargando indicadores:', err);
+        }
+      });
   }
-
- cargarPagina(p:number){
-      if(p < 1) return;
-
-      this.paginaActual = p;
-
-      this.consultaMultipleService
-          .getConsultaDatos(this.whereFinal, p, this.registrosPorPagina)
-          .subscribe((resp:__esri.FeatureSet) =>{
-              this.resultados = this.mapResultados(resp);
-          });
-  }
-
-
-
 
   mapResultados(result: __esri.FeatureSet): ResultadoConsulta[] {
     return result.features.map(f => {
@@ -299,164 +284,81 @@ export class ConsultaMultipleComponent {
     this.selectedCondicion = selectedValue;
   }
 
-  // onAgregarCondicion() {
-
-  //   if (
-  //     this.selectedCategoria &&
-  //     this.selectedVariable &&
-  //     this.selectedCondicion &&
-  //     this.selectedValor
-  //   ) {
-  //     // Buscar registro de configuración
-  //     const registro = this.categoriasInicial.find(
-  //       d =>
-  //         d.IDCATEGORIA == this.selectedCategoria &&
-  //         d.CAMPO_BUSQUEDA == this.selectedVariable
-  //     );
-
-  //     let valorFormateado: string | number = this.selectedValor;
-
-  //     if (registro) {
-  //       switch (registro.TIPODATO) {
-  //         case 'string':
-  //           valorFormateado = `${this.selectedValor}`;
-  //           break;
-  //         case 'number':
-  //           valorFormateado = this.selectedValor;
-  //           break;
-  //         case 'date':
-  //           valorFormateado = `DATE ${this.selectedValor}`;
-  //           break;
-  //         default:
-  //           valorFormateado = `${this.selectedValor}`;
-  //       }
-  //     }
-
-  //     const where = `${this.selectedVariable} ${this.selectedCondicion} ${valorFormateado}`;
-
-  //     //  Buscar nombres legibles
-  //     const categoriaNombre =
-  //       this.categorias.find(c => c.IDCATEGORIA === this.selectedCategoria)?.CATEGORIA ??
-  //       this.selectedCategoria;
-
-  //     const condicionNombre =
-  //       this.condicionesCatalogo.find(c => c.id === this.selectedCondicion)?.nombre ??
-  //       this.selectedCondicion;
-
-  //     const valorNombre =
-  //       this.valores.find(v => v.IDVALOR == this.selectedValor)?.VALOR ??
-  //       this.selectedValor;
-
-  //     this.condicionesAgregadas.push({
-  //       categoriaId: this.selectedCategoria,
-  //       categoriaNombre,
-  //       variable: this.selectedVariable,
-  //       condicionId: this.selectedCondicion,
-  //       condicionNombre,
-  //       valorId: this.selectedValor,
-  //       valorNombre,
-  //       where
-  //     });
-
-  //     this.whereFinal = this.condicionesAgregadas.map(c => c.where).join(' AND ');
-
-  //     console.log(this.whereFinal);
-  //   } else {
-  //     console.warn(" Faltan datos para armar la condición");
-  //   }
-  // }
-
   onAgregarCondicion() {
 
-      if (!(this.selectedCategoria && this.selectedVariable && this.selectedCondicion && this.selectedValor)) {
-          console.warn(" Faltan datos para armar condición.");
-          return;
-      }
-
-      // Buscar configuración del campo
+    if (
+      this.selectedCategoria &&
+      this.selectedVariable &&
+      this.selectedCondicion &&
+      this.selectedValor
+    ) {
+      // Buscar registro de configuración
       const registro = this.categoriasInicial.find(
-          d =>
-              d.IDCATEGORIA == this.selectedCategoria &&
-              d.CAMPO_BUSQUEDA == this.selectedVariable
+        d =>
+          d.IDCATEGORIA == this.selectedCategoria &&
+          d.CAMPO_BUSQUEDA == this.selectedVariable
       );
 
-      let valorFormateado = this.selectedValor;
+      let valorFormateado: string | number = this.selectedValor;
 
       if (registro) {
-          const tipo = registro.TIPODATO?.toLowerCase();
-
-          switch (tipo) {
-              case 'string':
-                  valorFormateado = `'${this.selectedValor}'`; // <-- FIX REAL
-                  break;
-
-              case 'number':
-              case 'integer':
-              case 'float':
-                  valorFormateado = this.selectedValor;
-                  break;
-
-              case 'date':
-                  valorFormateado = `DATE '${this.selectedValor}'`; // <-- FIX DATE
-                  break;
-
-              case 'boolean':
-                  valorFormateado = this.selectedValor ? 1 : 0;
-                  break;
-
-              default:
-                  valorFormateado = `'${this.selectedValor}'`; // fallback seguro
-          }
+        switch (registro.TIPODATO) {
+          case 'string':
+            valorFormateado = `${this.selectedValor}`;
+            break;
+          case 'number':
+            valorFormateado = this.selectedValor;
+            break;
+          case 'date':
+            valorFormateado = `DATE ${this.selectedValor}`;
+            break;
+          default:
+            valorFormateado = `${this.selectedValor}`;
+        }
       }
 
-      //  construir where
       const where = `${this.selectedVariable} ${this.selectedCondicion} ${valorFormateado}`;
 
-      //  Armado visible en UI (sin afectar SQL)
+      //  Buscar nombres legibles
       const categoriaNombre =
-          this.categorias.find(c => c.IDCATEGORIA === this.selectedCategoria)?.CATEGORIA ??
-          this.selectedCategoria;
+        this.categorias.find(c => c.IDCATEGORIA === this.selectedCategoria)?.CATEGORIA ??
+        this.selectedCategoria;
 
       const condicionNombre =
-          this.condicionesCatalogo.find(c => c.id === this.selectedCondicion)?.nombre ??
-          this.selectedCondicion;
+        this.condicionesCatalogo.find(c => c.id === this.selectedCondicion)?.nombre ??
+        this.selectedCondicion;
 
       const valorNombre =
-          this.valores.find(v => v.IDVALOR == this.selectedValor)?.VALOR ??
-          this.selectedValor;
+        this.valores.find(v => v.IDVALOR == this.selectedValor)?.VALOR ??
+        this.selectedValor;
 
       this.condicionesAgregadas.push({
-          categoriaId: this.selectedCategoria,
-          categoriaNombre,
-          variable: this.selectedVariable,
-          condicionId: this.selectedCondicion,
-          condicionNombre,
-          valorId: this.selectedValor,
-          valorNombre,
-          where
+        categoriaId: this.selectedCategoria,
+        categoriaNombre,
+        variable: this.selectedVariable,
+        condicionId: this.selectedCondicion,
+        condicionNombre,
+        valorId: this.selectedValor,
+        valorNombre,
+        where
       });
 
       this.whereFinal = this.condicionesAgregadas.map(c => c.where).join(' AND ');
 
-      console.log(" SQL Final >>> ", this.whereFinal);
+      console.log(this.whereFinal);
+    } else {
+      console.warn(" Faltan datos para armar la condición");
+    }
   }
-
 
   eliminarCondicion(row: any) {
     this.condicionesAgregadas = this.condicionesAgregadas.filter(r => r !== row);
   }
 
-  // consultar() {
-  //     console.log("Ejecutando consulta con WHERE:", this.whereFinal);
-  //     this.getConsultaDatos(this.whereFinal); // cargar datos y paginar
-  // }
+  consultar() {
 
-
-  consultar(){
-    this.cargarPagina(1);  // primera página
+    this.getConsultaDatos(this.whereFinal );
   }
-
-
 
   limpiar() {
     this.condicionesAgregadas = [];

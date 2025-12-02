@@ -5,8 +5,6 @@ import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { Input } from '@angular/core';
 import {FormatUtil} from "../../shared/utils/format.util";
-import { MapCommService } from '../../services/map-comm.service';
-
 
 @Component({
   selector: 'app-indice-tipoorg',
@@ -32,18 +30,6 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
   tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
-
-  
-
-  constructor(private mapComm: MapCommService) {}  // <-- solo para inyectar
-
-
-  
-
-  aplicarColoresTematico() {
-    this.mapComm.emitRenderTematico("TIPORG");
-  }
-
 
   ngOnInit() {
     //this.cargarDatos(); // Nacional por defecto

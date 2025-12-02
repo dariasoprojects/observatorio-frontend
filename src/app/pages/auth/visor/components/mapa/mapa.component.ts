@@ -1,37 +1,3 @@
-// import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-// import { Mapa } from '../../../../../shared/utils/mapa.util';
-// import { MapCommService } from '../../../../../services/map-comm.service';
-
-// @Component({
-//   selector: 'app-mapa',
-//   standalone: true,
-//   templateUrl: './mapa.component.html',
-//   styleUrl: './mapa.component.css'
-// })
-// export class MapaComponent implements AfterViewInit {
-
-//   @ViewChild('mapDiv', { static: true }) mapDiv!: ElementRef<HTMLDivElement>;
-//   @ViewChild('sceneDiv', { static: true }) sceneDiv!: ElementRef<HTMLDivElement>;
-
-//   mapa!: Mapa;
-
-//   constructor(private comm: MapCommService) {}
-
-//   ngAfterViewInit(): void {
-//     this.mapa = new Mapa(
-//       this.mapDiv.nativeElement,
-//       this.comm,
-//       this.sceneDiv.nativeElement
-//     );
-
-//     this.mapa.iniciar()
-//       .then(() => console.log("🟢 MAPA BÁSICO OK"))
-//       .catch(err => console.error("❌ ERROR MAPA:", err));
-//   }
-// }
-
-
-
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {MapCommService} from '../../../../../services/map-comm.service';
 import {Mapa} from '../../../../../shared/utils/mapa.util';
@@ -42,17 +8,12 @@ import {ProductorService} from '../../../../../services/productor.service';
 
 @Component({
   selector: 'app-mapa',
-  standalone: true,             // 👈 FALTABA ESTO
   imports: [],
   templateUrl: './mapa.component.html',
   styleUrl: './mapa.component.css'
 })
 export class MapaComponent implements AfterViewInit, OnDestroy {
-
-  @ViewChild('mapDiv', { static:true }) mapDiv!: ElementRef<HTMLDivElement>;
-  @ViewChild('sceneDiv', { static:true }) sceneDiv!: ElementRef<HTMLDivElement>;
-  @ViewChild('hostMap', { static:true }) hostMap!: ElementRef<HTMLDivElement>;
-
+  @ViewChild('mapaRef', { static: false }) mapaRef!: ElementRef<HTMLDivElement>;
   private mapa!: Mapa;
   private subFiltros?: Subscription;
   private subProductor?: Subscription;
@@ -73,52 +34,51 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
 
   private aplicarFiltrosEnMapa(departamento: string | null, provincia: string | null): void {
-    // ... tal como lo tienes ahora
-    // (no lo toco)
     if (!departamento || departamento === '00') {
-      this.mapaService.getDepartamentoGrafico('00').subscribe({
-        next: (features) => this.mapa.queryByDepartamento('00', features),
-        error: console.error
-      });
-      this.mapa.filtrarParcelasPorUbigeo('00');
-      return;
-    }
 
-    if (!provincia || provincia === '00') {
+      this.mapaService.getDepartamentoGrafico(departamento??'00').subscribe({
+        next: (features) => this.mapa.queryByDepartamento(departamento??'00', features),
+        error: (err) => console.error(err)
+      });
+
+    } else if (!provincia || provincia === '00') {
+
       this.mapaService.getDepartamentoGrafico(departamento).subscribe({
         next: (features) => this.mapa.queryByDepartamento(departamento, features),
-        error: console.error
+        error: (err) => console.error(err)
       });
-      this.mapa.filtrarParcelasPorUbigeo(departamento);
-      return;
+
+    } else {
+
+      this.mapaService.getProvinciaoGrafico(provincia).subscribe({
+        next: (features) => this.mapa.queryByProvincia(provincia, features),
+        error: (err) => console.error(err)
+      });
     }
-
-    this.mapaService.getProvinciaoGrafico(provincia).subscribe({
-      next: (features) => this.mapa.queryByProvincia(provincia, features),
-      error: console.error
-    });
-
-    this.mapa.filtrarParcelasPorUbigeo(provincia);
   }
 
   ngAfterViewInit(): void {
-    console.log("CONTENEDORES:", this.mapDiv, this.sceneDiv);
-
-    this.mapa = new Mapa(
-      this.mapDiv.nativeElement,
-      this.comm,
-      this.sceneDiv.nativeElement
-    );
-
-    this.mapa.iniciar()
-      .then(() => console.log("🟢 MAPA CARGADO & READY"))
-      .catch(err => console.error("❌ ERROR mapa:", err));
+    this.mapa = new Mapa(this.mapaRef.nativeElement, this.comm);
 
     this.subZoom = this.comm.zoomRequestGraphic$
-      .subscribe(feature => this.mapa.zoomToGraphic(feature));
+      .subscribe(feature => {
+        this.mapa.zoomToGraphic(feature);
+      });
 
-    this.subProductor = this.productorService.productor$
-      .subscribe(features => features?.length && this.mapa.mostrarParcela(features));
+    this.mapa.iniciar()
+      .then(res => {
+        console.log(res);
+
+        // 👇 aquí nos suscribimos al mismo Observable que el sidebar
+        this.subProductor = this.productorService.productor$
+          .subscribe(features => {
+            if (!features || features.length === 0) {
+              return;
+            }
+            this.mapa.mostrarParcela(features)
+          });
+      })
+      .catch(err => console.error('Error al iniciar el mapa:', err));
   }
 
   ngOnDestroy(): void {
@@ -128,5 +88,3 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     this.subZoom?.unsubscribe();
   }
 }
-
-

@@ -113,23 +113,3 @@
   height: 16px !important;
   width: 16px !important;
 }
-
-
-.tematico-btn {
-  background: #155f31 !important;      /* Verde MIDAGRI */
-  border: 3px solid #ffffff !important;
-  border-radius: 10px !important;
-  color: white !important;
-
-  padding: 12px 20px !important;       /* Más grande */
-  font-size: 16px !important;
-  font-weight: bold !important;
-
-  box-shadow: 0 0 10px rgba(0,0,0,0.45) !important;
-  transition: 0.25s ease !important;
-}
-
-.tematico-btn:hover {
-  background: #0f4a25 !important;       /* Verde más oscuro */
-  transform: scale(1.05);
-}

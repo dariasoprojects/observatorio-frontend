@@ -164,32 +164,3 @@
   overflow-y: auto;
   scroll-behavior: smooth;
 }
-
-
-.paginado-manual {
-  margin: 18px 0;
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  align-items: center;
-}
-
-.pagina-info {
-  font-weight: bold;
-  color: #006637;
-}
-
-
-.acciones-paginacion {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 18px;
-  margin: 18px 0;
-}
-
-.pagina-info {
-  font-weight: bold;
-  color: #0a8f4d;
-  font-size: 14px;
-}
