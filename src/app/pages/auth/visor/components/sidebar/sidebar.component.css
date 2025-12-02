@@ -361,3 +361,183 @@
 .tabla-region td.cell-center {
   text-align: center;
 }
+
+.panel-tight :global(.p-panel-header){ padding: 8px 12px; }
+.panel-tight :global(.p-panel-content){ padding: 8px 12px; }
+.muted{ color:#6b7280; display:block; margin-bottom:6px; }
+
+:host ::ng-deep .ppa-chip {
+  background: #f3f4f6 !important;        /* gris suave como los hover de lista */
+  border: 1px solid #e5e7eb !important;   /* borde estándar de tu UI */
+  color: #374151 !important;              /* gris de texto */
+
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border-radius: 12px !important;
+  padding: 2px 10px !important;
+  align-items: center !important;
+  gap: 6px !important;
+
+  margin-right: 6px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Ícono de remover (si decides usarlo luego) */
+:host ::ng-deep .ppa-chip .p-chip-remove-icon {
+  font-size: 14px !important;
+  color: #6b7280 !important;      /* gris intermedio */
+  transition: color 0.15s ease;
+}
+
+:host ::ng-deep .ppa-chip .p-chip-remove-icon:hover {
+  color: #dc2626 !important;       /* rojo suave al hover */
+}
+
+/* ============================
+   ESTADOS VACÍOS DE FILTROS
+   ============================ */
+
+.filter-empty,
+.filter-empty-mini {
+  margin-top: 6px;
+  padding: 10px;
+  background: #f8fafc;              /* gris muy suave */
+  border: 1px dashed #d1d5db;       /* igual a tus paneles */
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  text-align: center;
+  color: #475569;                   /* gris del texto */
+  font-size: 13px;
+}
+
+.filter-empty i,
+.filter-empty-mini i {
+  font-size: 1.2rem;
+  color: #64748b;                   /* gris del ícono */
+}
+
+/* Botón minimalista para no romper el diseño */
+.btn-minimal {
+  padding: 0 !important;
+  color: #009c5a !important;
+  font-size: 12px !important;
+  box-shadow: none !important;
+}
+
+.btn-minimal:hover {
+  color: #007a46 !important;
+}
+
+/* Estado vacío de filtros */
+.filter-empty.clean {
+  margin-top: 6px;
+  padding: 6px 2px;
+  border-radius: 6px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+
+  font-size: 13px;
+  color: #475569;
+}
+
+/* Línea con icono y texto */
+.filter-empty-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.filter-empty-line i {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Botón minimalista verde */
+.btn-ubigeo {
+  padding: 0 !important;
+  font-size: 13px !important;
+  color: #009c5a !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-ubigeo:hover {
+  color: #007a46 !important;
+}
+.btn-ubigeo.center {
+  margin: 0 auto !important;   /* lo centra horizontalmente */
+}
+
+
+/* ===========================
+   MODO COLAPSADO
+=========================== */
+
+/* BLOQUE COLAPSADO */
+.side-left__head[ng-reflect-ng-if="true"],
+.side-left__head.collapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  gap: 6px;
+  background: #fff;
+}
+
+/* Logo circular centrado */
+.collapsed-logo img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
+}
+
+.siea-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 56px;      /* encaja con tu sidebar colapsado */
+  margin-top: 4px;
+}
+
+.siea-svg {
+  width: 30px;
+  height: auto;
+  display: block;
+}
+
+.siea-letters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.siea-letters span {
+  font-family:  Arial, sans-serif;
+  line-height: 1;
+  color: #000;
+}
+
+
+
+
+
+

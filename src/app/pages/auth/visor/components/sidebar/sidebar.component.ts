@@ -1,20 +1,22 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {PanelModule} from 'primeng/panel';
 import {CommonModule} from '@angular/common';
 import {ButtonModule } from 'primeng/button';
 import {CardModule } from 'primeng/card';
 import {DividerModule} from 'primeng/divider';
-import {ProductorService} from '../../../../../services/productor.service';
-import {Feature, ProductorAttributes} from '../../../../../models/productor/productor.model';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs';
+import {ReactiveFormsModule} from '@angular/forms';
 import {MapCommService} from '../../../../../services/map-comm.service';
 import {FormatUtil} from '../../../../../shared/utils/format.util';
-import {UbigeoService} from '../../../../../services/ubigeo.service';
+import {DropdownModule} from 'primeng/dropdown';
+import {BusquedaUbigeoComponent} from '../busqueda-ubigeo/busqueda-ubigeo.component';
+import {ChipModule} from 'primeng/chip';
+import {Subject} from 'rxjs';
+import {FiltrosUbigeo, FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
+import {Dialog} from 'primeng/dialog';
 
-export interface Item { title: string; section: string; icon: string; }
+interface Item { title: string; section: string; icon: string; }
 interface PanelGroup { title: string; icon: string; collapsed: boolean; items: Item[]; }
+
 
 @Component({
   selector: 'app-sidebar',
@@ -25,7 +27,11 @@ interface PanelGroup { title: string; icon: string; collapsed: boolean; items: I
     ButtonModule,
     CardModule,
     DividerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DropdownModule,
+    ChipModule,
+    BusquedaUbigeoComponent,
+    Dialog
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
@@ -33,12 +39,12 @@ interface PanelGroup { title: string; icon: string; collapsed: boolean; items: I
 export class SidebarComponent  implements OnInit, OnDestroy{
 
 
-  @Input()  isCollapsed = false;                       // no nullable
   @Output() isCollapsedChange = new EventEmitter<boolean>();
 
   // Selección de sección
   @Input()  activeSection: string | null = null;
   @Output() sectionSelected = new EventEmitter<string>();
+  @Input()  isCollapsed = false;
 
   // Datos
   readonly panels: PanelGroup[] = [
@@ -105,55 +111,22 @@ export class SidebarComponent  implements OnInit, OnDestroy{
     },
   ];
 
-  productor: ProductorAttributes | null = null;
-  parcelas: Feature []=[];
 
-  formBusqueda!: FormGroup;
-  mostrarProductor:boolean=false;
-  existeProductor:boolean=false;
-  @Output() buscarDni = new EventEmitter<void>();
-  @Output() limpiarDni = new EventEmitter<void>();
+  @ViewChild(BusquedaUbigeoComponent)  busquedaUbigeo!: BusquedaUbigeoComponent;
 
   private destroy$ = new Subject<void>();
+  filtrosUbigeo!: FiltrosUbigeo;
+  ubicacionGeograficaVisible: boolean = false;
 
   constructor(
-    private productorService: ProductorService,
-    private fb: FormBuilder,
     private comm: MapCommService,
-    readonly ubigeoService: UbigeoService
+    private filtroUbigeoService: FiltroUbigeoService,
   ) {
-    this.formBusqueda = this.fb.group({
-      dni: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(8),
-          Validators.maxLength(8),
-          Validators.pattern(/^\d+$/) // solo números
-        ]
-      ]
-    });
-
   }
 
   ngOnInit(): void {
-    this.productorService.productor$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(features => {
 
-        if (!features || features.length === 0) {
-          this.productor = null;
-          this.parcelas = [];
-          this.existeProductor = false;
-          return;
-        }
-
-        const parcelas = features as unknown as Feature[];
-
-        this.productor = parcelas[0]?.attributes ?? null;
-        this.parcelas = parcelas;
-        this.existeProductor = !!this.productor;
-      });
+    this.filtroUbigeoService.filtrosUbigeo$.subscribe(s => this.filtrosUbigeo = s);
   }
 
   ngOnDestroy(): void {
@@ -163,7 +136,7 @@ export class SidebarComponent  implements OnInit, OnDestroy{
 
   toggleLeft(): void {
     this.isCollapsed = !this.isCollapsed;
-    this.isCollapsedChange.emit(this.isCollapsed);  // <-- clave para two-way
+    this.isCollapsedChange.emit(this.isCollapsed);
   }
 
   selectSection(id: string) {
@@ -174,36 +147,10 @@ export class SidebarComponent  implements OnInit, OnDestroy{
   trackByItem  = (_: number, it: Item) => it.section;
 
 
-  onSearchDni(): void {
-    const dniControl = this.formBusqueda.get('dni');
-    this.mostrarProductor =true;
-    this.existeProductor=true;
-
-    if (dniControl?.invalid) {
-      dniControl.markAsTouched();
-      return;
-    }
-
-    const dni = dniControl?.value;
-
-    this.productorService.getProductor(dni);
-    this.buscarDni.emit();
-
-    this.sectionSelected.emit("");
-
-
-  }
-
-  onClearDni(): void {
-    this.formBusqueda.get('dni')?.setValue('');
-    this.productor =null;
-    this.parcelas=[];
-    this.limpiarDni.emit();
-  }
 
   onVerPaneles():void{
-    this.mostrarProductor =false;
-    this.limpiarDni.emit();
+    // this.mostrarProductor =false;
+    // this.limpiarDni.emit();
   }
 
   verParcela(fila: any): void {
@@ -216,6 +163,27 @@ export class SidebarComponent  implements OnInit, OnDestroy{
     this.comm.requestZoomGraphic(fila);
   }
 
+  onClearDepartamento(): void {
+    this.busquedaUbigeo.resetFiltros()
+  }
+
+  onClearProvincia() {
+    this.filtroUbigeoService.setFiltros({
+      provincia: null,
+      nombreProvincia: null
+    });
+
+    this.busquedaUbigeo.form.patchValue({
+      provincia: null
+    });
+  }
+  onOpenUbicacionGeografica() {
+    this.ubicacionGeograficaVisible = true;
+  }
+
+  onCloseUbicacionGeografica() {
+    this.ubicacionGeograficaVisible = false;
+  }
 
   protected readonly FormatUtil = FormatUtil;
 }

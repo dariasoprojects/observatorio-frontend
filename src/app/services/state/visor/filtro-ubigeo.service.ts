@@ -3,6 +3,8 @@ import {BehaviorSubject} from 'rxjs';
 export interface FiltrosUbigeo {
   departamento: string | null;
   provincia: string | null;
+  nombreDepartamento: string | null;
+  nombreProvincia: string | null;
 }
 
 @Injectable({
@@ -10,22 +12,33 @@ export interface FiltrosUbigeo {
 })
 export class FiltroUbigeoService {
 
-  private filtrosSource = new BehaviorSubject<FiltrosUbigeo>({
+  private  filtrosSubject = new BehaviorSubject<FiltrosUbigeo>({
     departamento: '00',   // nacional
-    provincia: null
+    provincia: null,
+    nombreDepartamento:null,
+    nombreProvincia:null,
   });
 
-  filtros$ = this.filtrosSource.asObservable();
+  filtrosUbigeo$ = this.filtrosSubject.asObservable();
+
+  get filtrosActuales(): FiltrosUbigeo {
+    return this.filtrosSubject.value;
+  }
 
   setFiltros(partial: Partial<FiltrosUbigeo>) {
-    const current = this.filtrosSource.value;
-    this.filtrosSource.next({
+    const current = this.filtrosSubject.value;
+    this.filtrosSubject.next({
       ...current,
       ...partial
     });
   }
 
   reset() {
-    this.filtrosSource.next({ departamento: '00', provincia: null });
+    this.filtrosSubject.next({
+      departamento: null,
+      provincia: null ,
+      nombreDepartamento:null,
+      nombreProvincia:null,
+    });
   }
 }

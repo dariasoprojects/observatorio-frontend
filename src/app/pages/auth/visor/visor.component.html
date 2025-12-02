@@ -6,23 +6,16 @@
     #sidebar
     [(isCollapsed)]="isCollapsed"
     [activeSection]="activeSection"
-    (buscarDni)="onBuscarDni()"
-    (limpiarDni)="onLimpiarDni()"
     (sectionSelected)="onSelectSection($event)">
   </app-sidebar>
 
   <!-- TOP-WIDE -->
   <section class="top-wide">
-    <div class="topbar">
-      <div class="topbar-right">
-        <p-avatar label="RA" shape="circle" styleClass="usr-avatar" (click)="menu.toggle($event)"></p-avatar>
-        <p-menu #menu [model]="items" [popup]="true" />
-        <div class="usr-info">
-          <div class="usr-name">Roberto Aranda</div>
-          <div class="usr-role">Analista del Sistema</div>
-        </div>
-      </div>
-    </div>
+    <app-busqueda-dni
+      (buscarDni)="onBuscarDni()"
+      (limpiarDni)="onLimpiarDni()"
+    >
+    </app-busqueda-dni>
   </section>
 
   <!-- CENTRO: MAPA -->
