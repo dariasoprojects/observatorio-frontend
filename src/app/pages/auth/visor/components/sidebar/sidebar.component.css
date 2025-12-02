@@ -482,3 +482,62 @@
 .btn-ubigeo.center {
   margin: 0 auto !important;   /* lo centra horizontalmente */
 }
+
+
+/* ===========================
+   MODO COLAPSADO
+=========================== */
+
+/* BLOQUE COLAPSADO */
+.side-left__head[ng-reflect-ng-if="true"],
+.side-left__head.collapsed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  gap: 6px;
+  background: #fff;
+}
+
+/* Logo circular centrado */
+.collapsed-logo img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
+}
+
+.siea-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 56px;      /* encaja con tu sidebar colapsado */
+  margin-top: 4px;
+}
+
+.siea-svg {
+  width: 30px;
+  height: auto;
+  display: block;
+}
+
+.siea-letters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.siea-letters span {
+  font-family:  Arial, sans-serif;
+  line-height: 1;
+  color: #000;
+}
+
+
+
+
+
+
