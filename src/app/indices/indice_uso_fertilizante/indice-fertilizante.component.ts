@@ -89,9 +89,15 @@ export class IndiceFertilizanteComponent implements OnInit {
     }
   }
 
+
+  aplicarColoresGenero() {
+    this.mapComm.emitRenderTematico("FERTILIZA");
+  }
+
+
   abrirDialogoExportar(reg: string) {
 
-    alert(reg);
+    //alert(reg);
 
     this.dialog.open(DialogExportarComponent, {
       width: '900px',
@@ -195,7 +201,7 @@ export class IndiceFertilizanteComponent implements OnInit {
           parcelas: f.attributes.PARCELAS
         }));
 
-        // 👉 Usa la misma función centralizada
+        //  Usa la misma función centralizada
         this.prepararDatos(data);
 
       } else {

@@ -11,7 +11,6 @@
     (sectionSelected)="onSelectSection($event)">
   </app-sidebar>
 
-
   <!-- TOP-WIDE -->
   <section class="top-wide">
     <div class="topbar">
@@ -22,25 +21,21 @@
           <div class="usr-name">Roberto Aranda</div>
           <div class="usr-role">Analista del Sistema</div>
         </div>
-
       </div>
     </div>
   </section>
 
-
   <!-- CENTRO: MAPA -->
   <main class="center-map">
-    <div id="mapContainer" class="map">
-      <app-mapa></app-mapa>
-
-    </div>
+    <app-mapa></app-mapa>
   </main>
+
+  
 
   <!-- DERECHA -->
   <app-side-right
     #sideright
-    [activeSection]="activeSection"
-  >
+    [activeSection]="activeSection">
   </app-side-right>
 
   <p-dialog
@@ -52,8 +47,8 @@
     [resizable]="false"
   >
     <app-analisis-espacial
-      (close)="dialogVisible = false"
-    ></app-analisis-espacial>
+      (close)="dialogVisible = false">
+    </app-analisis-espacial>
   </p-dialog>
 
   <p-dialog
@@ -64,7 +59,8 @@
     [draggable]="true"
     [resizable]="false"
   >
-    <app-consulta-multiple ></app-consulta-multiple>
+    <app-consulta-multiple></app-consulta-multiple>
   </p-dialog>
 </div>
+
 <app-loader></app-loader>

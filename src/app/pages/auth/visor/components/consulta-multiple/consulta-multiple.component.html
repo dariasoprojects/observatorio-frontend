@@ -131,58 +131,80 @@
     </div>
 
     <!-- Tabla de resultados -->
-    <p-table
-      [value]="resultados"
-      [paginator]="true"
-      [rows]="10"
-      class="tabla-resultados p-datatable-sm"
-    >
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Zoom</th>
-          <th>FID</th>
-          <th>Tip Doc</th>
-          <th>Género</th>
-          <th>Edad</th>
-          <th>Estado Civil</th>
-          <th style="width: 3rem;"></th>
-        </tr>
-      </ng-template>
+    <!-- Tabla de resultados — Paginado REAL -->
+<p-table
+  [value]="resultados"
+  [paginator]="false"
+  class="tabla-resultados p-datatable-sm"
+>
 
-      <ng-template pTemplate="body" let-row>
-        <tr>
-          <td class="text-center">
-            <button
-              pButton
-              type="button"
-              icon="pi pi-search"
-              class="p-button-text p-button-rounded p-button-sm"
-              (click)="onVerZoom(row.fidS)"
-            ></button>
-          </td>
-          <td>{{ row.fid }}</td>
-          <td>{{ row.attributes.TDOC }}</td>
-          <td>{{ row.attributes.GENERO }}</td>
-          <td>{{ row.attributes.EDAD }}</td>
-          <td>{{ row.attributes.ECIVIL }}</td>
-          <td class="text-center">
-            <button
-              pButton
-              type="button"
-              icon="pi pi-ellipsis-v"
-              class="p-button-text p-button-rounded p-button-sm"
-              (click)="onAbrirDetalle(row.attributes)"
-            ></button>
-          </td>
-        </tr>
-      </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Zoom</th>
+      <th>FID</th>
+      <th>Tip Doc</th>
+      <th>Género</th>
+      <th>Edad</th>
+      <th>Estado Civil</th>
+      <th style="width: 3rem;"></th>
+    </tr>
+  </ng-template>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="5" class="text-center">No hay resultados</td>
-        </tr>
-      </ng-template>
-    </p-table>
+  <ng-template pTemplate="body" let-row>
+    <tr>
+      <td class="text-center">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-search"
+          class="p-button-text p-button-rounded p-button-sm"
+          (click)="onVerZoom(row.fid)"
+        ></button>
+      </td>
+      <td>{{ row.fid }}</td>
+      <td>{{ row.attributes.TDOC }}</td>
+      <td>{{ row.attributes.GENERO }}</td>
+      <td>{{ row.attributes.EDAD }}</td>
+      <td>{{ row.attributes.ECIVIL }}</td>
+      <td class="text-center">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-ellipsis-v"
+          class="p-button-text p-button-rounded p-button-sm"
+          (click)="onAbrirDetalle(row.attributes)"
+        ></button>
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>
+
+<!-- 🔥 PAGINADO REAL -->
+<div class="acciones-paginacion">
+  <button pButton
+    icon="pi pi-angle-left"
+    label="Anterior"
+    class="p-button-outlined"
+    [disabled]="paginaActual <= 1"
+    (click)="cargarPagina(paginaActual - 1)">
+  </button>
+
+  <span class="pagina-info">Página {{ paginaActual }}</span>
+
+  <button pButton
+    icon="pi pi-angle-right"
+    label="Siguiente"
+    class="p-button-outlined"
+    (click)="cargarPagina(paginaActual + 1)">
+  </button>
+</div>
+
+
+
+
+
+    
 
     <!-- Botón cerrar -->
     <div class="cerrar">
