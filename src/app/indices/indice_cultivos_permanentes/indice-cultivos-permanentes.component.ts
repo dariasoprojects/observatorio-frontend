@@ -99,7 +99,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
       credits: { enabled: false },
 
       tooltip: {
-        pointFormat: '<b>{point.y:,.0f}</b> parcelas ({point.percentage:.1f}%)'
+        pointFormat: '<b>{point.y:,.0f}</b> ha ({point.percentage:.1f}%)'
       },
 
       plotOptions: {
@@ -120,7 +120,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
       },
 
       series: [{
-        name: 'Parcelas',
+        name: 'Hectáreas',
         type: 'pie',
         data: this.categorias.map((c, i) => ({
           name: c,
@@ -137,7 +137,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
   public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'CULTIPERMA' AND CAPA = 1",
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
+      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
       returnGeometry: false
     });
 
@@ -148,7 +148,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
         const data = response.features.map(f => ({
           ubigeo: f.attributes.UBIGEO,
           ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
+          parcelas: f.attributes.HECTAREA
         }));
 
         //  Agrupar por UBIGEO (para la tabla)
@@ -192,7 +192,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
     //alert(ubigeo);
     const q = new Query({
        where: `INDICE = 'CULTIPERMA' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
+      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
       returnGeometry: false
     });
 
@@ -203,7 +203,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
         const data = response.features.map(f => ({
           ubigeo: f.attributes.UBIGEO,
           ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
+          parcelas: f.attributes.HECTAREA
         }));
 
         // Tabla: sumar por UBIGEO
@@ -237,7 +237,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
       where: `INDICE = 'CULTIPERMA' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
+      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
       returnGeometry: false
     });
 
@@ -248,7 +248,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
         const data = response.features.map(f => ({
           ubigeo: f.attributes.UBIGEO,
           ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
+          parcelas: f.attributes.HECTAREA
         }));
 
         // Tabla: sumar por UBIGEO
