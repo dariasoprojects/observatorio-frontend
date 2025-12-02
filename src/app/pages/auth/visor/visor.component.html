@@ -9,30 +9,39 @@
     (sectionSelected)="onSelectSection($event)">
   </app-sidebar>
 
-
   <!-- TOP-WIDE -->
   <section class="top-wide">
+<<<<<<< Updated upstream
     <app-busqueda-dni
       (buscarDni)="onBuscarDni()"
       (limpiarDni)="onLimpiarDni()"
     >
     </app-busqueda-dni>
+=======
+    <div class="topbar">
+      <div class="topbar-right">
+        <p-avatar label="RA" shape="circle" styleClass="usr-avatar" (click)="menu.toggle($event)"></p-avatar>
+        <p-menu #menu [model]="items" [popup]="true" />
+        <div class="usr-info">
+          <div class="usr-name">Roberto Aranda</div>
+          <div class="usr-role">Analista del Sistema</div>
+        </div>
+      </div>
+    </div>
+>>>>>>> Stashed changes
   </section>
-
 
   <!-- CENTRO: MAPA -->
   <main class="center-map">
-    <div id="mapContainer" class="map">
-      <app-mapa></app-mapa>
-
-    </div>
+    <app-mapa></app-mapa>
   </main>
+
+  
 
   <!-- DERECHA -->
   <app-side-right
     #sideright
-    [activeSection]="activeSection"
-  >
+    [activeSection]="activeSection">
   </app-side-right>
 
   <p-dialog
@@ -44,8 +53,8 @@
     [resizable]="false"
   >
     <app-analisis-espacial
-      (close)="dialogVisible = false"
-    ></app-analisis-espacial>
+      (close)="dialogVisible = false">
+    </app-analisis-espacial>
   </p-dialog>
 
   <p-dialog
@@ -56,7 +65,8 @@
     [draggable]="true"
     [resizable]="false"
   >
-    <app-consulta-multiple ></app-consulta-multiple>
+    <app-consulta-multiple></app-consulta-multiple>
   </p-dialog>
 </div>
+
 <app-loader></app-loader>

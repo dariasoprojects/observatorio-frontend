@@ -16,6 +16,8 @@ export class MapaService {
   constructor(private http: HttpClient) {}
 
   getDepartamentoGrafico(departamentoId: string): Observable<__esri.Graphic[]> {
+
+    
     const fl = new FeatureLayer({ url: this.urlDepartamento });
 
     const q = fl.createQuery();
