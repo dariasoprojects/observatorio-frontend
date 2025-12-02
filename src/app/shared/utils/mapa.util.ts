@@ -132,7 +132,7 @@ export class Mapa {
 
 
   async aplicarRendererTematico(campo: string) {
-    console.log("🎨 Aplicando renderer temático... Campo:", campo);
+    console.log(" Aplicando renderer temático... Campo:", campo);
 
     switch (campo) {
 
@@ -153,11 +153,11 @@ export class Mapa {
         break;
 
       default:
-        console.warn("⚠️ Campo no reconocido:", campo);
+        console.warn(" Campo no reconocido:", campo);
         return;
     }
 
-    console.log("✅ Renderer temático aplicado:", campo);
+    console.log(" Renderer temático aplicado:", campo);
   }
 
 
@@ -187,7 +187,7 @@ export class Mapa {
       "2": "#E53935"    // Rojo intenso
     };
 
-    // 🖌 Símbolo simple-fill para polígonos (borde igual al color)
+    //  Símbolo simple-fill para polígonos (borde igual al color)
     const simb = (hex: string) =>
       ({
         type: "simple-fill",
@@ -198,7 +198,7 @@ export class Mapa {
         }
       } as any);
 
-    // 🔥 RENDERER FINAL POR GENERO
+    //  RENDERER FINAL POR GENERO
     sub0.renderer = {
       type: "unique-value",
       field: "GENERO",
@@ -222,7 +222,7 @@ export class Mapa {
       defaultLabel: "Sin dato"
     } as any;
 
-    console.log("✔ Renderer GÉNERO aplicado correctamente");
+    console.log(" Renderer GÉNERO aplicado correctamente");
   }
 
 
@@ -233,21 +233,21 @@ export class Mapa {
 
   private async aplicarRendererTipoOrganizacion() {
 
-    console.log("🎨 Aplicando renderer por TORG...");
+    console.log(" Aplicando renderer por TORG...");
 
     if (!this.capaParcelasPadron) return;
     await this.capaParcelasPadron.when();
 
     const sub0 = this.capaParcelasPadron.findSublayerById(0);
     if (!sub0) {
-      console.error("❌ No se encontró el sublayer 0");
+      console.error(" No se encontró el sublayer 0");
       return;
     }
 
     sub0.visible = true;
     this.capaParcelasPadron.visible = true;
 
-    // 🎨 Colores Highcharts (solo 4)
+    //  Colores Highcharts (solo 4)
     const colores: Record<string, string> = {
       "1": "#20B5B8",
       "2": "#229389",
@@ -255,7 +255,7 @@ export class Mapa {
       "4": "#FFE44A"
     };
 
-    // 🖌 Símbolo para polígonos (con cast any, evita errores TS)
+    //  Símbolo para polígonos (con cast any, evita errores TS)
     const simb = (hex: string) =>
       ({
         type: "simple-fill",
@@ -266,7 +266,7 @@ export class Mapa {
         }
       } as any);
 
-    // 🔥 RENDERER FINAL POR TORG
+    //  RENDERER FINAL POR TORG
     sub0.renderer = {
       type: "unique-value",
       field: "TORG",
@@ -284,7 +284,7 @@ export class Mapa {
       defaultLabel: "Sin dato"
     } as any;
 
-    console.log("✔ Renderer TORG aplicado correctamente");
+    console.log(" Renderer TORG aplicado correctamente");
   }
 
 
@@ -293,21 +293,21 @@ export class Mapa {
 
   private async aplicarRendererNivelEstudio() {
 
-    console.log("🎨 Aplicando renderer NIVEST Highcharts...");
+    console.log(" Aplicando renderer NIVEST Highcharts...");
 
     if (!this.capaParcelasPadron) return;
     await this.capaParcelasPadron.when();
 
     const sub0 = this.capaParcelasPadron.findSublayerById(0);
     if (!sub0) {
-      console.error("❌ No se encontró el sublayer 0");
+      console.error(" No se encontró el sublayer 0");
       return;
     }
 
     sub0.visible = true;
     this.capaParcelasPadron.visible = true;
 
-    // 🎨 Colores Highcharts (tus colores del donut)
+    //  Colores Highcharts (tus colores del donut)
     const colores: Record<number, string> = {
       11: "#20B5B8", // Sin info
       13: "#229389", // Primaria
@@ -317,7 +317,7 @@ export class Mapa {
       12: "#F76C4A"  // Posgrado
     };
 
-    // 👉 Símbolo compatible para MapImageSubLayer (con cast ANY)
+    //  Símbolo compatible para MapImageSubLayer (con cast ANY)
     const simb = (hex: string) =>
       ({
         type: "simple-fill",
@@ -328,7 +328,7 @@ export class Mapa {
         }
       } as any); // ← evita error TS
 
-    // 🔥 RENDERER FINAL
+    //  RENDERER FINAL
     sub0.renderer = {
       type: "unique-value",
       field: "IDE_ESTUDI",
@@ -1126,6 +1126,8 @@ export class Mapa {
     this.toc_Draw.innerHTML = '<span class="esri-icon-edit" title="Dibujar"></span>';
     this.toc_Draw.style.margin = '5px';
 
+ 
+
     this.toc_Draw.onclick = () => {
       // habilita funcion identiffy para click y popup
       this.drawActive = !this.drawActive;
@@ -1360,9 +1362,9 @@ export class Mapa {
     this.multiQyBtn = document.createElement("div");
     this.multiQyBtn.className = "esri-widget esri-widget--button esri-interactive";
     this.multiQyBtn.innerHTML = '<span class="esri-icon-filter"></span>';
-    this.multiQyBtn.title = "GeoPerfil";
+    this.multiQyBtn.title = "Consulta Múltiple";
 
-    // 📌 SUPER BOTÓN MIDAGRI – Más grande y más visible sobre azul
+    //  BOTÓN MIDAGRI – Más grande y más visible sobre azul
 this.multiQyBtn.style.background = "#155f31";       
 this.multiQyBtn.style.color = "white";
 this.multiQyBtn.style.border = "4px solid #ffffff";   // borde más ancho
@@ -1458,13 +1460,13 @@ this.btnAnalisis.onclick = () => {
 
 
     if (this.mapView) {
-      this.mapView.ui.add(this.legendToggleBtn, 'top-right');
+      //this.mapView.ui.add(this.legendToggleBtn, 'top-right');
       this.mapView.ui.add(this.toc_ToggleBtn, 'top-right');
       //this.mapView.ui.add(this.toc_IndetifiBtn, 'top-right');
       this.mapView.ui.add(this.toc_Draw, 'top-right');
-      //this.mapView.ui.add(this.sketsch, "top-right");
+      this.mapView.ui.add(this.sketsch, "top-right");
       this.mapView.ui.add(this.toc_MedirRegla, "top-right");
-      this.mapView.ui.add(this.toc_MedirArea, "top-right");
+      //this.mapView.ui.add(this.toc_MedirArea, "top-right");
       this.mapView.ui.add(this.toc_3D, "top-right");
       // this.currentView.ui.add(basemapBtn, "top-right");
       // this.currentView.ui.add(basemapMenu, "top-right");
