@@ -5,6 +5,8 @@ import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { Input } from '@angular/core';
 import {FormatUtil} from "../../shared/utils/format.util";
+import { MapCommService } from '../../services/map-comm.service';
+
 
 @Component({
   selector: 'app-indice-genero',
@@ -30,6 +32,13 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
   // URL
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
+
+  constructor(private mapComm: MapCommService) {}  // <-- solo para inyectar
+
+  aplicarColoresTematico() {
+    this.mapComm.emitRenderTematico("GEN");
+  }
+
 
   ngOnInit() {
 
@@ -127,7 +136,7 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
           name: c,
           y: this.valores[i]
         })),
-        colors: ['#20B5B8', '#229389', '#D2DD45', '#FFE44A', '#FFB022', '#F76C4A', '#F23C3C']
+        colors: ['#1A73E8', '#E53935']
       }],
 
     };

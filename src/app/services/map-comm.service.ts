@@ -7,6 +7,16 @@ import Polygon from '@arcgis/core/geometry/Polygon';
 export class MapCommService {
 
 
+  private renderTematicoSource = new Subject<string>();
+renderTematico$ = this.renderTematicoSource.asObservable();
+
+
+emitRenderTematico(campo: string) {
+  this.renderTematicoSource.next(campo);
+}
+
+
+
   private selectLayerSource = new Subject<string | null>();
   selectLayer$ = this.selectLayerSource.asObservable();
 
@@ -56,6 +66,11 @@ export class MapCommService {
 
   private abrirConsultasMultipleDialogSource = new Subject<void>();
   abrirConsultasMultipleDialog$ = this.abrirConsultasMultipleDialogSource.asObservable();
+
+
+  // requestRenderGenero() {
+  //   this.renderGeneroSource.next();
+  // }
 
 
   requestZoom(objectId: number) {
