@@ -884,9 +884,9 @@ export class Mapa {
       // Crear un símbolo personalizado
       feature.symbol = {
         type: "simple-fill",
-        color: [0, 0, 0, 0],            // fondo transparente
+        color: [0, 0, 0, 0],   // transparente
         outline: {
-          color: [255, 0, 255, 1],     // borde dorado
+          color: [255, 0, 255],  // MAGENTA correcto
           width: 4
         }
       };
@@ -1054,12 +1054,35 @@ export class Mapa {
           "lasso-selection": true,   // Desactiva selección lasso
           "rectangle-selection": true //  Desactiva selección rectangular
         },
-        undoRedoMenu: true,
+        undoRedoMenu: false,
         settingsMenu: false, //  Opcional: oculta engranaje de configuración
         duplicateButton: true //  Dejar duplicar
         //deleteButton: true     //  Dejar eliminar
       }
     });
+
+
+    const polySym: any = this.sketsch.viewModel.polygonSymbol;
+    polySym.color = [0, 0, 0, 0];      // transparente
+    polySym.outline = {
+      color: [255, 0, 255],           // MAGENTA
+      width: 3
+    };
+
+
+    //  Al iniciar un nuevo dibujo, borrar el dibujo anterior
+    this.sketsch.on("create", (event) => {
+      if (event.state === "start") {
+        // cuando comienza un nuevo dibujo → limpia todos los anteriores
+        this.resultsLayer.removeAll();
+      }
+    });
+
+
+    // (opcional) que las líneas también sean magenta
+    const lineSym: any = this.sketsch.viewModel.polylineSymbol;
+    lineSym.color = [255, 0, 255];
+    lineSym.width = 3;
 
 
     this.toc_Draw = document.createElement('div');
@@ -1778,6 +1801,9 @@ private restaurarRendererParcelas(): void {
         width: 3, // Ancho del borde
       },
     });
+
+
+
 
     // Asigna el símbolo a cada gráfico
     const updatedFeatures = features.map((feature) => {
