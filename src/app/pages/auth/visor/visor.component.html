@@ -9,7 +9,6 @@
     (sectionSelected)="onSelectSection($event)">
   </app-sidebar>
 
-
   <!-- TOP-WIDE -->
   <section class="top-wide">
     <app-busqueda-dni
@@ -19,20 +18,17 @@
     </app-busqueda-dni>
   </section>
 
-
   <!-- CENTRO: MAPA -->
   <main class="center-map">
-    <div id="mapContainer" class="map">
-      <app-mapa></app-mapa>
-
-    </div>
+    <app-mapa></app-mapa>
   </main>
+
+  
 
   <!-- DERECHA -->
   <app-side-right
     #sideright
-    [activeSection]="activeSection"
-  >
+    [activeSection]="activeSection">
   </app-side-right>
 
   <p-dialog
@@ -44,8 +40,8 @@
     [resizable]="false"
   >
     <app-analisis-espacial
-      (close)="dialogVisible = false"
-    ></app-analisis-espacial>
+      (close)="dialogVisible = false">
+    </app-analisis-espacial>
   </p-dialog>
 
   <p-dialog
@@ -56,7 +52,8 @@
     [draggable]="true"
     [resizable]="false"
   >
-    <app-consulta-multiple ></app-consulta-multiple>
+    <app-consulta-multiple></app-consulta-multiple>
   </p-dialog>
 </div>
+
 <app-loader></app-loader>
