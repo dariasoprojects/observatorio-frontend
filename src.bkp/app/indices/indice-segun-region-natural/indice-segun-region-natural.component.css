@@ -1,0 +1,38 @@
+.indice-region {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px;
+}
+
+.tabla-wrapper {
+  overflow-x: auto;
+}
+
+.tabla-region {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabla-region th,
+.tabla-region td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: left;
+}
+
+.tabla-region th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.tabla-region tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.tabla-region th.num-col,
+.tabla-region td.num-col {
+  text-align: right;
+  padding-right: 12px;
+}

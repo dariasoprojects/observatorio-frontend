@@ -1,0 +1,45 @@
+<form [formGroup]="formBusqueda">
+  <div class="search">
+    <i class="pi pi-search icon-left"
+       role="button"
+       tabindex="0"
+       (click)="onSearchDni()">
+    </i>
+
+    <input
+      pInputText
+      type="text"
+      formControlName="dni"
+      placeholder="Ingresar número DNI"
+      maxlength="8"
+      (keydown.enter)="onSearchDni()" />
+
+    <i class="pi pi-times icon-right"
+       role="button"
+       tabindex="0"
+       (click)="onClearDni()">
+    </i>
+  </div>
+  <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched && formBusqueda.get('dni')?.invalid && this.mostrarProductor">
+
+    <div *ngIf="formBusqueda.get('dni')?.errors?.['required']">
+      DNI no debe estar vacío.
+    </div>
+
+    <div *ngIf="formBusqueda.get('dni')?.errors?.['minlength'] || formBusqueda.get('dni')?.errors?.['maxlength']">
+      DNI debe tener 8 dígitos.
+    </div>
+
+    <div *ngIf="formBusqueda.get('dni')?.errors?.['pattern']">
+      Solo se permiten números.
+    </div>
+
+  </div>
+  <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched  && this.mostrarProductor && !this.existeProductor">
+
+    <div >
+      Dni no encontrado.
+    </div>
+
+  </div>
+</form>

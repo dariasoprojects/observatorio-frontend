@@ -1,0 +1,322 @@
+<div class="wrap-scroll" #wrapScroll>
+  <div class="consulta-container" *ngIf="!detalleVisible">
+
+    <div class="filtros-row grid">
+
+      <div class="col-12 md:col-3">
+        <label>Categoría</label>
+        <p-dropdown
+          [options]="categorias"
+          optionLabel="CATEGORIA"
+          optionValue="IDCATEGORIA"
+          placeholder="Seleccione"
+          [showClear]="true"
+          [filter]="true"
+          [appendTo]="'body'"
+          panelStyleClass="dep-panel"
+          (onChange)="onCategoriaChange($event)"
+        >
+        </p-dropdown>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <label>Variables</label>
+        <p-dropdown
+          [options]="variables"
+          optionLabel="VARIABLE"
+          optionValue="CAMPO_BUSQUEDA"
+          placeholder="Seleccione"
+          [showClear]="true"
+          [filter]="true"
+          [appendTo]="'body'"
+          panelStyleClass="dep-panel"
+          (onChange)="onVariableChange($event)"
+        >
+        </p-dropdown>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <label>Condición</label>
+        <p-dropdown
+          [options]="condiciones"
+          optionLabel="nombre"
+          optionValue="id"
+          placeholder="Seleccione"
+          [showClear]="true"
+          [filter]="true"
+          [appendTo]="'body'"
+          panelStyleClass="dep-panel"
+          (onChange)="onCondicionChange($event)"
+        >
+        </p-dropdown>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <label>Valor</label>
+
+        <p-dropdown
+          [options]="valores"
+          optionLabel="VALOR"
+          optionValue="IDVALOR"
+          placeholder="Seleccione"
+          [showClear]="true"
+          [filter]="true"
+          [appendTo]="'body'"
+          panelStyleClass="dep-panel"
+          (onChange)="onValorChange($event)"
+        >
+        </p-dropdown>
+      </div>
+
+      <!-- Botón agregar condición -->
+      <div class="col-12 flex justify-content-end add-condicion">
+        <button
+          pButton
+          label="Agregar condición"
+          icon="pi pi-plus"
+          class="p-button-text"
+          (click)="onAgregarCondicion()"
+        >
+        </button>
+      </div>
+
+    </div>
+    <!-- FIN filtros -->
+
+    <!-- Tabla de condiciones agregadas -->
+    <p-table
+      [value]="condicionesAgregadas"
+      [paginator]="true"
+      [rows]="10"
+      class="tabla-condiciones p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Grupo</th>
+          <th>Variable</th>
+          <th>Condición</th>
+          <th>Valor</th>
+          <th>Acción</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ row.categoriaNombre }}</td>
+          <td>{{ row.variable }}</td>
+          <td>{{ row.condicionNombre }}</td>
+          <td>{{ row.valorNombre }}</td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-danger p-button-text"
+              (click)="eliminarCondicion(row)">
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center">No hay condiciones agregadas</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- Botones de acción -->
+    <div class="acciones">
+      <button pButton label="Consultar datos" class="p-button-success" (click)="consultar()"></button>
+      <button pButton label="Limpiar" class="p-button-outlined" (click)="limpiar()"></button>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <!-- Tabla de resultados — Paginado REAL -->
+<p-table
+  [value]="resultados"
+  [paginator]="false"
+  class="tabla-resultados p-datatable-sm"
+>
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Zoom</th>
+      <th>FID</th>
+      <th>Tip Doc</th>
+      <th>Género</th>
+      <th>Edad</th>
+      <th>Estado Civil</th>
+      <th style="width: 3rem;"></th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-row>
+    <tr>
+      <td class="text-center">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-search"
+          class="p-button-text p-button-rounded p-button-sm"
+          (click)="onVerZoom(row.fid)"
+        ></button>
+      </td>
+      <td>{{ row.fid }}</td>
+      <td>{{ row.attributes.TDOC }}</td>
+      <td>{{ row.attributes.GENERO }}</td>
+      <td>{{ row.attributes.EDAD }}</td>
+      <td>{{ row.attributes.ECIVIL }}</td>
+      <td class="text-center">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-ellipsis-v"
+          class="p-button-text p-button-rounded p-button-sm"
+          (click)="onAbrirDetalle(row.attributes)"
+        ></button>
+      </td>
+    </tr>
+  </ng-template>
+
+</p-table>
+
+<!-- 🔥 PAGINADO REAL -->
+<div class="acciones-paginacion">
+  <button pButton
+    icon="pi pi-angle-left"
+    label="Anterior"
+    class="p-button-outlined"
+    [disabled]="paginaActual <= 1"
+    (click)="cargarPagina(paginaActual - 1)">
+  </button>
+
+  <span class="pagina-info">Página {{ paginaActual }}</span>
+
+  <button pButton
+    icon="pi pi-angle-right"
+    label="Siguiente"
+    class="p-button-outlined"
+    (click)="cargarPagina(paginaActual + 1)">
+  </button>
+</div>
+
+
+
+
+
+    
+
+    <!-- Botón cerrar -->
+    <div class="cerrar">
+      <button pButton label="Cerrar" class="p-button-success" (click)="cerrar()"></button>
+    </div>
+
+  </div>
+
+  <p-card *ngIf="detalleVisible" class="step-card">
+
+    <ng-template pTemplate="title">
+      <span class="step-title">Detalle del registro</span>
+    </ng-template>
+
+
+    <div class="detalle-grid">
+      <div>
+        <strong>Tipo Doc:</strong>
+        <span>{{ filaSeleccionada.TDOC }}</span>
+      </div>
+
+      <div>
+        <strong>Género:</strong>
+        <span>{{ filaSeleccionada.GENERO }}</span>
+      </div>
+
+      <div>
+        <strong>Edad:</strong>
+        <span>{{ filaSeleccionada.EDAD }}</span>
+      </div>
+
+      <div>
+        <strong>Estado Civil:</strong>
+        <span>{{ filaSeleccionada.ECIVIL }}</span>
+      </div>
+
+      <div>
+        <strong>Grado Estudios:</strong>
+        <span>{{ filaSeleccionada.GRADO }}</span>
+      </div>
+
+      <div>
+        <strong>Región:</strong>
+        <span>{{ filaSeleccionada.REG }}</span>
+      </div>
+
+      <div>
+        <strong>Provincia:</strong>
+        <span>{{ filaSeleccionada.PROV }}</span>
+      </div>
+
+      <div>
+        <strong>Distrito:</strong>
+        <span>{{ filaSeleccionada.DIST }}</span>
+      </div>
+
+      <div>
+        <strong>CC.PP.:</strong>
+        <span>{{ filaSeleccionada.CCMP }}</span>
+      </div>
+
+      <div>
+        <strong>Comunidad:</strong>
+        <span>{{ filaSeleccionada.CORG }}</span>
+      </div>
+
+      <div>
+        <strong>Comunidad Nativa:</strong>
+        <span>{{ filaSeleccionada.CNAT }}</span>
+      </div>
+
+      <div>
+        <strong>Idioma:</strong>
+        <span>{{ filaSeleccionada.LENG }}</span>
+      </div>
+
+      <div>
+        <strong>Miembros Hogar Agrario:</strong>
+        <span>{{ filaSeleccionada.CMH }}</span>
+      </div>
+
+      <div>
+        <strong>Parcelas:</strong>
+        <span>{{ filaSeleccionada.NPAR }}</span>
+      </div>
+
+      <div>
+        <strong>Sup. Total (ha):</strong>
+        <span>{{ filaSeleccionada.SUPA }}</span>
+      </div>
+
+      <div>
+        <strong>Financiamiento:</strong>
+        <span>{{ filaSeleccionada.RFNA }}</span>
+      </div>
+
+      <div>
+        <strong>Régimen Tenencia:</strong>
+        <span>{{ filaSeleccionada.TENP }}</span>
+      </div>
+
+    </div>
+
+    <div class="text-right mt-3">
+      <button
+        pButton
+        label="Cerrar"
+        class="w-full btn-analisis"
+        (click)="detalleVisible = false"
+      ></button>
+    </div>
+
+  </p-card>
+
+</div>

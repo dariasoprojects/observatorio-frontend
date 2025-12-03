@@ -1,0 +1,32 @@
+<div class="indice-region">
+  <!-- Contenedor del gráfico -->
+  <div id="container-region"></div>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-region">
+      <thead>
+        <tr>
+          <th>Descripción</th>
+          <th>Productores</th>
+          <th>Hectárea</th>
+          <th>Parcelas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.hectarea) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

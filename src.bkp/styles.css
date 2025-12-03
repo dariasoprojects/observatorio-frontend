@@ -1,0 +1,124 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+:root{
+  --rail-w: 8px;
+  --rail-g: 8px;
+}
+/* ========= Variables base (mobile-first) ========= */
+
+/* Variables y ajustes globales */
+:root{
+  --landing-h: 60px;
+  --logo-w: 140px;
+  --logo-h: 38px;
+  --title-fs: 19px;
+  --sub-fs: 12.5px;
+  --gap-main: 28px;
+  --video-w: 92%;
+  --page-x: 24px;
+  --panel-w: 320px;
+  --panel-pad: 18px;
+  --video-radius: 12px;
+}
+
+
+/* Fondo y overlay generales de la landing (si esta página es la home) */
+.landing-container{
+  position: relative;
+  width:100%;
+  min-height:100vh;
+  background:
+    url("/assets/img/fondo.avif") center/cover no-repeat,
+    linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%);
+  background-color: #2d2d2d;
+  overflow: hidden;
+}
+.landing-container::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,0.7);
+  pointer-events:none;
+  z-index:1;
+}
+
+/* Header (barra superior compartida) */
+.header{
+  position: relative; z-index:2; height: var(--landing-h);
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 var(--page-x); gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.22);
+}
+.logo-slogan{ display:flex; align-items:center; gap:8px; min-width:0; }
+.logo{ width:var(--logo-w); height:var(--logo-h); object-fit:contain; flex-shrink:0; }
+.slogan{ display:flex; flex-direction:column; justify-content:center; min-width:0; }
+.slogan-title{
+  margin:0; color:#fff; font-family:"Raleway",sans-serif; font-weight:900;
+  font-size: clamp(16px,2.2vw,var(--title-fs)); line-height:1.05; letter-spacing:.2px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.slogan-sub-title{
+  margin:2px 0 0; color:#fff; font-family:"Raleway",sans-serif; font-weight:500;
+  font-size: clamp(11px,1.8vw,var(--sub-fs)); line-height:1.1; opacity:.95;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.btn-login{
+  background:transparent; color:#fff; border:1px solid #fff; border-radius:20px;
+  padding:6px 12px; font:600 12px/1 "Raleway",sans-serif; cursor:pointer;
+  backdrop-filter: saturate(1.05) blur(2px);
+}
+.btn-login:hover{ background:rgba(255,255,255,.15); }
+
+/* Breakpoints que solo tocan variables o header */
+@media (min-width: 640px){ .header{ padding:0 20px; } }
+@media (min-width: 1024px){ .header{ padding:0 28px; } }
+@media (min-width: 1280px){ :root{ --page-x:40px; --gap-main:56px; } }
+@media (min-width: 1440px){ :root{ --title-fs:22px; --logo-w:220px; --logo-h:52px; } }
+
+/* Accesibilidad global */
+@media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+
+/* === Estilos globales para el p-dropdown con búsqueda === */
+
+/* Panel del dropdown (overlay) */
+/* Raíz del overlay: baja todo a 12px */
+.dep-panel {
+  font-size: 12px !important;
+  line-height: 1.3;
+  font-family: 'Raleway', sans-serif;
+}
+
+/* Cubre cualquier input dentro del panel (incluye el filtro) */
+.dep-panel input,
+.dep-panel .p-dropdown-filter {
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  height: 28px; /* opcional, compactar */
+}
+
+/* Placeholder del buscador con prefijos (algunos navegadores lo ignoran si no se fuerza así) */
+.dep-panel .p-dropdown-filter::placeholder,
+.dep-panel input::placeholder,
+.dep-panel .p-dropdown-filter::-webkit-input-placeholder,
+.dep-panel input::-webkit-input-placeholder,
+.dep-panel .p-dropdown-filter:-ms-input-placeholder,
+.dep-panel input:-ms-input-placeholder,
+.dep-panel .p-dropdown-filter::-ms-input-placeholder,
+.dep-panel input::-ms-input-placeholder {
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  color: #9ca3af; /* gris suave */
+  opacity: 1;
+}
+
+/* Ajustes visuales del header e icono (opcional) */
+.dep-panel .p-dropdown-header { padding: 6px 8px !important; }
+.dep-panel .p-dropdown-filter { padding: 4px 8px 4px 28px !important; border-radius: 6px; }
+.dep-panel .p-dropdown-filter-icon { left: 10px; font-size: 0.9rem; color:#6b7280; }
+
+/* Ítems compactos */
+.dep-panel .p-dropdown-items .p-dropdown-item { padding: 6px 10px !important; font-size: 12px !important; }

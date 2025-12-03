@@ -1,0 +1,27 @@
+<div class="indice-cultivperm">
+  <!-- Contenedor del gráfico -->
+  <div id="container-cultivperm"></div>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-cultivperm">
+      <thead>
+        <tr>
+          <th>Jurisdicción</th>
+          <th>Parcelas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td class="num-col">
+            {{ fila.ubigeo }}
+          </td>
+
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

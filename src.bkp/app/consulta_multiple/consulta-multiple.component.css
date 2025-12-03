@@ -1,0 +1,177 @@
+.tabla-resultados {
+  height: 400px;           /* alto fijo de la tabla */
+  overflow-y: auto;        /* scroll vertical */
+  display: block;
+  border: 1px solid #ccc;  /* borde general del contenedor */
+  width: 880px;
+}
+
+.tabla-resultados table {
+  width: 100%;
+  border-collapse: collapse; /* colapsa bordes para que se vean celdas */
+}
+
+.tabla-resultados th,
+.tabla-resultados td {
+  border: 1px solid #ccc;    /* bordes de cada celda */
+  padding: 8px;              /* espacio interno */
+  text-align: left;          /* alineación opcional */
+  background-color: #fff;    /* fondo blanco para que resalte */
+}
+
+.tabla-resultados thead th {
+  position: sticky;          /* sticky para mantener visible la cabecera */
+  top: 0;
+  background-color: #f5f5f5; /* color de fondo de la cabecera */
+  z-index: 1;
+}
+
+
+
+
+.map-consulmulti{
+    position: absolute;
+    top: 300px;
+    left: 500px;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+    z-index: 20;
+}
+
+
+
+/* Estilos generales tabla */
+table.condiciones {
+  border-collapse: separate;
+  border-spacing: 12px; /* espacio entre columnas */
+  width: 100%;
+}
+
+table.condiciones td {
+  vertical-align: middle;
+}
+
+/* Selects */
+table.condiciones select {
+  width: 180px;   /* más ancho */
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Botón */
+#btnCDAgregarCon {
+  padding: 6px 14px;
+  background-color: #0369a1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+#btnCDAgregarCon:hover {
+  background-color: #0284c7;
+}
+
+
+#TDataGeo {
+  width: 100%;
+  border-collapse: collapse; /* une las líneas */
+  font-size: 14px;
+}
+
+#TDataGeo th,
+#TDataGeo td {
+  border: 1px solid #ccc; /* líneas visibles */
+  padding: 8px;
+  text-align: left;
+}
+
+#TDataGeo th {
+  background-color: #f1f5f9; /* gris claro en encabezado */
+  font-weight: 600;
+}
+
+
+
+
+.legend-title2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: green;
+  color: #fff;
+  padding: 6px 12px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Botón de cierre */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #f87171; /* rojo claro al pasar el mouse */
+}
+
+
+
+.cd-acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Estilo base */
+.cd-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Botones verdes */
+.cd-success {
+  background-color: #22c55e; /* verde */
+  color: #fff;
+}
+
+.cd-success:hover {
+  background-color: #16a34a; /* verde más oscuro */
+}
+
+/* Botón blanco */
+.cd-light {
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.cd-light:hover {
+  background-color: #f9fafb;
+}
+
+
