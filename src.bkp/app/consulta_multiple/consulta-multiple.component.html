@@ -1,0 +1,208 @@
+<div id="divDragConsultaMulti" appDraggable style="display:none" class="map-consulmulti">
+
+  <!-- cabecera movible -->
+  <div class="drag-handle legend-title2" 
+       style="padding:5px; cursor:move;">
+    Consulta Múltiple
+    <button (click)="closeVentana()" class="close-btn">×</button>
+  </div>
+
+  <div style="padding:10px;">
+
+                        
+
+                        <div>
+                          <div>
+                            <div>
+                              <div>
+
+                                <div>Agregar condición</div>
+
+                                <table class="condiciones">
+                                  <tr>
+                                    <td>
+                                      <!-- Categoría -->
+                                      <!-- <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaChange()">
+                                        <option *ngFor="let c of categoriasCombo" [value]="c.id">{{ c.nombre }}</option>
+                                      </select> -->
+                                      <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaChange()">
+                                        <option *ngFor="let c of categoriasCombo" [ngValue]="c.id">{{ c.nombre }}</option>
+                                      </select>
+                                    </td>
+
+                                    <td>
+                                      <select [(ngModel)]="variableSeleccionada" (change)="onVariableChange()">
+                                        <option *ngFor="let v of variablesCombo" [value]="v.campo_busqueda">
+                                          {{ v.variable }}
+                                        </option>
+                                      </select>
+                                    </td>
+
+                                    <td>
+                                      <select [(ngModel)]="condicionSeleccionada">
+                                        <option *ngFor="let c of condicionesCombo" [value]="c.id">{{ c.nombre }}</option>
+                                      </select>
+                                    </td>
+                                    
+                                    <td>
+                                      <input type="hidden" id="hfCDTipoDato" value="0">
+                                      <input type="hidden" id="hfCDIdxCondicion" value="-1">
+                                      <select [(ngModel)]="valorSeleccionado" (change)="onValorChange()">
+                                        <option *ngFor="let v of valoresCombo" [value]="v.idvalor">{{ v.valor }}</option>
+                                      </select>
+                                    </td>
+
+                                    <td>
+                                      <!-- <button id="btnCDAgregarCon">+</button> -->
+                                      <button (click)="onAgregarCondicion()">➕ Agregar condición</button>
+                                    </td>
+                                  </tr>
+                                </table>
+
+                              </div>
+
+                              <div id="CDListaCon">
+                                <div>Condiciones agregadas</div>
+                                <table id="TDataGeo" class="table table-bordered">
+                                  <thead>
+                                    <tr>
+                                      <th>Grupo</th>
+                                      <th>Variable</th>
+                                      <th>Condición</th>
+                                      <th>Valor</th>
+                                      <th>Acción</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr *ngFor="let c of consultas; let i = index">
+                                      <td>{{ c.categoriaNombre }}</td>
+                                      <td>{{ c.variable }}</td>
+                                      <td>{{ c.condicionNombre }}</td>
+                                      <td>{{ c.valorNombre }}</td>
+                                      <td>
+                                        <button (click)="eliminarConsulta(i)" class="btn btn-sm btn-danger">❌</button>
+                                      </td>
+                                    </tr>
+                                    <tr *ngIf="consultas.length === 0">
+                                      <td colspan="5" class="text-center">No hay condiciones agregadas</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+
+
+                              </div>
+
+                             <div class="cd-acciones">                              
+                               <button  class="cd-btn cd-success" (click)="ejecutarConsulta()">Consultar Datos</button>
+                              <!-- <button class="cd-btn cd-success">
+                                 Ver en el Mapa
+                              </button> -->
+                              <button class="cd-btn cd-light">
+                                 Limpiar
+                              </button>
+                            </div>
+
+
+                            <div class="tabla-resultados">
+                              <div >
+  <!-- <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>FID</th>
+        <th>Tipo Doc</th>
+        <th>Género</th>
+        <th>Edad</th>
+        <th>Estado Civil</th>
+        <th>Grado</th>
+        <th>Zoom</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of resultados">
+        <td>{{ r.fid }}</td>
+        <td>{{ r.attributes.TDOC }}</td>
+        <td>{{ r.attributes.GENERO }}</td>
+        <td>{{ r.attributes.EDAD }}</td>
+        <td>{{ r.attributes.ECIVIL }}</td>
+        <td>{{ r.attributes.GRADO }}</td>
+        <td>
+          <button (click)="onZoom(r.fid)" class="btn btn-sm btn-primary"></button>
+        </td>
+      </tr>
+      <tr *ngIf="resultados.length === 0">
+        <td colspan="7" class="text-center">No hay resultados</td>
+      </tr>
+    </tbody>
+  </table> -->
+  <table class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Zoom</th>
+      <th>Tipo Doc</th>
+      <th>Género</th>
+      <th>Edad</th>
+      <th>Estado Civil</th>
+      <th>Grado Estudios</th>
+      <th>Región</th>
+      <th>Provincia</th>
+      <th>Distrito</th>
+      <th>CC.PP.</th>
+      <th>Comunidad</th>
+      <th>Comunidad Nativa</th>
+      <th>Idioma</th>
+      <th>Miembros Hogar Agrario</th>
+      <th>Parcelas</th>
+      <th>Sup. Total (ha)</th>
+      <th>Financiamiento</th>
+      <th>Régimen Tenencia</th>
+      
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let r of resultados">
+     <td>
+        <button (click)="onZoom(r.fid)" class="btn btn-sm btn-primary">🔍</button>
+      </td>
+      <td>{{ r.attributes.TDOC }}</td>
+      <td>{{ r.attributes.GENERO }}</td>
+      <td>{{ r.attributes.EDAD }}</td>
+      <td>{{ r.attributes.ECIVIL }}</td>
+      <td>{{ r.attributes.GRADO }}</td>
+      <td>{{ r.attributes.REG }}</td>
+      <td>{{ r.attributes.PROV }}</td>
+      <td>{{ r.attributes.DIST }}</td>
+      <td>{{ r.attributes.CCMP }}</td>
+      <td>{{ r.attributes.CORG }}</td>
+      <td>{{ r.attributes.CNAT }}</td>
+      <td>{{ r.attributes.LENG }}</td>
+      <td>{{ r.attributes.CMH }}</td>
+      <td>{{ r.attributes.NPAR }}</td>
+      <td>{{ r.attributes.SUPA }}</td>
+      <td>{{ r.attributes.RFNA }}</td>
+      <td>{{ r.attributes.TENP }}</td>
+
+      
+    </tr>
+
+    <tr *ngIf="resultados.length === 0">
+      <td colspan="19" class="text-center">No hay resultados</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+</div>
+
+                            </div>
+
+
+                            </div>
+                          </div>
+                        </div>
+
+
+</div>
+
+</div>

@@ -1,0 +1,182 @@
+<aside class="side-right">
+  <div class="right-sticky">
+    <div  class="right-scroll">
+
+
+      <div [ngSwitch]="activeSection">
+
+        <p-panel *ngSwitchCase="'sec_padron_pa'" styleClass="panel-tight">
+          <app-indice-padronp
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-padronp>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_01'" styleClass="panel-tight">
+          <app-indice-centros-empadronamiento
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-centros-empadronamiento>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_03a'" styleClass="panel-tight">
+          <app-indice-tipo-activ
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-tipo-activ>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_04'" styleClass="panel-tight">
+          <app-indice-nivel-estudio
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-nivel-estudio>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_05'" styleClass="panel-tight">
+          <app-indice-segun-region-natural
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-segun-region-natural>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_06'" styleClass="panel-tight">
+          <app-indice-fuente-ingreso
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-fuente-ingreso>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_07'" styleClass="panel-tight">
+          <app-indice-genero
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-genero>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_08'" styleClass="panel-tight">
+          <app-indice-tipoorg
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-tipoorg>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_09'" styleClass="panel-tight">
+          <app-indice-supagri
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-supagri>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_10'" styleClass="panel-tight">
+          <app-indice-supsemb
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-supsemb>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_11'" styleClass="panel-tight">
+          <app-indice-tamparce
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-tamparce>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_12'" styleClass="panel-tight">
+          <app-indice-regtene
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-regtene>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_13'" styleClass="panel-tight">
+          <app-indice-princult
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-princult>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_14'" styleClass="panel-tight">
+          <app-indice-cultivtran
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-cultivtran>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_15'" styleClass="panel-tight">
+          <app-indice-cultivperm
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-cultivperm>
+        </p-panel>
+
+        <p-panel *ngSwitchCase="'sec_indi_16'" styleClass="panel-tight">
+          <app-indice-fertilizante></app-indice-fertilizante>
+        </p-panel>
+
+
+
+      </div>
+
+
+
+      <p-panel header="Datos" styleClass="panel-tight kpi-panel">
+        <small class="kpi-hint">Consulta las estadísticas más recientes del sector agrario</small>
+
+        <div class="kpi kpi--green">
+          <div class="kpi__value">{{ this.nroProductores }}</div>
+          <div class="kpi__label">Productores</div>
+        </div>
+
+        <div class="kpi kpi--blue">
+          <div class="kpi__value">{{ this.nroParcelas }}</div>
+          <div class="kpi__label">Parcelas</div>
+        </div>
+
+        <div class="kpi kpi--brown">
+          <div class="kpi__value">{{ this.nroHectareas }}</div>
+          <div class="kpi__label">Hectáreas</div>
+        </div>
+      </p-panel>
+
+      <p-panel header="Cobertura" styleClass="panel-tight">
+        <div class="coverage">
+          <div><b>Departamentos:</b> 25/25</div>
+          <div><b>Provincias:</b> 195/196</div>
+          <div><b>Fecha:</b> 28/06</div>
+        </div>
+      </p-panel>
+    </div>
+
+  </div>
+</aside>

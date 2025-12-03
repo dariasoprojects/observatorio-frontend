@@ -1,0 +1,29 @@
+<div class="indice-supsemb">
+  <!-- Contenedor del gráfico -->
+  <div id="container-supsemb"></div>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-supsemb">
+      <thead>
+        <tr>
+          <th> </th>
+          <th>Área Total (ha.)</th>
+          <th>Área Sembrada (ha.)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.hectarea) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

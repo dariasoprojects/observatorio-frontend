@@ -1,0 +1,36 @@
+<div class="indice-genero">
+  <!-- Contenedor del gráfico -->
+  <div id="container-genero"></div>
+
+    <button class="btn-tematico" (click)="aplicarColoresTematico()">
+  Ver temático
+</button>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-genero">
+      <thead>
+        <tr>
+          <th>Descripción</th>
+          <th>Productores</th>
+          <th>Hectárea</th>
+          <th>Parcelas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.hectarea) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+.indice-tipoorg {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px;
+}
+
+.tabla-wrapper {
+  overflow-x: auto;
+}
+
+.tabla-tipoorg {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabla-tipoorg th,
+.tabla-tipoorg td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: left;
+}
+
+.tabla-tipoorg th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.tabla-tipoorg tr:nth-child(even) {
+  background-color: #fafafa;
+}
+.tabla-tipoorg th.num-col,
+.tabla-tipoorg td.num-col {
+  text-align: right;
+  padding-right: 12px;
+}
+
+
+.tematico-btn {
+  background: #155f31 !important;      /* Verde MIDAGRI */
+  border: 3px solid #ffffff !important;
+  border-radius: 10px !important;
+  color: white !important;
+
+  padding: 12px 20px !important;       /* Más grande */
+  font-size: 16px !important;
+  font-weight: bold !important;
+
+  box-shadow: 0 0 10px rgba(0,0,0,0.45) !important;
+  transition: 0.25s ease !important;
+}
+
+.tematico-btn:hover {
+  background: #0f4a25 !important;       /* Verde más oscuro */
+  transform: scale(1.05);
+}

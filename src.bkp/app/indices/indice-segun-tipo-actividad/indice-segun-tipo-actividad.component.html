@@ -1,0 +1,50 @@
+<div class="indice-tipoactiv">
+  <!-- Contenedor del gráfico -->
+  <div id="container-tipoactiv" ></div>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-tipoactiv">
+      <thead>
+        <tr>
+          <th>Descripción</th>
+          <th>Productores</th>
+          <th>Parcelas</th>
+          <th>Datos</th>
+          <th>Ver en Mapa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
+          <td>
+            <button
+              mat-icon-button
+              color="primary"
+              class="mini-icon"
+              matTooltip="Exportar a Excel"
+              (click)="abrirDialogoExportar(fila.ddescr)"
+            >
+              <mat-icon>file_download</mat-icon>
+            </button>
+          </td>
+          <td>
+
+            <mat-slide-toggle
+              color="primary"
+              [checked]="activeReg === fila.ddescr"
+              (change)="toggleCluster($event, fila.ddescr)"
+              class="small-toggle"
+            ></mat-slide-toggle>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
