@@ -25,7 +25,7 @@ export class IndiceSuperfiSembComponent implements OnInit {
   categorias: string[] = [];
   chart!: Highcharts.Chart;
 
-  tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
+  tablaDatos: { ddescr: string; productores: number; hectareaTotal: number; parcelas: number ; hectariaSembrada: number }[] = [];
 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
@@ -55,7 +55,7 @@ export class IndiceSuperfiSembComponent implements OnInit {
         title: { text: 'Departamentos' }
       },
       yAxis: {
-        title: { text: 'Valores' },
+        title: { text: 'Cantidad' },
         allowDecimals: false
       },
       legend: { enabled: true },
@@ -69,14 +69,14 @@ export class IndiceSuperfiSembComponent implements OnInit {
       },
       series: [
         {
-          name: 'Hectáreas',
+          name: 'Área Total',
           type: 'bar',
-          data: this.tablaDatos.map(d => d.hectarea)
+          data: this.tablaDatos.map(d => d.hectareaTotal)
         },
         {
-          name: 'Parcelas',
+          name: 'Área Sembrada',
           type: 'bar',
-          data: this.tablaDatos.map(d => d.parcelas)
+          data: this.tablaDatos.map(d => d.hectariaSembrada)
         }
       ]
     });
@@ -85,7 +85,7 @@ export class IndiceSuperfiSembComponent implements OnInit {
   public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'SUPSEMB' AND CAPA = 1",
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS", "HECTAREA2"],
       returnGeometry: false
     });
 
@@ -96,8 +96,9 @@ export class IndiceSuperfiSembComponent implements OnInit {
         this.tablaDatos = response.features.map(f => ({
           ddescr: f.attributes.DDESCR,
           productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
+          hectareaTotal: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS,
+          hectariaSembrada: f.attributes.HECTAREA2,
         }));
 
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
@@ -116,8 +117,8 @@ export class IndiceSuperfiSembComponent implements OnInit {
   public async cargarDatosByDpto(ubigeo: string) {
 
     const q = new Query({
-      where: `INDICE = 'SUPSEMB' AND CAPA = 2 AND UBIGEO = '${ubigeo}'`,
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
+      where: `INDICE = 'SUPSEMB' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS", "HECTAREA2"],
       returnGeometry: false
     });
 
@@ -128,8 +129,9 @@ export class IndiceSuperfiSembComponent implements OnInit {
         this.tablaDatos = response.features.map(f => ({
           ddescr: f.attributes.DDESCR,
           productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
+          hectareaTotal: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS,
+          hectariaSembrada: f.attributes.HECTAREA2,
         }));
 
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
@@ -148,8 +150,8 @@ export class IndiceSuperfiSembComponent implements OnInit {
 
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
-      where: `INDICE = 'SUPSEMB' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
+      where: `INDICE = 'SUPSEMB' AND CAPA =  3 AND UBIGEO LIKE '${ubigeo}%'`,
+      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS","HECTAREA2"],
       returnGeometry: false
     });
 
@@ -160,8 +162,9 @@ export class IndiceSuperfiSembComponent implements OnInit {
         this.tablaDatos = response.features.map(f => ({
           ddescr: f.attributes.DDESCR,
           productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
+          hectareaTotal: f.attributes.HECTAREA,
+          parcelas: f.attributes.PARCELAS,
+          hectariaSembrada: f.attributes.HECTAREA2
         }));
 
         this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
