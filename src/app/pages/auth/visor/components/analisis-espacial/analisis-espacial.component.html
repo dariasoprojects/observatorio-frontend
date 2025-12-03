@@ -60,6 +60,74 @@
           <span class="step-title">3. Resultados</span>
         </ng-template>
 
+
+        <p-card class="step-card" *ngIf="gridGenero?.length">
+        <ng-template pTemplate="title">
+          <span class="step-title">Distribución por Género</span>
+        </ng-template>
+
+        <p-table [value]="gridGenero" class="estadistica-table" >
+          <ng-template pTemplate="header">
+            <tr>
+              <th *ngFor="let c of colsGenero">{{ c }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.GENERO }}</td>
+              <td>{{ row.DESCRIPCION }}</td>
+              <td>{{ row.SUM_GENERO }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+
+
+
+      <p-card class="step-card" *ngIf="gridProductivo?.length">
+        <ng-template pTemplate="title">
+          <span class="step-title">Actividad Productiva</span>
+        </ng-template>
+
+        <p-table [value]="gridProductivo" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th *ngFor="let c of colsProductivo">{{ c }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.DESCRIPCION }}</td>
+              <td>{{ row.TOTAL }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+
+
+      <p-card class="step-card" *ngIf="gridRiego?.length">
+        <ng-template pTemplate="title">
+          <span class="step-title">Método de Riego</span>
+        </ng-template>
+
+        <p-table [value]="gridRiego" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th *ngFor="let c of colsRiego">{{ c }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.DESCRIPCION }}</td>
+              <td>{{ row.TOTAL }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+
         <p-table
           *ngIf="resultados?.length"
           [value]="resultados"
@@ -96,10 +164,21 @@
           </ng-template>
         </p-table>
 
+
         <div class="p-text-center p-text-secondary" *ngIf="!resultados?.length">
           No hay resultados para mostrar.
         </div>
       </p-card>
+
+
+
+
+
+
+
+
+
+
 
     </div>
 

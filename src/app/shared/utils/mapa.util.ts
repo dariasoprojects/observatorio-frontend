@@ -23,6 +23,8 @@ import Point from "@arcgis/core/geometry/Point";
 
 export class Mapa {
 
+  private coordsDiv!: HTMLDivElement;
+
   private destroyed$ = new Subject<void>();
 
   private map!: EsriMap;
@@ -72,7 +74,14 @@ export class Mapa {
   private printDiv!: HTMLDivElement;
   private basemapBtn!: HTMLDivElement;
 
+  private btnReset!: HTMLDivElement;
+
   private container!: HTMLDivElement;
+
+  private capaSeleccionada: string | null = null;
+  private queryTask: any;
+  private modoConsulta = false;
+  private highlightLayerKml: GraphicsLayer = new GraphicsLayer();
   
 
 
@@ -100,7 +109,7 @@ export class Mapa {
     this.comm = comm;
 
 
-    this.resultsLayer   = new GraphicsLayer({ id: 'results' });
+    this.resultsLayer   = new GraphicsLayer({ id: 'Elemento Seleccionado' });
     this.highlightLayer = new GraphicsLayer({ id: 'highlight' });
 
     this.comm.zoomRequest$
@@ -128,7 +137,91 @@ export class Mapa {
       .pipe(takeUntil(this.destroyed$))
       .subscribe(campo => this.aplicarRendererTematico(campo));
 
+
+    // this.comm.selectLayer$.subscribe(layer => {
+    //   console.log("Capa seleccionada:", layer);
+
+    //   if (!layer) {
+    //     this.modoConsulta = false;
+    //     return;
+    //   }
+
+    //   this.modoConsulta = true;
+
+    //   // guardar qué capa se seleccionó
+    //   this.capaSeleccionada = layer;
+
+    //   // configurar queryTask dinámico
+    //   this.configurarQueryTask(layer);
+
+    //   // activar cursor especial
+    //   if (this.mapView?.container) {
+    //     this.mapView.container.style.cursor = "crosshair";
+    //   }
+    // });
+
+    this.comm.selectLayer$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(campo => {
+
+        console.log("Campo temático recibido:", campo);
+
+        // Si viene null/undefined → desactivar modo temático
+        if (!campo) {
+          this.modoConsulta = false;
+          return;
+        }
+
+        this.modoConsulta = true;
+
+        // guardar qué capa se seleccionó
+        this.capaSeleccionada = campo;
+
+        // configurar queryTask dinámico
+        this.configurarQueryTask(campo);
+
+
+        // Cambiar cursor (si aplica)
+        if (this.mapView?.container) {
+          this.mapView.container.style.cursor = "crosshair";
+        }
+
+    });
+
+
   }
+
+
+
+
+   private configurarQueryTask(layer: string) {
+    let url = "";
+
+    if (layer === "junta") {
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/6";
+    } else if (layer === "comite") {
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/7";
+    }else if (layer === "unidadhidro") {
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/10";
+    }else if (layer === "sectores") {
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/9";
+    }else if (layer === "microcuencas") {
+      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/8";
+    }
+
+
+
+
+    this.queryTask = new FeatureLayer({
+      url,
+      outFields: ["*"]
+    });
+
+    console.log("QueryTask configurado:", url);
+  }
+
+
+
 
 
   async aplicarRendererTematico(campo: string) {
@@ -520,214 +613,6 @@ export class Mapa {
 
 
 
-  // async iniciar(): Promise<string> {
-  //   try {
-
-
-  //     this.capaParcelasPadron = new MapImageLayer({
-  //       url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/",
-  //       title: "Parcelas Productores",
-  //        visible: false
-  //     });
-
-  //     this.capaMapServer = new MapImageLayer({
-  //       url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/SectoresEstadisticos/MapServer/",
-  //       visible: false
-  //     });
-
-  //     this.rasterBosqueAmazonico= new MapImageLayer({
-  //       url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/UnidadHidrografica/MapServer/",
-  //       visible: false
-
-  //     });
-
-  //     this.capaClusterAlertas = new MapImageLayer({
-  //       url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Microcuencas/MapServer/",
-  //       visible: false
-  //     });
-
-  //     this.capaJuntausuario = new MapImageLayer({
-  //       url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/",
-  //       visible: false
-  //     });
-
-  //     this.capaComiteRiego = new MapImageLayer({
-  //       url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/ComisionesRiego/MapServer/",
-  //       visible: false
-  //     });
-
-  //     this.capaAntenasCelular = new MapImageLayer({
-  //       url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Antenas/MapServer/",
-  //       visible: false
-  //     });
-
-
-  //     this.capaCluster = new FeatureLayer({
-  //       url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/1',
-  //       outFields: ['*'],
-  //       visible: false,
-  //       featureReduction: {
-  //         type: 'cluster',
-  //         clusterRadius: '100px',
-  //         labelsVisible: true, // mostrar número
-  //         labelingInfo: [
-  //           {
-  //             deconflictionStrategy: "none",
-  //             labelExpressionInfo: { expression: "$feature.cluster_count" }, // número de puntos en el cluster
-  //             labelPlacement: "center-center", // centrar el label
-  //             symbol: {
-  //               type: "text",
-  //               color: "white",
-  //               font: {
-  //                 size: 14,
-  //                 weight: "bold",
-  //                 family: "Arial"
-  //               },
-  //               haloColor: "black", // opcional, para mejor visibilidad
-  //               haloSize: 1
-  //             }
-  //           }
-  //         ]
-  //       },
-  //       popupTemplate: {
-  //         title: 'Centro: {REG}',
-  //         content: 'Cantidad de registros agrupados por cluster.'
-  //       }
-  //     });
-
-
-
-
-
-  //     this.capaClusterPpa = new FeatureLayer({
-  //       url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0',
-  //       outFields: ['*'],
-  //       visible: false,
-  //       featureReduction: {
-  //         type: 'cluster',
-  //         clusterRadius: '100px',
-  //         labelsVisible: true, // mostrar número
-  //         labelingInfo: [
-  //           {
-  //             deconflictionStrategy: "none",
-  //             labelExpressionInfo: { expression: "$feature.cluster_count" }, // número de puntos en el cluster
-  //             labelPlacement: "center-center", // centrar el label
-  //             symbol: {
-  //               type: "text",
-  //               color: "white",
-  //               font: {
-  //                 size: 14,
-  //                 weight: "bold",
-  //                 family: "Arial"
-  //               },
-  //               haloColor: "black", // opcional, para mejor visibilidad
-  //               haloSize: 1
-  //             }
-  //           }
-  //         ]
-  //       },
-  //       popupTemplate: {
-  //         title: 'Centro: {UBIGEO3}',
-  //         content: 'Cantidad de registros agrupados por cluster.'
-  //       }
-  //     });
-
-
-  //     this.mapDiv.style.display = "block";
-  //     this.sceneDiv.style.display = "none";  // 3D oculto al iniciar
-
-
-
-  //     this.map = new EsriMap({
-  //       basemap: 'hybrid',
-  //       ground: "world-elevation",   // <── ESTO ES LO QUE FALTABA
-  //       layers: [
-  //         this.capaParcelasPadron,
-  //         this.rasterBosqueAmazonico,
-  //         this.capaMapServer,
-  //         this.capaClusterAlertas,
-  //         this.capaJuntausuario,
-  //         this.capaComiteRiego,
-  //         this.capaAntenasCelular,
-  //         this.resultsLayer!,
-  //         this.highlightLayer!
-  //       ]
-  //     });
-
-
-
-
-
-  //     // === 2D VIEW ===
-  //     this.mapView = new MapView({
-  //       container: this.mapDiv,
-  //       map: this.map,
-  //       center: [-75.015, -9.19],
-  //       zoom: 6
-  //     });
-
-  //     await this.mapView!.when();
-  //     console.log("2D Listo ✔");
-  //     this.currentView = this.mapView!;  
-
-
-  //     // === 3D VIEW (Cargada pero oculta) ===
-  //     this.sceneView = new SceneView({
-  //       container: this.sceneDiv,
-  //       map: this.map,
-  //       camera: {
-  //         position: { x: -74.5, y: -9, z: 1500000 },
-  //         tilt: 45
-  //       },
-  //       environment: {
-  //         atmosphereEnabled: true,
-  //         starsEnabled: false,
-  //         lighting: {
-  //           directShadowsEnabled: true
-  //         }
-  //       }
-  //     });
-
-
-      
-
-
-
-
-  //     // agrega clústeres al mapa (o inclúyelos en el array de arriba)
-  //     this.map.addMany([this.capaCluster, this.capaClusterPpa]);
-
-  //     // UI containers
-  //     this.legendContainer = document.createElement('div');
-  //     this.legendContainer.classList.add('esri-widget', 'esri-widget--panel');
-  //     this.legendContainer.style.width = '250px';
-  //     this.legendContainer.style.display = 'none';
-
-  //     this.tocContainer = document.createElement('div');
-  //     this.tocContainer.classList.add('esri-widget', 'esri-widget--panel');
-  //     this.tocContainer.style.width = '250px';
-  //     this.tocContainer.style.display = 'none';
-
-  //     this.mapView.ui.add(this.legendContainer, 'bottom-right');
-  //     this.mapView.ui.add(this.tocContainer, 'bottom-right');
-
-  //     await this.mapView!.when();
-  //     console.log("%c2D >>> OK", "background:green;color:white;padding:3px");
-  //     this.currentView = this.mapView!; // para el toggle 2D/3D
-
-  //     this.agregarBotones();
-  //     this.aplicarEstadoInicial();
-
-  //     this.isReady = true;
-
-  //     return 'Mapa cargado con éxito';
-  //   } catch (error) {
-  //     console.error('Error al cargar el mapa:', error);
-  //     throw error; // deja que el caller haga catch
-  //   }
-  // }
-
-
   async iniciar(): Promise<string> {
     try {
 
@@ -742,77 +627,15 @@ export class Mapa {
       });
 
 
+      await this.capaParcelasPadron.load();
 
-      // await this.capaParcelasPadron.load();
+      const sub0 = this.capaParcelasPadron.findSublayerById(0);
 
-      // if (!this.capaParcelasPadron.sublayers) {
-      //   console.error("❌ No hay sublayers en la capa Parcelas");
-      //   return "Sin sublayers";
-      // }
-
-      // // listar sublayers para identificar el correcto
-      // this.capaParcelasPadron.sublayers.forEach(sl => {
-      //   console.log("SUBLAYER:", sl.id, sl.title);
-      // });
-
-      // // buscar sublayer (puede no ser 0 → revisa consola!)
-      // const sub0 = this.capaParcelasPadron.sublayers.find(s => s.id === 0);
-
-      // if (!sub0) {
-      //   console.error("❌ Sublayer 0 no encontrado");
-      //   return "Sublayer no encontrado";
-      // }
-
-      // // Aplicar renderer directamente (NO usar source)
-      // sub0.renderer = {
-      //   type: "unique-value",
-      //   field: "GENERO",
-      //   uniqueValueInfos: [
-      //     {
-      //       value: "1",
-      //       label: "Género 1",
-      //       symbol: {
-      //         type: "simple-fill",
-      //         color: [255, 0, 0, 0.35],       // 🔥 ROJO FOSFORESCENTE
-      //         outline: {
-      //           color: [255, 0, 0, 1],       // ROJO PURO
-      //           width: 2.5                   // BORDE GRUESO
-      //         }
-      //       }
-      //     },
-      //     {
-      //       value: "2",
-      //       label: "Género 2",
-      //       symbol: {
-      //         type: "simple-fill",
-      //         color: [0, 120, 255, 0.35],    // 🔵 AZUL CHILLÓN
-      //         outline: {
-      //           color: [0, 120, 255, 1],     // AZUL PURO
-      //           width: 2.5
-      //         }
-      //       }
-      //     }
-      //   ],
-      //   defaultSymbol: {
-      //     type: "simple-fill",
-      //     color: [180, 180, 180, 0.2],       // GRIS CLARO
-      //     outline: {
-      //       color: [100, 100, 100, 0.8],
-      //       width: 1
-      //     }
-      //   }
-      // };
-
-
-      // sub0.visible = true;
-      // this.capaParcelasPadron.visible = true;
-
-      // console.log("🎨 Renderer aplicado correctamente");
-
-
-
-
-
+      if (sub0) {
+        // Guardar renderer original
+        (sub0 as any)._rendererOriginal = sub0.renderer ? JSON.parse(JSON.stringify(sub0.renderer)) : null;
+      }
+      
 
 
       this.capaMapServer = new MapImageLayer({
@@ -929,6 +752,55 @@ export class Mapa {
       await this.mapView.when();
       console.log("🟢 MAPA 2D listo");
 
+      // // === Widget de Coordenadas ===
+      //   this.coordsDiv = document.createElement("div");
+      //   this.coordsDiv.className = "esri-widget esri-view-width-xlarge";
+      //   this.coordsDiv.style.padding = "4px 8px";
+      //   this.coordsDiv.style.background = "rgba(255,255,255,0.85)";
+      //   this.coordsDiv.style.fontSize = "13px";
+      //   this.coordsDiv.style.borderRadius = "6px";
+      //   this.coordsDiv.style.boxShadow = "0 1px 4px rgba(0,0,0,0.3)";
+      //   this.coordsDiv.style.minWidth = "160px";
+
+      //   this.coordsDiv.innerHTML = "Lat: — | Lon: —";
+
+      //   // agregar a la vista
+      //   this.mapView.ui.add(this.coordsDiv, "bottom-left");
+
+      //   // activar evento de movimiento
+      //   this.iniciarCoordenadas();
+
+      this.activarCoordenadasEnVivo();
+
+
+
+
+
+      this.mapView.on("click", (event) => {
+        if (!this.modoConsulta || !this.queryTask) return;
+
+        this.buscarEntidad(event.mapPoint);
+      });
+
+
+
+
+      this.mapView.on("pointer-move", (evt) => {
+  const point = this.mapView!.toMap({ x: evt.x, y: evt.y });
+
+  if (!point) return;
+
+  const lat = point.latitude?.toFixed(6) ?? "—";
+  const lon = point.longitude?.toFixed(6) ?? "—";
+
+  const div = document.getElementById("coords");
+  if (div) {
+    div.innerHTML = `Lat: ${lat} <br> Lon: ${lon}`;
+  }
+});
+
+
+
       this.currentView = this.mapView;
 
       // --- UI extra ---
@@ -964,9 +836,78 @@ export class Mapa {
   }
 
 
+  private activarCoordenadasEnVivo() {
+    if (!this.mapView) return;
+
+    const div = document.getElementById("coords");
+    if (!div) return;
+
+    this.mapView.on("pointer-move", (event) => {
+      const point = this.mapView!.toMap({ x: event.x, y: event.y });
+
+      if (!point || point.latitude == null || point.longitude == null) {
+        div.innerHTML = "Move mouse...";
+        return;
+      }
+
+      const lat = point.latitude.toFixed(6);
+      const lon = point.longitude.toFixed(6);
+
+      div.innerHTML = `Lat: <b>${lat}</b> | Lon: <b>${lon}</b>`;
+    });
+  }
 
 
 
+
+  private async buscarEntidad(mapPoint: any) {
+    try {
+      const query = this.queryTask.createQuery();
+      query.geometry = mapPoint;
+      query.spatialRelationship = "intersects";
+      query.returnGeometry = true;
+      query.maxAllowableOffset = 30;  // recomendado
+      query.geometryPrecision = 4; 
+
+      const res = await this.queryTask.queryFeatures(query);
+
+      if (!res.features.length) {
+        console.warn("No se encontró entidad.");
+        return;
+      }
+
+      const feature = res.features[0];
+
+      // Dibujar
+      this.resultsLayer?.removeAll();
+      // this.resultsLayer?.add(feature);
+      // Crear un símbolo personalizado
+      feature.symbol = {
+        type: "simple-fill",
+        color: [0, 0, 0, 0],            // fondo transparente
+        outline: {
+          color: [255, 0, 255, 1],     // borde dorado
+          width: 4
+        }
+      };
+
+      // Agregar al mapa
+      this.resultsLayer?.add(feature);
+
+
+      // Zoom
+      this.mapView?.goTo(feature.geometry);
+
+      // Enviar evento para panel u otro componente
+      this.comm.sendFeatureSelected(feature);
+      this.comm.sendGeometry(feature.geometry); 
+
+      console.log("OBJECTID encontrado:", feature.attributes.OBJECTID);
+
+    } catch (err) {
+      console.error("Error al consultar la capa seleccionada:", err);
+    }
+  }
 
 
 
@@ -1226,7 +1167,7 @@ export class Mapa {
     //             });
 
     //             await this.sceneView.when();
-    //             console.log("🚀 3D cargado correctamente");
+    //             console.log(" 3D cargado correctamente");
     //         }
 
     //         this.currentView = this.sceneView;
@@ -1459,6 +1400,45 @@ this.btnAnalisis.onclick = () => {
 };
 
 
+
+
+
+this.btnReset = document.createElement("div");
+this.btnReset.className = "esri-widget esri-widget--button esri-interactive";
+this.btnReset.innerHTML = '<span class="esri-icon-refresh"></span>';
+this.btnReset.title = "Restablecer mapa";
+
+// Estilo institucional MIDAGRI (igual que botones verdes)
+this.btnReset.style.background = "#155f31";
+this.btnReset.style.color = "white";
+this.btnReset.style.border = "4px solid #ffffff";
+this.btnReset.style.borderRadius = "12px";
+this.btnReset.style.padding = "14px 20px";
+this.btnReset.style.fontSize = "22px";
+this.btnReset.style.margin = "8px";
+this.btnReset.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
+this.btnReset.style.display = "flex";
+this.btnReset.style.alignItems = "center";
+this.btnReset.style.justifyContent = "center";
+this.btnReset.style.cursor = "pointer";
+this.btnReset.style.transition = "0.25s";
+
+this.btnReset.onmouseover = () => {
+  this.btnReset.style.background = "#0f4a25";
+  this.btnReset.style.transform = "scale(1.18)";
+  this.btnReset.style.boxShadow = "0 0 16px rgba(0,0,0,0.85)";
+};
+this.btnReset.onmouseleave = () => {
+  this.btnReset.style.background = "#155f31";
+  this.btnReset.style.transform = "scale(1)";
+  this.btnReset.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
+};
+
+// Acción
+this.btnReset.onclick = () => this.resetCompleto();
+
+
+
     if (this.mapView) {
       //this.mapView.ui.add(this.legendToggleBtn, 'top-right');
       this.mapView.ui.add(this.toc_ToggleBtn, 'top-right');
@@ -1467,7 +1447,7 @@ this.btnAnalisis.onclick = () => {
       this.mapView.ui.add(this.sketsch, "top-right");
       this.mapView.ui.add(this.toc_MedirRegla, "top-right");
       //this.mapView.ui.add(this.toc_MedirArea, "top-right");
-      this.mapView.ui.add(this.toc_3D, "top-right");
+      //this.mapView.ui.add(this.toc_3D, "top-right");
       // this.currentView.ui.add(basemapBtn, "top-right");
       // this.currentView.ui.add(basemapMenu, "top-right");
       this.currentView.ui.add(this.basemapContainer, "top-right");
@@ -1477,6 +1457,7 @@ this.btnAnalisis.onclick = () => {
       this.currentView.ui.add(this.multiQyBtn, "top-left");
 
       this.currentView.ui.add(this.btnAnalisis, "top-left");
+      //this.currentView.ui.add(this.btnReset, "top-left");   // new
 
 
       // if (this.printWidget) {
@@ -1487,6 +1468,145 @@ this.btnAnalisis.onclick = () => {
     }
 
   }
+
+
+private restaurarRendererParcelas(): void {
+  if (!this.capaParcelasPadron) return;
+
+  const sub0 = this.capaParcelasPadron.findSublayerById(0);
+  if (!sub0) return;
+
+  const original = (sub0 as any)._rendererOriginal;
+
+  if (original) {
+    sub0.renderer = JSON.parse(JSON.stringify(original)); // restablecer renderer original
+  }
+
+  // ❌ No volver visible la capa (como dijiste)
+  sub0.visible = false;
+  this.capaParcelasPadron.visible = false;
+
+  // limpiar filtros
+  sub0.definitionExpression = "";
+}
+
+
+
+
+
+
+
+  resetCompleto() {
+
+  console.log("🔄 RESET COMPLETO DEL MAPA");
+
+  // 1) Estado y selección
+  this.modoConsulta = false;
+  this.capaSeleccionada = null;
+  this.queryTask = null;
+
+  // 2) Limpiar resultados
+  this.resultsLayer?.removeAll();
+  this.highlightLayer?.removeAll();
+
+  // 3) Cerrar Identify y dibujo
+  this.identifyActive = false;
+
+  if (this.sketsch) {
+    this.sketsch.visible = false;
+    this.sketsch.cancel();
+  }
+  this.drawActive = false;
+
+  // 4) Ocultar paneles UI
+  if (this.legendContainer) this.legendContainer.style.display = "none";
+  if (this.tocContainer) this.tocContainer.style.display = "none";
+
+  // 5) Cursor default
+  if (this.mapView?.container) {
+    this.mapView.container.style.cursor = "default";
+  }
+
+  // 6) Vista inicial
+  if (this.mapView) {
+    this.mapView.goTo({ center: [-75.015, -9.19], zoom: 6 });
+  }
+
+  // 7) Quitar popup
+  if (this.mapView?.popup) this.mapView.popup.visible = false;
+
+  // 8) Notificar a la app
+  this.comm.sendFeatureSelected(null);
+  this.comm.sendGeometry(null);
+
+  // 9) Restaurar renderer de ParcelasPadron (muy importante)
+  this.restaurarRendererParcelas();
+
+  console.log("🟢 Mapa restablecido correctamente.");
+}
+
+
+
+
+
+  // resetCompleto() {
+
+  //   console.log(" Restaurando mapa al estado inicial...");
+
+  //   // 1) Desactivar modo de consulta / renderer temático
+  //   this.modoConsulta = false;
+  //   this.capaSeleccionada = null;
+  //   this.queryTask = null;
+
+  //   // 2) Restablecer visibilidad de capas
+  //   if (this.capaParcelasPadron) this.capaParcelasPadron.visible = false;
+  //   if (this.capaMapServer) this.capaMapServer.visible = false;
+  //   if (this.rasterBosqueAmazonico) this.rasterBosqueAmazonico.visible = false;
+  //   if (this.capaClusterAlertas) this.capaClusterAlertas.visible = false;
+  //   if (this.capaJuntausuario) this.capaJuntausuario.visible = false;
+  //   if (this.capaComiteRiego) this.capaComiteRiego.visible = false;
+  //   if (this.capaAntenasCelular) this.capaAntenasCelular.visible = false;
+  //   if (this.capaCluster) this.capaCluster.visible = false;
+  //   if (this.capaClusterPpa) this.capaClusterPpa.visible = false;
+
+  //   // 3) Limpiar resultados
+  //   this.resultsLayer?.removeAll();
+  //   this.highlightLayer?.removeAll();
+
+  //   // 4) Cerrar Identify
+  //   this.identifyActive = false;
+
+  //   // 5) Cerrar dibujo
+  //   if (this.sketsch) {
+  //     this.sketsch.visible = false;
+  //     this.sketsch.cancel();
+  //   }
+  //   this.drawActive = false;
+
+  //   // 6) Restablecer UI
+  //   if (this.legendContainer) this.legendContainer.style.display = "none";
+  //   if (this.tocContainer) this.tocContainer.style.display = "none";
+
+  //   // 7) Restaurar cursor
+  //   if (this.mapView?.container) {
+  //     this.mapView.container.style.cursor = "default";
+  //   }
+
+  //   // 8) Restablecer vista inicial
+  //   if (this.mapView) {
+  //     this.mapView.goTo({ center: [-75.015, -9.19], zoom: 6 });
+  //   }
+
+  //   // 9) Ocultar popup si estaba abierto
+  //   if (this.mapView?.popup) this.mapView.popup.visible = false;
+
+  //   // 10) Notificar al resto de la app (si tienes algún Subject)
+  //   this.comm.sendFeatureSelected(null);
+  //   this.comm.sendGeometry(null);
+
+  //   console.log(" Mapa restablecido.");
+  // }
+
 
 
   private renderUI(){

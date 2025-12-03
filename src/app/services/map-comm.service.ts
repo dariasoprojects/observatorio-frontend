@@ -27,10 +27,10 @@ emitRenderTematico(campo: string) {
 
 
   //  NUEVO canal para devolver feature seleccionado
-  private featureSelectedSource = new Subject<__esri.Graphic>();
+  private featureSelectedSource = new Subject<__esri.Graphic | null>();
   featureSelected$ = this.featureSelectedSource.asObservable();
 
-  sendFeatureSelected(feature: __esri.Graphic) {
+  sendFeatureSelected(feature: __esri.Graphic | null) {
     this.featureSelectedSource.next(feature);
   }
 

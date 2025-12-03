@@ -236,3 +236,28 @@
     padding: 0.5rem;
   }
 }
+
+
+
+/* ======== ESTILOS PARA TABLAS DE ESTADÍSTICAS ======== */
+
+/* Cabecera gris profesional */
+.estadistica-table thead th {
+  background: #e0e0e0 !important; /* gris suave pero corporativo */
+  color: #333 !important;         /* letra gris oscuro para profesionalismo */
+  font-weight: 600;
+  border-bottom: 2px solid #c7c7c7 !important;
+  padding: 8px !important;
+  text-align: left;
+}
+
+/* Ajuste del borde */
+.estadistica-table {
+  border: 1px solid #d5d5d5;
+  border-radius: 4px;
+}
+
+/* Filas */
+.estadistica-table tbody td {
+  padding: 6px 8px !important;
+}
