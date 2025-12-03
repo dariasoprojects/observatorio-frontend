@@ -16,10 +16,10 @@
         <tr *ngFor="let fila of tablaDatos">
           <td>{{ fila.ddescr }}</td>
           <td class="num-col">
-            {{ FormatUtil.formatInteger2Digitos(fila.hectarea) }}
+            {{ FormatUtil.formatInteger2Digitos(fila.hectareaTotal) }}
           </td>
           <td class="num-col">
-            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+            {{ FormatUtil.formatInteger2Digitos(fila.hectariaBajoRiego) }}
           </td>
         </tr>
       </tbody>
