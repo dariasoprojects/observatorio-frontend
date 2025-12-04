@@ -20,8 +20,13 @@ export class MapaService {
 
     const q = fl.createQuery();
     q.where = `IDDPTO = '${departamentoId}'`;
-    q.outFields = ['*'];
+    //q.outFields = ['*'];
     q.returnGeometry = true;
+    //SUAVIZADO FUERTE (polígonos grandes)
+    //q.maxAllowableOffset = 30;   // en metros
+    //q.geometryPrecision = 4;      // reduce vértices hasta 4 decimales
+    q.maxAllowableOffset = this.metrosAGrados(300); // 100 metros
+    q.geometryPrecision = 5;
 
     return from(fl.queryFeatures(q)).pipe(
       map(res => {
@@ -37,6 +42,10 @@ export class MapaService {
     q.where = `IDPROV = '${provinciaId}'`;
     q.outFields = ['*'];
     q.returnGeometry = true;
+    // SUAVIZADO MEDIO (límites provinciales)
+    q.maxAllowableOffset = this.metrosAGrados(300); // 100 metros
+    q.geometryPrecision = 5;
+
 
     return from(fl.queryFeatures(q)).pipe(
       map(res => {
@@ -44,4 +53,9 @@ export class MapaService {
       })
     );
   }
+
+  private metrosAGrados(metros: number): number {
+    return metros / 111320;   // promedio global exacto para WGS84
+  }
+
 }
