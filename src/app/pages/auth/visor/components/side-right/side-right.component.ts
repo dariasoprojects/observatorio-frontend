@@ -52,6 +52,12 @@ import {IndicadoresSumatoriaResponse} from '../../../../../models/Sumatorias/ind
 import {FormatUtil} from '../../../../../shared/utils/format.util';
 import {FiltrosUbigeo, FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
 import {debounceTime, distinctUntilChanged,  Subscription} from 'rxjs';
+import {
+  IndiceBienesRecibidosComponent
+} from '../../../../../indices/indice-bienes-recibidos/indice-bienes-recibidos.component';
+import {
+  IndiceServiciosRecibidosComponent
+} from '../../../../../indices/indice-servicios-recibidos/indice-servicios-recibidos.component';
 
 
 
@@ -78,7 +84,9 @@ import {debounceTime, distinctUntilChanged,  Subscription} from 'rxjs';
     IndiceCultivosTransitComponent,
     IndiceCultivosPermaComponent,
     IndiceFertilizanteComponent,
-    CommonModule
+    CommonModule,
+    IndiceBienesRecibidosComponent,
+    IndiceServiciosRecibidosComponent
   ],
   templateUrl: './side-right.component.html',
   styleUrl: './side-right.component.css'
@@ -116,6 +124,8 @@ export class SideRightComponent {
   @ViewChild(IndiceCultivosTransitComponent) indiceCultivosTransitComponent!: IndiceCultivosTransitComponent;
   @ViewChild(IndiceCultivosPermaComponent) indiceCultivosPermaComponent!: IndiceCultivosPermaComponent;
   @ViewChild(IndiceFertilizanteComponent) indiceFertilizanteComponent!: IndiceFertilizanteComponent;
+  @ViewChild(IndiceBienesRecibidosComponent) indiceBienesRecibidosComponent!: IndiceBienesRecibidosComponent;
+  @ViewChild(IndiceServiciosRecibidosComponent) indiceServiciosRecibidosComponent!: IndiceServiciosRecibidosComponent;
 
   constructor(
     private sumatoriasService: SumatoriasService,
@@ -156,11 +166,6 @@ export class SideRightComponent {
     this.valorSeleccionadoProv = prov !== '00' ? prov : null;
     this.valorSeleccionadoProvText = nombreProvincia !== '' ? nombreProvincia : null;
 
-
-    console.log(dpto);
-    console.log(prov);
-    console.log(nombreDepartamento);
-    console.log(nombreProvincia);
 
     if (prov !== '00') {
       this.getDatosIndicadoresbyProvincia(prov);
@@ -238,7 +243,9 @@ export class SideRightComponent {
       { ref: this.indicePrincipalesCultivosComponent, usarNombre: false },
       { ref: this.indiceCultivosTransitComponent, usarNombre: false },
       { ref: this.indiceCultivosPermaComponent, usarNombre: false },
-      { ref: this.indiceFertilizanteComponent, usarNombre: false }
+      { ref: this.indiceFertilizanteComponent, usarNombre: false },
+      { ref: this.indiceBienesRecibidosComponent, usarNombre: false },
+      { ref: this.indiceServiciosRecibidosComponent, usarNombre: false }
     ];
 
     componentes.forEach(c => {
@@ -293,6 +300,8 @@ export class SideRightComponent {
     cargar(this.indiceCultivosTransitComponent);
     cargar(this.indiceCultivosPermaComponent);
     cargar(this.indiceFertilizanteComponent);
+    cargar(this.indiceBienesRecibidosComponent);
+    cargar(this.indiceServiciosRecibidosComponent);
   }
 
 
@@ -379,6 +388,8 @@ export class SideRightComponent {
     try { this.indiceCultivosTransitComponent?.cargarDatos(); } catch {}
     try { this.indiceCultivosPermaComponent?.cargarDatos(); } catch {}
     try { this.indiceFertilizanteComponent?.cargarDatos(); } catch {}
+    try { this.indiceBienesRecibidosComponent?.cargarDatos(); } catch {}
+    try { this.indiceServiciosRecibidosComponent?.cargarDatos(); } catch {}
 
   }
 

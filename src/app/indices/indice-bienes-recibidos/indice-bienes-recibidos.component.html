@@ -1,0 +1,44 @@
+<div class="indice-bienes-recibidos">
+
+
+
+  <!-- Contenedor del gráfico -->
+  <div id="container-bienes-recibidos"></div>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <span> Cantidad de productores que recibieron bienes</span>
+    <table class="tabla-bienes-recibidos">
+      <thead>
+      <tr>
+        <th>Descripción</th>
+        <th>Productores</th>
+        <th>Entidad de Apoyo</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <!-- Recorrer categorías -->
+      <ng-container *ngFor="let key of tablaKeys">
+        <ng-container *ngFor="let item of tablaDatos[key]; let i = index">
+
+          <tr>
+            <!-- SOLO SE PINTA EN LA PRIMERA FILA DE CADA GRUPO -->
+            <td *ngIf="i === 0"
+                [attr.rowspan]="tablaDatos[key].length"
+                class="categoria-merged">
+              {{ key }}
+            </td>
+
+            <td>{{ item.productores }}</td>
+            <td>{{ item.entidadApoyo }}</td>
+          </tr>
+
+        </ng-container>
+      </ng-container>
+
+      </tbody>
+    </table>
+  </div>
+
+</div>
