@@ -16,7 +16,7 @@ export class AnalisisGeometricoService {
 
   getDatosAnalisisGeometrico(coberturaPolygon: Polygon): Observable<AnalisisGeometricoResponse> {
 
-    const jsonGeometry = coberturaPolygon.toJSON(); // ✔ rings + spatialReference
+    const jsonGeometry = coberturaPolygon.toJSON(); //  rings + spatialReference
 
     const body = new HttpParams({
       fromObject: {

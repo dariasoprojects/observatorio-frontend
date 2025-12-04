@@ -208,17 +208,31 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
       // ----------------------------
       // 2) CONSULTA ESTADÍSTICA
       // ----------------------------
+      // const qStats = new Query({
+      //   geometry: this.coberturaPolygon,
+      //   spatialRelationship: 'intersects',
+      //   returnGeometry: false,
+      //   outFields: ['GENERO'],   // ← NECESARIO
+      //   groupByFieldsForStatistics: ['GENERO'],
+      //   outStatistics: [
+      //     {
+      //       statisticType: 'sum',
+      //       onStatisticField: 'GENERO',
+      //       outStatisticFieldName: 'SUM_GENERO'
+      //     }
+      //   ]
+      // });
+
       const qStats = new Query({
         geometry: this.coberturaPolygon,
-        spatialRelationship: 'intersects',
+        spatialRelationship: "intersects",
         returnGeometry: false,
-        outFields: ['GENERO'],   // ← NECESARIO
-        groupByFieldsForStatistics: ['GENERO'],
+        groupByFieldsForStatistics: ["GENERO"],
         outStatistics: [
           {
-            statisticType: 'sum',
-            onStatisticField: 'GENERO',
-            outStatisticFieldName: 'SUM_GENERO'
+            statisticType: "count",
+            onStatisticField: "GENERO",
+            outStatisticFieldName: "SUM_GENERO" // ← para que NO cambie tu lógica
           }
         ]
       });
