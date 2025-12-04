@@ -235,8 +235,8 @@ export class IndiceFertilizanteComponent implements OnInit {
     // Guardar la tabla base con ubigeo, ddescr y parcelas (ordenada alfabéticamente)
     const tablaOrdenada = data
       .map(d => ({
-        //ubigeo: this.ubigeoSrv.getNombre(d.ubigeo),
-        ubigeo: this.ubigeoSrv.getNombre("14"),
+        ubigeo: this.ubigeoSrv.getNombre(d.ubigeo),
+        //ubigeo: this.ubigeoSrv.getNombre("14"),
         //ubigeo: d.ubigeo,
         parcelas: d.parcelas,
         ddescr: d.ddescr || "No definido",
