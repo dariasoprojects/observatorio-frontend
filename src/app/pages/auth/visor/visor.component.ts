@@ -35,7 +35,6 @@ import {BusquedaDniComponent} from './components/busqueda-dni/busqueda-dni.compo
     ConsultaMultipleComponent,
     AnalisisEspacialComponent,
     DialogModule,
-    Menu,
     LoaderComponent,
     AnalisisEspacialComponent,
     ConsultaMultipleComponent,
