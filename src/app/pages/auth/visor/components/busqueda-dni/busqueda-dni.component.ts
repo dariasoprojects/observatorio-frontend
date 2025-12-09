@@ -4,13 +4,21 @@ import {Feature, ProductorAttributes} from '../../../../../models/productor/prod
 import {ProductorService} from '../../../../../services/productor.service';
 import {takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
-import {NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
+import {PanelModule} from 'primeng/panel';
+import {FormatUtil} from '../../../../../shared/utils/format.util';
+import {DividerModule} from 'primeng/divider';
+import {MapCommService} from '../../../../../services/map-comm.service';
+import {ButtonModule} from 'primeng/button';
 
 @Component({
   selector: 'app-busqueda-dni',
   imports: [
     ReactiveFormsModule,
-    NgIf
+    CommonModule,
+    PanelModule ,
+    DividerModule,
+    ButtonModule
   ],
   templateUrl: './busqueda-dni.component.html',
   styleUrl: './busqueda-dni.component.css'
@@ -29,7 +37,8 @@ export class BusquedaDniComponent {
 
   constructor(
     private productorService: ProductorService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private comm: MapCommService,
   ) {
     this.formBusqueda = this.fb.group({
       dni: [
@@ -54,6 +63,7 @@ export class BusquedaDniComponent {
           this.productor = null;
           this.parcelas = [];
           this.existeProductor = false;
+          this.mostrarProductor = this.existeProductor;
           return;
         }
 
@@ -62,6 +72,7 @@ export class BusquedaDniComponent {
         this.productor = parcelas[0]?.attributes ?? null;
         this.parcelas = parcelas;
         this.existeProductor = !!this.productor;
+        this.mostrarProductor = this.existeProductor;
       });
   }
 
@@ -81,6 +92,7 @@ export class BusquedaDniComponent {
     this.productorService.getProductor(dni);
     this.buscarDni.emit();
 
+
    // this.sectionSelected.emit("");
 
 
@@ -90,7 +102,24 @@ export class BusquedaDniComponent {
     this.formBusqueda.get('dni')?.setValue('');
     this.productor =null;
     this.parcelas=[];
+    this.mostrarProductor =false;
     this.limpiarDni.emit();
   }
 
+  verParcela(fila: any): void {
+    if (!fila || !fila.geometry) {
+      console.warn('La fila no tiene geometría', fila);
+      return;
+    }
+
+    // Si 'fila' ES un __esri.Graphic:
+    this.comm.requestZoomGraphic(fila);
+  }
+
+  onCerrar():void{
+    this.mostrarProductor =false;
+    // this.limpiarDni.emit();
+  }
+
+  protected readonly FormatUtil = FormatUtil;
 }

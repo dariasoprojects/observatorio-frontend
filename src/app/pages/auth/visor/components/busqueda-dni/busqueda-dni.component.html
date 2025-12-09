@@ -20,7 +20,7 @@
        (click)="onClearDni()">
     </i>
   </div>
-  <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched && formBusqueda.get('dni')?.invalid && this.mostrarProductor">
+  <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched && formBusqueda.get('dni')?.invalid ">
 
     <div *ngIf="formBusqueda.get('dni')?.errors?.['required']">
       DNI no debe estar vacío.
@@ -35,7 +35,7 @@
     </div>
 
   </div>
-  <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched  && this.mostrarProductor && !this.existeProductor">
+  <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched   && !this.existeProductor">
 
     <div >
       Dni no encontrado.
@@ -43,3 +43,65 @@
 
   </div>
 </form>
+<ng-container *ngIf="mostrarProductor">
+  <p-panel styleClass="producer-panel" [toggleable]="false">
+
+    <!-- BODY -->
+
+    <div class="panel-body">
+      <div class="panel-header">
+        <span class="section-title">Datos del Productor</span>
+
+        <span class="header-icon">
+                <i class="pi pi-info-circle"></i>
+              </span>
+      </div>
+
+      <div class="field-row"><span class="field-label">DNI: {{productor?.TXT_NRODOC??''}}</span></div>
+      <div class="field-row"><span class="field-label">Apellidos: {{productor?.APELLIDOPA??''}}</span></div>
+      <div class="field-row"><span class="field-label">Nombres: {{productor?.NOMBRES??''}}</span></div>
+
+      <p-divider></p-divider>
+
+      <div class="panel-header">
+        <span class="section-title">Ubicación parcela principal del productor</span>
+      </div>
+
+
+      <table class="tabla-region">
+        <thead>
+        <tr>
+          <th>Latitud</th>
+          <th>Longitud</th>
+          <th>Ubigeo</th>
+          <th>Ubicación</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let fila of parcelas">
+          <td>{{ FormatUtil.formatInteger2Digitos (fila.attributes.LAT ) }}</td>
+          <td>{{ FormatUtil.formatInteger2Digitos (fila.attributes.LONG_) }}</td>
+          <td>{{ fila.attributes.UBIGEO3 }}</td>
+          <td class="cell-center">
+            <i class="pi pi-search" (click)="verParcela(fila)"></i>
+          </td>
+
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+
+
+    <!-- FOOTER -->
+    <ng-template pTemplate="footer">
+      <div class="panel-footer">
+        <button type="button" pButton label="Cerrar" class="close-btn p-button-outlined"
+                (click)="onCerrar()"
+        ></button>
+      </div>
+    </ng-template>
+
+  </p-panel>
+</ng-container>
