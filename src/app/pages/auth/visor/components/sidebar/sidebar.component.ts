@@ -147,22 +147,6 @@ export class SidebarComponent  implements OnInit, OnDestroy{
   trackByItem  = (_: number, it: Item) => it.section;
 
 
-
-  onVerPaneles():void{
-    // this.mostrarProductor =false;
-    // this.limpiarDni.emit();
-  }
-
-  verParcela(fila: any): void {
-    if (!fila || !fila.geometry) {
-      console.warn('La fila no tiene geometría', fila);
-      return;
-    }
-
-    // Si 'fila' ES un __esri.Graphic:
-    this.comm.requestZoomGraphic(fila);
-  }
-
   onClearDepartamento(): void {
     this.busquedaUbigeo.resetFiltros()
   }
@@ -183,6 +167,11 @@ export class SidebarComponent  implements OnInit, OnDestroy{
 
   onCloseUbicacionGeografica() {
     this.ubicacionGeograficaVisible = false;
+  }
+
+  onVerPaneles():void{
+    // this.mostrarProductor =false;
+    // this.limpiarDni.emit();
   }
 
   protected readonly FormatUtil = FormatUtil;
