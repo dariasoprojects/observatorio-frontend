@@ -12,14 +12,26 @@ import {MatDialog} from '@angular/material/dialog';
 import {DialogExportarComponent} from '../../dialog-exportar/dialog-exportar.component';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSlideToggleChange, MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {UbigeoService} from '../../services/ubigeo.service';
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
+
+interface Tabla {
+  ubigeo: string;
+  ddescr: string;
+  productores: number;
+  parcela: number;
+}
 
 @Component({
   selector: 'app-indice-tipo-activ',
   standalone: true,
   imports: [
     CommonModule,
-    MatIconModule,
-    MatSlideToggleModule
+    MatSelectModule,
+    MatFormFieldModule,
+    MatSlideToggleModule,
+    MatIconModule
   ],
   templateUrl: './indice-segun-tipo-actividad.component.html',
   styleUrls: ['./indice-segun-tipo-actividad.component.css']
@@ -38,24 +50,23 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
   chart!: Highcharts.Chart;
   activeReg: string | null = null;
 
-  tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
+  tablaDatos: Tabla [] = [];
+  tablaFiltrada: Tabla[] = [];
+  categoriasUnicas: string[] = [];
+  categoriaSeleccionada: string = '';
 
   //  Nueva URL sin tilde en los campos
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
   constructor(
+    private ubigeoService: UbigeoService,
     private mapComm: MapCommService,
     private dialog: MatDialog)
   {}  // <-- solo para inyectar
 
 
-  ngOnInit() {
-    //this.cargarDatos(); // Nacional por defecto
-
-    //  Cargar datos desde el servicio
-    console.log('Valor inicial combo dpto:', this.valorSeleccionado);
-    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);
-    console.log('Valor inicial combo prov:', this.valorSeleccionadoProv);
+  async ngOnInit() {
+    await this.ubigeoService.cargarTodo();
 
     if (this.valorSeleccionadoProv !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
@@ -108,7 +119,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
   public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'TIPACT' AND CAPA = 1",
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
+      outFields: ["UBIGEO", "DDESCR", "PRODUCTORES",  "PARCELAS"],
       returnGeometry: false
     });
 
@@ -116,17 +127,12 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       const response = await query.executeQueryJSON(this.url, q);
 
       if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
-        }));
 
-        // Pie chart solo con productores
-        const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-        const valores = this.tablaDatos.map(d => d.productores);
+        const { tabla, categorias, valores } = this.procesarDatos(response.features);
+        this.tablaDatos = tabla;
 
+        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+        this.tablaFiltrada = [...this.tablaDatos];
         this.actualizarDatos(categorias, valores);
 
       }else{
@@ -151,22 +157,12 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
 
     try {
       const response = await query.executeQueryJSON(this.url, q);
-
-
-
-      console.log("DDDD : ", response.features.length);
-
       if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
-        }));
+        const { tabla, categorias, valores } = this.procesarDatos(response.features);
+        this.tablaDatos = tabla;
 
-        const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-        const valores = this.tablaDatos.map(d => d.productores);
-
+        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+        this.tablaFiltrada = [...this.tablaDatos];
         this.actualizarDatos(categorias, valores);
 
       } else{
@@ -180,7 +176,6 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
   }
 
   public async cargarDatosByProv(ubigeo: string) {
-    //alert(ubigeo);
     const q = new Query({
       where: `INDICE = 'TIPACT' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
       outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
@@ -191,16 +186,11 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       const response = await query.executeQueryJSON(this.url, q);
 
       if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
-        }));
+        const { tabla, categorias, valores } = this.procesarDatos(response.features);
+        this.tablaDatos = tabla;
 
-        const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-        const valores = this.tablaDatos.map(d => d.productores);
-
+        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+        this.tablaFiltrada = [...this.tablaDatos];
         this.actualizarDatos(categorias, valores);
       } else{
         this.tablaDatos = [];
@@ -209,6 +199,51 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
     } catch (err) {
       console.error(" Error al consultar ArcGIS (Provincial)", err);
     }
+  }
+
+  private procesarDatos(features: any[]): {
+    tabla: Tabla[];
+    categorias: string[];
+    valores: number[];
+  } {
+
+    const datos  = features.map(f => ({
+      ubigeo: f.attributes.UBIGEO,
+      ddescr: f.attributes.DDESCR,
+      productores: Number(f.attributes.PRODUCTORES),
+      parcela: Number(f.attributes.PARCELAS)
+    }));
+
+    const tabla: Tabla[] = [];
+    const acumulado: Record<string, number> = {};
+
+    for (const item of datos) {
+
+      tabla.push({
+        ubigeo: this.ubigeoService.getNombre(item.ubigeo),
+        ddescr:item.ddescr ??  "No definido",
+        productores:item.productores,
+        parcela:item.parcela,
+      });
+      acumulado[item.ddescr] = (acumulado[item.ddescr] ?? 0) + item.productores;
+    }
+
+    return {
+      tabla,
+      categorias: Object.keys(acumulado),
+      valores: Object.values(acumulado)
+    };
+  }
+
+  filtrarPorCategoria() {
+    if (!this.categoriaSeleccionada) {
+      this.tablaFiltrada = [...this.tablaDatos];
+      return;
+    }
+
+    this.tablaFiltrada = this.tablaDatos.filter(
+      x => x.ddescr === this.categoriaSeleccionada
+    );
   }
 
   private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[]) {
