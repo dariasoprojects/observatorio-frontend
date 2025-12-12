@@ -5,13 +5,29 @@ import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { UbigeoService } from '../../services/ubigeo.service';
 import {FormatUtil} from '../../shared/utils/format.util';
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatIconModule} from '@angular/material/icon';
 
+interface Tabla {
+  ubigeo: string;
+  ddescr: string;
+  productores: number;
+  parcela: number;
+}
 
 
 @Component({
   selector: 'app-indice-cultivtran',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatSlideToggleModule,
+    MatIconModule
+  ],
   templateUrl: './indice-cultivos-transitorios.component.html',
   styleUrls: ['./indice-cultivos-transitorios.component.css']
 })
@@ -25,18 +41,22 @@ export class IndiceCultivosTransitComponent implements OnInit {
 
   categorias: string[] = [];
   valores: number[] = [];
+  categoriasOrdenadas: string[] = [];
   chart!: Highcharts.Chart;
 
-  tablaDatos: { ubigeo: string; parcelas: number }[] = [];
+  tablaDatos: Tabla [] = [];
+  tablaFiltrada: Tabla[] = [];
+  categoriasUnicas: string[] = [];
+  categoriaSeleccionada: string = '';
+  categoriaSeleccionadaInit: string = '';
 
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
 
-  constructor(private ubigeoSrv: UbigeoService) {}
+  constructor(private ubigeoService: UbigeoService) {}
 
   async ngOnInit() {
-    await this.ubigeoSrv.cargarTodo();
-    //this.cargarDatos();
+    await this.ubigeoService.cargarTodo();
     if (this.valorSeleccionadoProv !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
     }else{
@@ -138,7 +158,7 @@ export class IndiceCultivosTransitComponent implements OnInit {
   public async cargarDatos() {
     const q = new Query({
       where: "INDICE = 'CULTITRANS' AND CAPA = 1",
-      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
+      outFields: ["UBIGEO", "DDESCR", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -146,40 +166,22 @@ export class IndiceCultivosTransitComponent implements OnInit {
       const response = await query.executeQueryJSON(this.url, q);
 
       if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.HECTAREA
-        }));
 
-        //  Agrupar por UBIGEO (para la tabla)
-        const agrupadoPorUbigeo: Record<string, number> = {};
-        data.forEach(item => {
-          if (!agrupadoPorUbigeo[item.ubigeo]) agrupadoPorUbigeo[item.ubigeo] = 0;
-          agrupadoPorUbigeo[item.ubigeo] += item.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrupadoPorUbigeo).map(([ubigeo, parcelas]) => {
-          const codigo = String(ubigeo);
-          const nombre = this.ubigeoSrv.getNombre(codigo);
-          return { ubigeo: nombre, parcelas };
-        });
-
-        // Agrupar por DDESCR (para el gráfico)
-        const agrupadoPorTam: Record<string, number> = {};
-        data.forEach(item => {
-          const clave = item.ddescr || "No definido";
-          if (!agrupadoPorTam[clave]) agrupadoPorTam[clave] = 0;
-          agrupadoPorTam[clave] += item.parcelas;
-        });
-        this.categorias = Object.keys(agrupadoPorTam);
-        this.valores = Object.values(agrupadoPorTam);
-
-        // Crear el gráfico
-        this.crearGrafico();
+        const { tabla, categorias, valores, categoriasOrdenadas } = this.procesarDatos(response.features);
+        this.tablaDatos = tabla;
+        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+        this.tablaFiltrada = [...this.tablaDatos];
+        this.actualizarDatos(categorias, valores);
+        this.categoriasOrdenadas = [...categoriasOrdenadas];
+        this.categoriaSeleccionadaInit = categoriasOrdenadas[0];
+        this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
+        this.filtrarPorCategoria();
       }else{
         this.tablaDatos = [];
         this.categorias = [];
         this.valores = []
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
         this.crearGrafico(); // envías vacío para limpiar el chart
       }
     } catch (err) {
@@ -192,8 +194,8 @@ export class IndiceCultivosTransitComponent implements OnInit {
 
     //alert(ubigeo);
     const q = new Query({
-       where: `INDICE = 'CULTITRANS' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
+      where: `INDICE = 'CULTITRANS' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
+      outFields: ["UBIGEO", "DDESCR", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -201,33 +203,21 @@ export class IndiceCultivosTransitComponent implements OnInit {
       const response = await query.executeQueryJSON(this.url, q);
 
       if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.HECTAREA
-        }));
-
-        // Tabla: sumar por UBIGEO
-        const agrUbigeo: Record<string, number> = {};
-        data.forEach(it => {
-          if (!agrUbigeo[it.ubigeo]) agrUbigeo[it.ubigeo] = 0;
-          agrUbigeo[it.ubigeo] += it.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrUbigeo).map(([u, p]) => ({ ubigeo: u, parcelas: p }));
-
-        // Pie: agrupar por DDESCR
-        const agrTam: Record<string, number> = {};
-        data.forEach(it => {
-          const k = it.ddescr || "No definido";
-          if (!agrTam[k]) agrTam[k] = 0;
-          agrTam[k] += it.parcelas;
-        });
-        const cats = Object.keys(agrTam);
-        const vals = Object.values(agrTam);
-
-        this.actualizarDatos(cats, vals);
+        const { tabla, categorias, valores, categoriasOrdenadas } = this.procesarDatos(response.features);
+        this.tablaDatos = tabla;
+        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+        this.tablaFiltrada = [...this.tablaDatos];
+        this.actualizarDatos(categorias, valores);
+        this.categoriasOrdenadas = [...categoriasOrdenadas];
+        this.categoriaSeleccionadaInit = categoriasOrdenadas[0];
+        this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
+        this.filtrarPorCategoria();
       } else {
         this.tablaDatos = [];
+        this.categorias = [];
+        this.valores = []
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
         this.actualizarDatos([], []);
       }
     } catch (err) {
@@ -238,7 +228,7 @@ export class IndiceCultivosTransitComponent implements OnInit {
   public async cargarDatosByProv(ubigeo: string) {
     const q = new Query({
       where: `INDICE = 'CULTITRANS' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
+      outFields: ["UBIGEO", "DDESCR", "HECTAREA", "PARCELAS"],
       returnGeometry: false
     });
 
@@ -246,38 +236,99 @@ export class IndiceCultivosTransitComponent implements OnInit {
       const response = await query.executeQueryJSON(this.url, q);
 
       if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.HECTAREA
-        }));
-
-        // Tabla: sumar por UBIGEO
-        const agrUbigeo: Record<string, number> = {};
-        data.forEach(it => {
-          if (!agrUbigeo[it.ubigeo]) agrUbigeo[it.ubigeo] = 0;
-          agrUbigeo[it.ubigeo] += it.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrUbigeo).map(([u, p]) => ({ ubigeo: u, parcelas: p }));
-
-        // Pie: agrupar por DDESCR
-        const agrTam: Record<string, number> = {};
-        data.forEach(it => {
-          const k = it.ddescr || "No definido";
-          if (!agrTam[k]) agrTam[k] = 0;
-          agrTam[k] += it.parcelas;
-        });
-        const cats = Object.keys(agrTam);
-        const vals = Object.values(agrTam);
-
-        this.actualizarDatos(cats, vals);
+        const { tabla, categorias, valores, categoriasOrdenadas } = this.procesarDatos(response.features);
+        this.tablaDatos = tabla;
+        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+        this.tablaFiltrada = [...this.tablaDatos];
+        this.actualizarDatos(categorias, valores);
+        this.categoriasOrdenadas = [...categoriasOrdenadas];
+        this.categoriaSeleccionadaInit = categoriasOrdenadas[0];
+        this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
+        this.filtrarPorCategoria();
       } else {
         this.tablaDatos = [];
+        this.categorias = [];
+        this.valores = []
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
         this.actualizarDatos([], []);
       }
     } catch (err) {
       console.error("Error al consultar ArcGIS (Provincial)", err);
     }
+  }
+
+  private procesarDatos(features: any[]): {
+    tabla: Tabla[];
+    categorias: string[];
+    valores: number[];
+    categoriasOrdenadas: string[];
+  } {
+
+    const tabla: Tabla[] = [];
+    const acumulado: Record<string, number> = {};
+
+    for (const f of features) {
+
+      const ddescr = f.attributes.DDESCR ?? 'No definido';
+      const parcela = Number(f.attributes.PARCELAS);
+
+      tabla.push({
+        ubigeo: this.ubigeoService.getNombre(f.attributes.UBIGEO),
+        ddescr,
+        productores: Number(f.attributes.PRODUCTORES),
+        parcela
+      });
+
+      acumulado[ddescr] = (acumulado[ddescr] ?? 0) + parcela;
+    }
+
+    // 🔹 Ordenar por mayor valor
+    const ordenado = Object.entries(acumulado)
+      .sort((a, b) => b[1] - a[1]);
+
+    const categorias: string[] = [];
+    const valores: number[] = [];
+
+    let otrosTotal = acumulado['OTROS'] ?? 0;
+    let count = 0;
+
+    for (const [cat, val] of ordenado) {
+
+      if (cat === 'OTROS') continue;
+
+      if (count < 6) {
+        categorias.push(cat);
+        valores.push(val);
+        count++;
+      } else {
+        otrosTotal += val;
+      }
+    }
+
+    if (otrosTotal > 0) {
+      categorias.push('OTROS');
+      valores.push(otrosTotal);
+    }
+
+    return {
+      tabla,
+      categorias,
+      valores,
+      categoriasOrdenadas: Object.keys(acumulado).sort((a, b) =>
+        a.localeCompare(b)
+      )
+    };
+  }
+
+  filtrarPorCategoria() {
+    if (!this.categoriaSeleccionada) {
+      this.tablaFiltrada = [...this.tablaDatos];
+      return;
+    }
+    this.tablaFiltrada = this.tablaDatos.filter(
+      x => x.ddescr === this.categoriaSeleccionada
+    );
   }
 
   private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[]) {
