@@ -2,6 +2,17 @@
   <!-- Contenedor del gráfico -->
   <div id="container-cultivperm"></div>
 
+  <div style="margin-bottom: 15px;">
+    <mat-form-field appearance="fill" style="width: 300px;">
+      <mat-label>Tipo de actividad</mat-label>
+      <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
+        <mat-option *ngFor="let cat of categoriasOrdenadas" [value]="cat">
+          {{ cat }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
   <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
     <table class="tabla-cultivperm">
@@ -12,13 +23,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let fila of tablaDatos">
+        <tr *ngFor="let fila of tablaFiltrada">
           <td class="num-col">
             {{ fila.ubigeo }}
           </td>
 
           <td class="num-col">
-            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+            {{ FormatUtil.formatInteger2Digitos(fila.parcela) }}
           </td>
         </tr>
       </tbody>

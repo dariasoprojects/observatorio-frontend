@@ -46,6 +46,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
 
 
   categorias: string[] = [];
+  categoriasOrdenadas: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
   activeReg: string | null = null;
@@ -54,6 +55,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
   tablaFiltrada: Tabla[] = [];
   categoriasUnicas: string[] = [];
   categoriaSeleccionada: string = '';
+  categoriaSeleccionadaInit: string = '';
 
   //  Nueva URL sin tilde en los campos
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
@@ -74,7 +76,9 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       if (this.valorSeleccionado !== null) {
         this.cargarDatosByDpto(this.valorSeleccionado);
       }else{
-        this.cargarDatos();
+        await this.cargarDatos();
+        this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+        this.filtrarPorCategoria();
       }
     }
 
@@ -130,7 +134,10 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
 
         const { tabla, categorias, valores } = this.procesarDatos(response.features);
         this.tablaDatos = tabla;
-
+        this.categoriasOrdenadas =categorias.sort((a, b) =>
+          a.localeCompare(b)
+        );
+        this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
         this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
         this.tablaFiltrada = [...this.tablaDatos];
         this.actualizarDatos(categorias, valores);
@@ -138,6 +145,8 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       }else{
 
         this.tablaDatos = [];
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
         this.actualizarDatos([], []); // envías vacío para limpiar el chart
       }
 
@@ -160,13 +169,17 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       if (response.features.length > 0) {
         const { tabla, categorias, valores } = this.procesarDatos(response.features);
         this.tablaDatos = tabla;
-
+        this.categoriasOrdenadas =categorias.sort((a, b) =>
+          a.localeCompare(b)
+        );
         this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
         this.tablaFiltrada = [...this.tablaDatos];
         this.actualizarDatos(categorias, valores);
 
       } else{
         this.tablaDatos = [];
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
         this.actualizarDatos([], []); // envías vacío para limpiar el chart
       }
 
@@ -188,12 +201,16 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       if (response.features.length > 0) {
         const { tabla, categorias, valores } = this.procesarDatos(response.features);
         this.tablaDatos = tabla;
-
+        this.categoriasOrdenadas =categorias.sort((a, b) =>
+          a.localeCompare(b)
+        );
         this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
         this.tablaFiltrada = [...this.tablaDatos];
         this.actualizarDatos(categorias, valores);
       } else{
         this.tablaDatos = [];
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
         this.actualizarDatos([], []); // envías vacío para limpiar el chart
       }
     } catch (err) {
@@ -240,7 +257,6 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       this.tablaFiltrada = [...this.tablaDatos];
       return;
     }
-
     this.tablaFiltrada = this.tablaDatos.filter(
       x => x.ddescr === this.categoriaSeleccionada
     );

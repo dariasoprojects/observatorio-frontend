@@ -5,9 +5,9 @@
 
   <div style="margin-bottom: 15px;">
     <mat-form-field appearance="fill" style="width: 300px;">
-      <mat-label>Tipo de fertilizante</mat-label>
+      <mat-label>Tipo de actividad</mat-label>
       <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
-        <mat-option *ngFor="let cat of categorias" [value]="cat">
+        <mat-option *ngFor="let cat of categoriasOrdenadas" [value]="cat">
           {{ cat }}
         </mat-option>
       </mat-select>
