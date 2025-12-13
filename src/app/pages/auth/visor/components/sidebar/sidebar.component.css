@@ -324,6 +324,14 @@
 }
 
 
+:host ::ng-deep .panel-tight .p-panel-header-icon {
+  width: 15px;
+  height: 15px;
+}
+
+:host ::ng-deep .panel-tight .p-panel-header-icon .pi {
+  font-size: 15px;
+}
 
 
 

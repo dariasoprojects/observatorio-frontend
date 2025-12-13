@@ -10,6 +10,7 @@ import {FormatUtil} from '../../../../../shared/utils/format.util';
 import {DividerModule} from 'primeng/divider';
 import {MapCommService} from '../../../../../services/map-comm.service';
 import {ButtonModule} from 'primeng/button';
+import {UbigeoService} from '../../../../../services/ubigeo.service';
 
 @Component({
   selector: 'app-busqueda-dni',
@@ -32,13 +33,12 @@ export class BusquedaDniComponent {
   productor: ProductorAttributes | null = null;
   parcelas: Feature []=[];
 
-  @Output() buscarDni = new EventEmitter<void>();
-  @Output() limpiarDni = new EventEmitter<void>();
 
   constructor(
     private productorService: ProductorService,
     private fb: FormBuilder,
     private comm: MapCommService,
+    protected ubigeoService: UbigeoService,
   ) {
     this.formBusqueda = this.fb.group({
       dni: [
@@ -54,7 +54,8 @@ export class BusquedaDniComponent {
 
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    await this.ubigeoService.cargarTodo();
     this.productorService.productor$
       .pipe(takeUntil(this.destroy$))
       .subscribe(features => {
@@ -90,11 +91,6 @@ export class BusquedaDniComponent {
     const dni = dniControl?.value;
 
     this.productorService.getProductor(dni);
-    this.buscarDni.emit();
-
-
-   // this.sectionSelected.emit("");
-
 
   }
 
@@ -103,7 +99,6 @@ export class BusquedaDniComponent {
     this.productor =null;
     this.parcelas=[];
     this.mostrarProductor =false;
-    this.limpiarDni.emit();
   }
 
   verParcela(fila: any): void {
@@ -111,14 +106,12 @@ export class BusquedaDniComponent {
       console.warn('La fila no tiene geometría', fila);
       return;
     }
-
     // Si 'fila' ES un __esri.Graphic:
     this.comm.requestZoomGraphic(fila);
   }
 
   onCerrar():void{
     this.mostrarProductor =false;
-    // this.limpiarDni.emit();
   }
 
   protected readonly FormatUtil = FormatUtil;

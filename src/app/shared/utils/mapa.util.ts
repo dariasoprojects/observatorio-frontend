@@ -1308,6 +1308,10 @@ export class Mapa {
     this.printDiv.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
     this.printDiv.style.zIndex = "9999";
 
+    this.printDiv.style.maxHeight = "80vh";
+    this.printDiv.style.overflowY = "auto";
+    this.printDiv.style.overflowX = "hidden";
+
     // Crear el Print widget si no existe
     if (!this.printWidget) {
       this.printWidget = new Print({

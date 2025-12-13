@@ -80,7 +80,7 @@ export class VisorComponent {
     this.activeSection = section;
     const el = this.elRef.nativeElement as HTMLElement;
     if(this.activeSection==""){
-      el.style.setProperty('--right-w', '250px');
+      el.style.setProperty('--right-w', '330px');
     }else{
       el.style.setProperty('--right-w', '450px');
     }
@@ -90,23 +90,12 @@ export class VisorComponent {
     this.showLoginDialog = true;
   }
 
-  onBuscarDni(): void {
-    const el = this.elRef.nativeElement as HTMLElement;
-    el.style.setProperty('--left-w', '360px');
-  }
-
-  onLimpiarDni(): void {
-    const el = this.elRef.nativeElement as HTMLElement;
-    el.style.setProperty('--left-w', '260px');
-  }
-
   onClear(): void {
     this.activeSection ="";
     const el = this.elRef.nativeElement as HTMLElement;
-    el.style.setProperty('--right-w', '250px');
+    el.style.setProperty('--right-w', '330px');
     this.comm.resetView();
     el.style.setProperty('--left-w', '260px');
-   // this.sidebar.onClearDni();
     this.sidebar.onVerPaneles();
     this.sideright.resetFiltros();
   }

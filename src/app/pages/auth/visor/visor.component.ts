@@ -39,6 +39,7 @@ import {BusquedaDniComponent} from './components/busqueda-dni/busqueda-dni.compo
     AnalisisEspacialComponent,
     ConsultaMultipleComponent,
     BusquedaDniComponent,
+    Menu,
 
   ],
   templateUrl: './visor.component.html',
@@ -61,6 +62,7 @@ export class VisorComponent {
   activeSection: string | null = null;
   dialogVisible = false;
   dialogVisibleConsultaMultiple = false;
+  dialogVisibleBusquedaDni = false;
   items: MenuItem[] | undefined;
   @ViewChild('sidebar') sidebar!: SidebarComponent;
   @ViewChild('sideright') sideright!: SideRightComponent;
@@ -97,20 +99,10 @@ export class VisorComponent {
      this.activeSection = section;
     const el = this.elRef.nativeElement as HTMLElement;
     if(this.activeSection==""){
-      el.style.setProperty('--right-w', '250px');
+      el.style.setProperty('--right-w', '330px');
     }else{
       el.style.setProperty('--right-w', '450px');
     }
-  }
-
-  onBuscarDni(): void {
-    const el = this.elRef.nativeElement as HTMLElement;
-  //  el.style.setProperty('--left-w', '360px');
-  }
-
-  onLimpiarDni(): void {
-    const el = this.elRef.nativeElement as HTMLElement;
-  //  el.style.setProperty('--left-w', '260px');
   }
 
   onLogout(): void {
@@ -120,10 +112,9 @@ export class VisorComponent {
   onClear(): void {
     this.activeSection ="";
     const el = this.elRef.nativeElement as HTMLElement;
-    el.style.setProperty('--right-w', '250px');
+    el.style.setProperty('--right-w', '330px');
     this.comm.resetView();
     el.style.setProperty('--left-w', '260px');
-   // this.sidebar.onClearDni();
     this.sidebar.onVerPaneles();
     this.sideright.resetFiltros();
   }
