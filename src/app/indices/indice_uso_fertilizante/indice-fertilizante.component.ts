@@ -5,8 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import * as Highcharts from 'highcharts';
-import Query from "@arcgis/core/rest/support/Query";
-import * as query from "@arcgis/core/rest/query";
 import { UbigeoService } from '../../services/ubigeo.service';
 import { FormatUtil } from '../../shared/utils/format.util';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,8 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MapCommService } from '../../services/map-comm.service';
 import { DialogExportarComponent } from './dialog-exportar/dialog-exportar.component';
-import {TipoActividadService} from '../../services/indices/tipo-actividad.service';
 import {UsoFertilizanteService} from '../../services/indices/uso-fertilizante.service';
+import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 
 @Component({
   selector: 'app-indice-fertilizante',
@@ -51,7 +49,6 @@ export class IndiceFertilizanteComponent implements OnInit {
 
   categoriaSeleccionada: string = '';
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
   private urlParcelas = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
 
 
@@ -66,14 +63,14 @@ export class IndiceFertilizanteComponent implements OnInit {
     await this.ubigeoSrv.cargarTodo();
 
     if (this.valorSeleccionadoProv) {
-      await this.cargarDatosByProv(this.valorSeleccionadoProv);
+      this.cargarDatosByProv(this.valorSeleccionadoProv);
       this.activeNivel="3"
     } else if (this.valorSeleccionado) {
-      await this.cargarDatosByDpto(this.valorSeleccionado);
+      this.cargarDatosByDpto(this.valorSeleccionado);
       this.activeNivel="2"
     } else {
       this.activeNivel="1"
-      await this.cargarDatos();
+      this.cargarDatos();
     }
   }
 
@@ -95,101 +92,90 @@ export class IndiceFertilizanteComponent implements OnInit {
   // ---------------------------------------------------
   //  CARGA GENERAL
   // ---------------------------------------------------
-  public async cargarDatos() {
-    const q = new Query({
-      where: "INDICE = 'FERTILIZA' AND CAPA = 1",
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
+  public cargarDatos() {
+    this.usoFertilizanteService.getDatosIndicadores().subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const data = features.map(f => ({
+            ubigeo: f.attributes.UBIGEO,
+            ddescr: f.attributes.DDESCR,
+            parcelas: f.attributes.PARCELAS
+          }));
+          this.prepararDatos(data);
+        }else {
+          this.tablaDatos = [];
+          this.tablaFiltrada = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
+        this.tablaDatos = [];
+        this.tablaFiltrada = [];
+      }
     });
-
-    const response = await query.executeQueryJSON(this.url, q);
-    const data = response.features.map(f => ({
-      ubigeo: f.attributes.UBIGEO,
-      ddescr: f.attributes.DDESCR,
-      parcelas: f.attributes.PARCELAS
-    }));
-
-
-
-    this.prepararDatos(data);
   }
 
   // ---------------------------------------------------
   //  CARGA POR DEPARTAMENTO
   // ---------------------------------------------------
-  public async cargarDatosByDpto(ubigeo: string) {
-    alert(ubigeo);
-    const q = new Query({
-      where: `INDICE = 'FERTILIZA' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
+  public cargarDatosByDpto(ubigeo: string) {
+    this.usoFertilizanteService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const data = features.map(f => ({
+            ubigeo: f.attributes.UBIGEO,
+            ddescr: f.attributes.DDESCR,
+            parcelas: f.attributes.PARCELAS
+          }));
 
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        //  Llama a prepararDatos (que internamente llama a actualizarDatos)
-        this.prepararDatos(data);
-
-      } else {
+          this.prepararDatos(data);
+        } else {
+          this.tablaDatos = [];
+          this.tablaFiltrada = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.tablaFiltrada = [];
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Departamental)", err);
-    }
-
-
+    });
   }
 
   // ---------------------------------------------------
   //  CARGA POR PROVINCIA
   // ---------------------------------------------------
-  public async cargarDatosByProv(ubigeo: string) {
-    const q = new Query({
-      where: `INDICE = 'FERTILIZA' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
+  public cargarDatosByProv(ubigeo: string) {
+    this.usoFertilizanteService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const data = features.map(f => ({
+            ubigeo: f.attributes.UBIGEO,
+            ddescr: f.attributes.DDESCR,
+            parcelas: f.attributes.PARCELAS
+          }));
 
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        //  Usa la misma función centralizada
-        this.prepararDatos(data);
-
-      } else {
+          this.prepararDatos(data);
+        } else {
+          this.tablaDatos = [];
+          this.tablaFiltrada = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.tablaFiltrada = [];
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Provincial)", err);
-    }
-
-
+    });
   }
 
   // ---------------------------------------------------
   //  PROCESAR Y AGRUPAR
   // ---------------------------------------------------
   private prepararDatos(data: any[]) {
-    //console.log("prepararDatos ..XXXXXXX. ", data);
-
-    // Agrupar para el gráfico (por tipo de fertilizante)
     const agrGrafico: Record<string, number> = {};
     data.forEach(it => {
       const clave = it.ddescr || "No definido";
@@ -200,12 +186,9 @@ export class IndiceFertilizanteComponent implements OnInit {
     const cats = Object.keys(agrGrafico);
     const vals = Object.values(agrGrafico);
 
-    // Guardar la tabla base con ubigeo, ddescr y parcelas (ordenada alfabéticamente)
     const tablaOrdenada = data
       .map(d => ({
         ubigeo: this.ubigeoSrv.getNombre(d.ubigeo),
-        //ubigeo: this.ubigeoSrv.getNombre("14"),
-        //ubigeo: d.ubigeo,
         parcelas: d.parcelas,
         ddescr: d.ddescr || "No definido",
         codubi: d.ubigeo

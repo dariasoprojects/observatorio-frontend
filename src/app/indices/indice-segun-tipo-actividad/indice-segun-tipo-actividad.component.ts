@@ -119,7 +119,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(response.features);
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(features);
           this.tablaDatos = tabla;
           this.categoriasOrdenadas =categorias.sort((a, b) =>
             a.localeCompare(b)
@@ -153,14 +153,17 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(response.features);
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(features);
           this.tablaDatos = tabla;
           this.categoriasOrdenadas =categorias.sort((a, b) =>
             a.localeCompare(b)
           );
+          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
           this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
           this.tablaFiltrada = [...this.tablaDatos];
           this.actualizarDatos(categorias, valores);
+          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
         } else {
           this.tablaDatos = [];
           this.categoriasUnicas = [];
@@ -183,14 +186,17 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(response.features);
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(features);
           this.tablaDatos = tabla;
           this.categoriasOrdenadas =categorias.sort((a, b) =>
             a.localeCompare(b)
           );
+          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
           this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
           this.tablaFiltrada = [...this.tablaDatos];
           this.actualizarDatos(categorias, valores);
+          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
         } else {
           this.tablaDatos = [];
           this.categoriasUnicas = [];

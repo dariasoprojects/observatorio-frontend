@@ -20,6 +20,7 @@ export interface Feature {
 }
 
 export interface Attributes {
+  UBIGEO: string;
   DDESCR: string;
   PRODUCTORES: number;
   HECTAREA: number;

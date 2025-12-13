@@ -7,14 +7,18 @@
     <table class="tabla-padronp">
       <thead>
         <tr>
-          <th> </th>
-          <th>Área Total (ha.)</th>
-          <th>Área Sembrada (ha.)</th>
+          <th>Regiones </th>
+          <th>Productores</th>
+          <th>Hectárea</th>
+          <th>Parcelas</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let fila of tablaDatos">
           <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
           <td class="num-col">
             {{ FormatUtil.formatInteger2Digitos(fila.hectarea) }}
           </td>

@@ -10,7 +10,7 @@
           <th>Cantidad</th>
           <th>Datos</th>
           <th>Ver en Mapa</th>
-          
+
         </tr>
       </thead>
       <tbody>
@@ -19,13 +19,6 @@
           <td class="num-col">
             {{ FormatUtil.formatInteger(valores[i]) }}
           </td>
-          
-          <!-- <td>
-              <button mat-raised-button color="primary" (click)="abrirDialogoExportar(c)">
-                Export
-              </button>
-          </td> -->
-
 
           <td>
             <button
@@ -39,17 +32,6 @@
             </button>
           </td>
 
-          <!-- <td>
-            <label class="switch">
-              <input
-                type="checkbox"
-                [checked]="activeReg === c"
-                (change)="toggleCluster($event, c)"
-              />
-              <span class="slider"></span>
-            </label>
-          </td> -->
-
           <td>
 
             <mat-slide-toggle
@@ -61,7 +43,7 @@
           </td>
 
 
-          
+
         </tr>
       </tbody>
     </table>

@@ -1,23 +1,17 @@
 import { Component, OnInit , Input} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-import Query from "@arcgis/core/rest/support/Query";
-import * as query from "@arcgis/core/rest/query";
 import { UbigeoService } from '../../services/ubigeo.service';
 import {FormatUtil} from '../../shared/utils/format.util';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatIconModule} from '@angular/material/icon';
-import {HttpClient} from '@angular/common/http';
 import {TamanioParcelaService} from '../../services/indices/tamanio-parcela.service';
+import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
+import {IndicesUtil} from '../../shared/utils/indices.util';
 
-
-interface Tabla {
-  ubigeo: string;
-  ddescr: string;
-  parcela: number;
-}
 
 @Component({
   selector: 'app-indice-tamparce',
@@ -44,18 +38,16 @@ export class IndiceTamanioParceComponent implements OnInit {
   categoriasOrdenadas: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
-  tablaDatos: Tabla [] = [];
-  tablaFiltrada: Tabla[] = [];
+  tablaDatos: TablaIndiceUbigeo [] = [];
+  tablaFiltrada: TablaIndiceUbigeo[] = [];
   categoriasUnicas: string[] = [];
   categoriaSeleccionada: string = '';
   categoriaSeleccionadaInit: string = '';
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
-
-
   constructor(
     private ubigeoService: UbigeoService,
     private tamanioParcelaService: TamanioParcelaService,
+    private indicesUtil: IndicesUtil,
     ) {}
 
   async ngOnInit() {
@@ -67,9 +59,7 @@ export class IndiceTamanioParceComponent implements OnInit {
       if (this.valorSeleccionado !== null) {
         this.cargarDatosByDpto(this.valorSeleccionado);
       }else{
-        await this.cargarDatos();
-        this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
-        this.filtrarPorCategoria();
+        this.cargarDatos();
       }
     }
   }
@@ -162,137 +152,113 @@ export class IndiceTamanioParceComponent implements OnInit {
   }
 
 
-  public async cargarDatos() {
-
-    const q = new Query({
-      where: "INDICE = 'TAMPARC' AND CAPA = 1",
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const { tabla, categorias, valores } = this.procesarDatos(response.features);
-        this.tablaDatos = tabla;
-        this.categoriasOrdenadas =categorias.sort((a, b) =>
-          a.localeCompare(b)
-        );
-        this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
-        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
-        this.tablaFiltrada = [...this.tablaDatos];
-        this.actualizarDatos(categorias, valores);
-
-      }else{
+  public cargarDatos() {
+    this.tamanioParcelaService.getDatosIndicadores().subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeoParcela(features);
+          this.tablaDatos = tabla;
+          this.categoriasOrdenadas =categorias.sort((a, b) =>
+            a.localeCompare(b)
+          );
+          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categorias = [];
+          this.valores = []
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.crearGrafico();
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.categorias = [];
         this.valores = []
         this.categoriasUnicas = [];
         this.tablaFiltrada = [];
-        this.crearGrafico(); // envías vacío para limpiar el chart
+        this.crearGrafico();
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS", err);
-    }
+    });
   }
 
 
 
 
-  public async cargarDatosByDpto(ubigeo: string) {
-
-    //alert(ubigeo);
-    const q = new Query({
-       where: `INDICE = 'TAMPARC' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const { tabla, categorias, valores } = this.procesarDatos(response.features);
-        this.tablaDatos = tabla;
-        this.categoriasOrdenadas =categorias.sort((a, b) =>
-          a.localeCompare(b)
-        );
-        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
-        this.tablaFiltrada = [...this.tablaDatos];
-        this.actualizarDatos(categorias, valores);
-      } else {
+  public  cargarDatosByDpto(ubigeo: string) {
+    this.tamanioParcelaService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeoParcela(features);
+          this.tablaDatos = tabla;
+          this.categoriasOrdenadas =categorias.sort((a, b) =>
+            a.localeCompare(b)
+          );
+          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.categoriasUnicas = [];
         this.tablaFiltrada = [];
         this.actualizarDatos([], []);
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Departamental)", err);
-    }
+    });
   }
 
-  public async cargarDatosByProv(ubigeo: string) {
-    const q = new Query({
-      where: `INDICE = 'TAMPARC' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const { tabla, categorias, valores } = this.procesarDatos(response.features);
-        this.tablaDatos = tabla;
-        this.categoriasOrdenadas =categorias.sort((a, b) =>
-          a.localeCompare(b)
-        );
-        this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
-        this.tablaFiltrada = [...this.tablaDatos];
-        this.actualizarDatos(categorias, valores);
-      } else {
+  public  cargarDatosByProv(ubigeo: string) {
+    this.tamanioParcelaService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeoParcela(features);
+          this.tablaDatos = tabla;
+          this.categoriasOrdenadas =categorias.sort((a, b) =>
+            a.localeCompare(b)
+          );
+          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.categoriasUnicas = [];
         this.tablaFiltrada = [];
         this.actualizarDatos([], []);
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Provincial)", err);
-    }
+    });
   }
 
-  private procesarDatos(features: any[]): {
-    tabla: Tabla[];
-    categorias: string[];
-    valores: number[];
-  } {
 
-    const datos  = features.map(f => ({
-      ubigeo: f.attributes.UBIGEO,
-      ddescr: f.attributes.DDESCR,
-      parcela: Number(f.attributes.PARCELAS)
-    }));
-
-    const tabla: Tabla[] = [];
-    const acumulado: Record<string, number> = {};
-
-    for (const item of datos) {
-
-      tabla.push({
-        ubigeo: this.ubigeoService.getNombre(item.ubigeo),
-        ddescr:item.ddescr ??  "No definido",
-        parcela:item.parcela,
-      });
-      acumulado[item.ddescr] = (acumulado[item.ddescr] ?? 0) + item.parcela;
-    }
-
-    return {
-      tabla,
-      categorias: Object.keys(acumulado),
-      valores: Object.values(acumulado)
-    };
-  }
 
   private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[]) {
     this.categorias = [...nuevasCategorias];
