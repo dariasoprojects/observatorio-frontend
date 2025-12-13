@@ -9,6 +9,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatIconModule} from '@angular/material/icon';
+import {HttpClient} from '@angular/common/http';
+import {TamanioParcelaService} from '../../services/indices/tamanio-parcela.service';
 
 
 interface Tabla {
@@ -51,7 +53,10 @@ export class IndiceTamanioParceComponent implements OnInit {
   private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
 
-  constructor(private ubigeoService: UbigeoService) {}
+  constructor(
+    private ubigeoService: UbigeoService,
+    private tamanioParcelaService: TamanioParcelaService,
+    ) {}
 
   async ngOnInit() {
 
