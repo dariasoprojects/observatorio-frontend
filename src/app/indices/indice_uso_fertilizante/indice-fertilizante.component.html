@@ -1,11 +1,11 @@
 <div class="indice-fertilizante">
 
-  
+
 
   <!-- Contenedor del gráfico -->
   <div id="container-fertilizante"></div>
 
-  <button pButton 
+  <button pButton
           label="Aplicar colores por Género"
           class="p-button-success mt-3"
           (click)="aplicarColoresGenero()">
@@ -18,7 +18,7 @@
     <mat-form-field appearance="fill" style="width: 300px;">
       <mat-label>Tipo de fertilizante</mat-label>
       <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
-        <mat-option *ngFor="let cat of categorias" [value]="cat">
+        <mat-option *ngFor="let cat of categoriasOrdenadas" [value]="cat">
           {{ cat }}
         </mat-option>
       </mat-select>

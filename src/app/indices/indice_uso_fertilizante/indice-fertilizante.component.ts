@@ -1,20 +1,3 @@
-// import { Component, OnInit , Input} from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import * as Highcharts from 'highcharts';
-// import Query from "@arcgis/core/rest/support/Query";
-// import * as query from "@arcgis/core/rest/query";
-// import { UbigeoService } from '../../services/ubigeo.service';
-// import {FormatUtil} from '../../shared/utils/format.util';
-// import { MatDialog } from '@angular/material/dialog';
-// import { MapCommService } from '../../services/map-comm.service';
-
-
-// import { MatSelectModule } from '@angular/material/select';
-// import { MatFormFieldModule } from '@angular/material/form-field';
-// import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-// import { MatIconModule } from '@angular/material/icon';
-// import { MatSlideToggleChange } from '@angular/material/slide-toggle';
-// import { DialogExportarComponent } from './dialog-exportar/dialog-exportar.component';
 
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -33,6 +16,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MapCommService } from '../../services/map-comm.service';
 import { DialogExportarComponent } from './dialog-exportar/dialog-exportar.component';
+import {TipoActividadService} from '../../services/indices/tipo-actividad.service';
+import {UsoFertilizanteService} from '../../services/indices/uso-fertilizante.service';
 
 @Component({
   selector: 'app-indice-fertilizante',
@@ -59,6 +44,7 @@ export class IndiceFertilizanteComponent implements OnInit {
   chart!: Highcharts.Chart;
   activeReg: string | null = null;
   activeNivel: string | null = null;
+  categoriasOrdenadas: string[] = [];
 
   tablaDatos: { ubigeo: string; parcelas: number; ddescr: string; codubi: string  }[] = [];
   tablaFiltrada: { ubigeo: string; parcelas: number; ddescr: string; codubi: string }[] = [];
@@ -69,9 +55,11 @@ export class IndiceFertilizanteComponent implements OnInit {
   private urlParcelas = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
 
 
-  constructor(private ubigeoSrv: UbigeoService, 
-              private mapComm: MapCommService, 
-              private dialog: MatDialog) {}  // <-- solo para inyectar
+  constructor(private ubigeoSrv: UbigeoService,
+              private mapComm: MapCommService,
+              private dialog: MatDialog,
+              private usoFertilizanteService: UsoFertilizanteService,
+  ) {}  // <-- solo para inyectar
 
 
   async ngOnInit() {
@@ -97,8 +85,6 @@ export class IndiceFertilizanteComponent implements OnInit {
 
   abrirDialogoExportar(reg: string) {
 
-    //alert(reg);
-
     this.dialog.open(DialogExportarComponent, {
       width: '900px',
       height: '500px',
@@ -123,7 +109,7 @@ export class IndiceFertilizanteComponent implements OnInit {
       parcelas: f.attributes.PARCELAS
     }));
 
-    
+
 
     this.prepararDatos(data);
   }
@@ -138,15 +124,6 @@ export class IndiceFertilizanteComponent implements OnInit {
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
-
-    // const response = await query.executeQueryJSON(this.url, q);
-    // const data = response.features.map(f => ({
-    //   ubigeo: f.attributes.UBIGEO,
-    //   ddescr: f.attributes.DDESCR,
-    //   parcelas: f.attributes.PARCELAS
-    // }));
-
-    // this.prepararDatos(data);
 
     try {
       const response = await query.executeQueryJSON(this.url, q);
@@ -181,15 +158,6 @@ export class IndiceFertilizanteComponent implements OnInit {
       outFields: ["UBIGEO", "DDESCR", "PARCELAS"],
       returnGeometry: false
     });
-
-    // const response = await query.executeQueryJSON(this.url, q);
-    // const data = response.features.map(f => ({
-    //   ubigeo: f.attributes.UBIGEO,
-    //   ddescr: f.attributes.DDESCR,
-    //   parcelas: f.attributes.PARCELAS
-    // }));
-
-    // this.prepararDatos(data);
 
     try {
       const response = await query.executeQueryJSON(this.url, q);
@@ -244,6 +212,10 @@ export class IndiceFertilizanteComponent implements OnInit {
       }))
       .sort((a, b) => a.ubigeo.localeCompare(b.ubigeo, 'es', { sensitivity: 'base' }));
 
+
+    this.categoriasOrdenadas = Object.keys(agrGrafico).sort((a, b) =>
+      a.localeCompare(b));
+
     // 👉 ahora llamamos al método central de actualización
     this.actualizarDatos(cats, vals, tablaOrdenada);
   }
@@ -281,7 +253,7 @@ export class IndiceFertilizanteComponent implements OnInit {
   // ---------------------------------------------------
   //  FILTRADO DINÁMICO
   // ---------------------------------------------------
- 
+
 
 
   filtrarPorCategoria() {
@@ -312,7 +284,7 @@ export class IndiceFertilizanteComponent implements OnInit {
       parcelas: it.parcelas,
       ddescr: this.categoriaSeleccionada || "Todos"
     }));
-  
+
   }
 
 
@@ -323,7 +295,7 @@ export class IndiceFertilizanteComponent implements OnInit {
     console.log('Toggle cambiado:', ubigeo, isChecked);
 
     let codReg = null;
-    
+
     switch (this.activeNivel) {
       case '1':
          codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 2);
@@ -333,7 +305,7 @@ export class IndiceFertilizanteComponent implements OnInit {
         break;
       case '3':
          codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 6);
-        break;      
+        break;
     }
 
     if(isChecked){
@@ -350,7 +322,7 @@ export class IndiceFertilizanteComponent implements OnInit {
   }
 
 
-  
+
 
   // ---------------------------------------------------
   //  CREAR GRÁFICO

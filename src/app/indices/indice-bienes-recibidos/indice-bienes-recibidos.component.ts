@@ -1,24 +1,17 @@
 import {Component, Input} from '@angular/core';
-import {MatSlideToggle, MatSlideToggleChange, MatSlideToggleModule} from "@angular/material/slide-toggle";
-import {CommonModule, NgForOf} from "@angular/common";
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {CommonModule} from "@angular/common";
 import * as Highcharts from 'highcharts';
-import {UbigeoService} from '../../services/ubigeo.service';
-import {MapCommService} from '../../services/map-comm.service';
-import {MatDialog} from '@angular/material/dialog';
-import {DialogExportarComponent} from '../indice_uso_fertilizante/dialog-exportar/dialog-exportar.component';
-import Query from '@arcgis/core/rest/support/Query';
-import * as query from '@arcgis/core/rest/query';
 import {FormsModule} from '@angular/forms';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import { FormatUtil } from '../../shared/utils/format.util';
-interface Tabla {
-  [key: string]: {
-    productores: number;
-    entidadApoyo: string;
-  }[];
-}
+import {BienesRecibidosService} from '../../services/indices/bienes-recibidos.service';
+import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import {TablaProductorBienServicio} from '../../models/indices/indices.model';
+import {IndicesUtil} from '../../shared/utils/indices.util';
+
 
 @Component({
   selector: 'app-indice-bienes-recibidos',
@@ -44,29 +37,25 @@ export class IndiceBienesRecibidosComponent {
   valores: number[] = [];
   chart!: Highcharts.Chart;
   activeNivel: string | null = null;
-
-  tablaDatos!: Tabla ;
-
-
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
+  tablaDatos!: TablaProductorBienServicio ;
 
 
-  constructor(private ubigeoSrv: UbigeoService,
-              private mapComm: MapCommService,
-              private dialog: MatDialog) {}  // <-- solo para inyectar
+  constructor(
+    private bienesRecibidosService: BienesRecibidosService
+  ) {}
 
 
-  async ngOnInit() {
+  ngOnInit() {
 
     if (this.valorSeleccionadoProv) {
-      await this.cargarDatosByProv(this.valorSeleccionadoProv);
+      this.cargarDatosByProv(this.valorSeleccionadoProv);
       this.activeNivel="3"
     } else if (this.valorSeleccionado) {
-      await this.cargarDatosByDpto(this.valorSeleccionado);
+      this.cargarDatosByDpto(this.valorSeleccionado);
       this.activeNivel="2"
     } else {
       this.activeNivel="1"
-      await this.cargarDatos();
+      this.cargarDatos();
     }
   }
 
@@ -74,133 +63,69 @@ export class IndiceBienesRecibidosComponent {
     this.crearGrafico();
   }
 
-  // ---------------------------------------------------
-  //  CARGA GENERAL
-  // ---------------------------------------------------
-  public async cargarDatos() {
-    const q = new Query({
-      where: "INDICE = 'BIEREC' AND CAPA = 1",
-      outFields: ["DDESCR", "PRODUCTORES", "ENTIDAD_APOYO"],
-      returnGeometry: false
-    });
 
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-
-        const { tabla, categorias, valores } = this.procesarDatos(response.features);
-
-        this.tablaDatos = tabla;
-        this.actualizarDatos(categorias, valores);
-
-      } else {
-
+  cargarDatos(): void {
+    this.bienesRecibidosService.getDatosIndicadores().subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } =  IndicesUtil.procesarDatos(features);
+          this.tablaDatos = tabla;
+          this.actualizarDatos(categorias, valores);
+        } else {
+          this.tablaDatos = {};
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = {};
-        this.actualizarDatos([], []); // limpiar gráfico si no hay registros
+        this.actualizarDatos([], []);
       }
-
-    } catch (err) {
-      console.error(" Error al consultar ArcGIS", err);
-    }
-  }
-
-  // ---------------------------------------------------
-  //  CARGA POR DEPARTAMENTO
-  // ---------------------------------------------------
-  public async cargarDatosByDpto(ubigeo: string) {
-    const q = new Query({
-      where: `INDICE = 'BIEREC' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["DDESCR", "PRODUCTORES", "ENTIDAD_APOYO"],
-      returnGeometry: false
     });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-
-        const { tabla, categorias, valores } = this.procesarDatos(response.features);
-
-        this.tablaDatos = tabla;
-        this.actualizarDatos(categorias, valores);
-
-      } else {
-
-        this.tablaDatos = {};
-        this.actualizarDatos([], []); // limpiar gráfico si no hay registros
-      }
-
-    } catch (err) {
-      console.error(" Error al consultar ArcGIS", err);
-    }
-
   }
 
-  // ---------------------------------------------------
-  //  CARGA POR PROVINCIA
-  // ---------------------------------------------------
-  public async cargarDatosByProv(ubigeo: string) {
-    const q = new Query({
-      where: `INDICE = 'BIEREC' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["DDESCR", "PRODUCTORES", "ENTIDAD_APOYO"],
-      returnGeometry: false
+  cargarDatosByDpto(ubigeo: string): void {
+    this.bienesRecibidosService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } =  IndicesUtil.procesarDatos(features);
+          this.tablaDatos = tabla;
+          this.actualizarDatos(categorias, valores);
+        } else {
+          this.tablaDatos = {};
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
+        this.tablaDatos = {};
+        this.actualizarDatos([], []);
+      }
     });
+  }
 
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-
-        const { tabla, categorias, valores } = this.procesarDatos(response.features);
-
-        this.tablaDatos = tabla;
-        this.actualizarDatos(categorias, valores);
-
-      } else {
-
+  cargarDatosByProv(ubigeo: string): void {
+    this.bienesRecibidosService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } = IndicesUtil.procesarDatos(features);
+          this.tablaDatos = tabla;
+          this.actualizarDatos(categorias, valores);
+        } else {
+          this.tablaDatos = {};
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = {};
-        this.actualizarDatos([], []); // limpiar gráfico si no hay registros
+        this.actualizarDatos([], []);
       }
-
-    } catch (err) {
-      console.error(" Error al consultar ArcGIS", err);
-    }
+    });
   }
-
-  private procesarDatos(features: any[]): {
-    tabla: Tabla;
-    categorias: string[];
-    valores: number[];
-  } {
-
-    const datos = features.map(f => ({
-      ddescr: f.attributes.DDESCR,
-      productores: Number(f.attributes.PRODUCTORES),
-      entidadApoyo: f.attributes.ENTIDAD_APOYO
-    }));
-
-    const tabla: Tabla = {};
-    const acumulado: Record<string, number> = {};
-
-    for (const item of datos) {
-
-      if (!tabla[item.ddescr]) tabla[item.ddescr] = [];
-      tabla[item.ddescr].push({
-        productores: item.productores,
-        entidadApoyo: item.entidadApoyo
-      });
-
-      acumulado[item.ddescr] = (acumulado[item.ddescr] || 0) + item.productores;
-    }
-
-    return {
-      tabla,
-      categorias: Object.keys(acumulado),
-      valores: Object.values(acumulado)
-    };
-  }
-
 
 
   private actualizarDatos(categorias: string[], valores: number[]) {
@@ -296,8 +221,6 @@ export class IndiceBienesRecibidosComponent {
 
     this.chart = Highcharts.chart('container-bienes-recibidos', options);
   }
-
-
 
   protected readonly Number = Number;
   protected readonly FormatUtil = FormatUtil;
