@@ -159,7 +159,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(response.features);
+          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(features);
           this.tablaDatos = tabla;
           this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
           this.tablaFiltrada = [...this.tablaDatos];
@@ -194,7 +194,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(response.features);
+          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(features);
           this.tablaDatos = tabla;
           this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
           this.tablaFiltrada = [...this.tablaDatos];
@@ -229,7 +229,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(response.features);
+          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(features);
           this.tablaDatos = tabla;
           this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
           this.tablaFiltrada = [...this.tablaDatos];

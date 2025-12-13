@@ -91,7 +91,7 @@ export class IndiceSuperfiAgriComponent implements OnInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          this.tablaDatos = response.features.map(f => ({
+          this.tablaDatos = features.map(f => ({
             ddescr: f.attributes.DDESCR,
             productores: f.attributes.PRODUCTORES,
             hectareaTotal: f.attributes.HECTAREA,
@@ -122,7 +122,7 @@ export class IndiceSuperfiAgriComponent implements OnInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          this.tablaDatos = response.features.map(f => ({
+          this.tablaDatos = features.map(f => ({
             ddescr: f.attributes.DDESCR,
             productores: f.attributes.PRODUCTORES,
             hectareaTotal: f.attributes.HECTAREA,
@@ -153,7 +153,7 @@ export class IndiceSuperfiAgriComponent implements OnInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          this.tablaDatos = response.features.map(f => ({
+          this.tablaDatos = features.map(f => ({
             ddescr: f.attributes.DDESCR,
             productores: f.attributes.PRODUCTORES,
             hectareaTotal: f.attributes.HECTAREA,

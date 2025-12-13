@@ -4,8 +4,6 @@ import * as Highcharts from 'highcharts';
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
 import { MapCommService } from '../../services/map-comm.service';
-import * as XLSX from 'xlsx'; // npm i xlsx
-import { saveAs } from 'file-saver'; // npm i file-saver
 import { MatDialog } from '@angular/material/dialog';
 import { DialogExportarComponent } from '../../dialog-exportar/dialog-exportar.component';
 import { Input } from '@angular/core';
@@ -25,8 +23,6 @@ import {MatSlideToggleChange, MatSlideToggleModule} from '@angular/material/slid
 })
 export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewInit {
 
-  //@Input() valorSeleccionado!: string | null;
-
   @Input() valorSeleccionado!: string | null;
   @Input() valorSeleccionadoText!: string | null;
 
@@ -35,8 +31,6 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
   categorias: string[] = [];
   valores: number[] = [];
-  valores2: number[] = [];
-  valores3: number[] = [];
   chart!: Highcharts.Chart;
   activeReg: string | null = null;
 
@@ -45,10 +39,6 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
 
   ngOnInit() {
-    //  Cargar datos desde el servicio
-    console.log('Valor inicial combo dpto:', this.valorSeleccionado);
-    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);
-    console.log('Valor inicial combo prov:', this.valorSeleccionadoProv);
 
     if (this.valorSeleccionadoProvText !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProvText);
@@ -76,56 +66,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   }
 
 
-  exportarExcel(reg: string) {
-    const q = new Query({
-      where: `REG = '${reg}'`,
-      outFields: ["*"], // campos que quieras incluir
-      returnGeometry: false
-    });
-
-    query.executeQueryJSON(this.url, q)
-      .then((response: any) => {
-        if (response.features.length === 0) {
-          alert('No se encontraron registros para este REG.');
-          return;
-        }
-
-        // Mapear atributos para Excel
-        const datos = response.features.map((f: any) => f.attributes);
-
-        // Crear workbook
-        const ws = XLSX.utils.json_to_sheet(datos);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, `REG_${reg}`);
-
-        // Generar archivo
-        const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-        saveAs(blob, `Export_REG_${reg}.xlsx`);
-      })
-      .catch(err => {
-        console.error('Error al exportar Excel:', err);
-        alert('Error al generar el Excel');
-      });
-  }
-
-
   constructor(private mapComm: MapCommService, private dialog: MatDialog) {}  // <-- solo para inyectar
-
-
-  // toggleCluster(event: Event, reg: string) {
-  //   const checked = (event.target as HTMLInputElement).checked;
-
-  //   if (checked) {
-  //     console.log('Activando filtro para:', reg);
-  //     this.activeReg = reg;
-  //     this.mapComm.requestFilter(reg);
-  //   } else {
-  //     console.log('Desactivando filtro');
-  //     this.activeReg = null;
-  //     this.mapComm.requestFilter(null);
-  //   }
-  // }
 
 
 
@@ -144,7 +85,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   }
 
 
-  
+
 
   private crearGrafico() {
     this.chart = Highcharts.chart('container-centros', {
@@ -200,8 +141,6 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
 
   public async cargarDatosByDpto(ubigeo: string) {
-
-    //alert("ddxxxx DEPE : "+ubigeo);
 
      const q = new Query({
       where:  `reg = '${ubigeo}'`,
