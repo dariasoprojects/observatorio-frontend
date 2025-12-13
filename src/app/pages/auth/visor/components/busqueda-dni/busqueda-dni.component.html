@@ -1,25 +1,33 @@
-<form [formGroup]="formBusqueda">
-  <div class="search">
-    <i class="pi pi-search icon-left"
-       role="button"
-       tabindex="0"
-       (click)="onSearchDni()">
-    </i>
+<form [formGroup]="formBusqueda" >
 
+  <div class="search">
     <input
       pInputText
       type="text"
       formControlName="dni"
-      placeholder="Ingresar número DNI"
+      placeholder="Ingresar DNI (8 dígitos)"
       maxlength="8"
       (keydown.enter)="onSearchDni()" />
 
-    <i class="pi pi-times icon-right"
-       role="button"
-       tabindex="0"
-       (click)="onClearDni()">
-    </i>
+    <button
+      type="button"
+      class="icon-btn search-btn"
+      aria-label="Buscar DNI"
+      title="Buscar DNI"
+      (click)="onSearchDni()">
+      <i class="pi pi-search"></i>
+    </button>
+
+    <button
+      type="button"
+      class="icon-btn clear-btn"
+      aria-label="Limpiar DNI"
+      title="Limpiar"
+      (click)="onClearDni()">
+      <i class="pi pi-times"></i>
+    </button>
   </div>
+
   <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched && formBusqueda.get('dni')?.invalid ">
 
     <div *ngIf="formBusqueda.get('dni')?.errors?.['required']">
@@ -81,7 +89,7 @@
         <tr *ngFor="let fila of parcelas">
           <td>{{ FormatUtil.formatInteger2Digitos (fila.attributes.LAT ) }}</td>
           <td>{{ FormatUtil.formatInteger2Digitos (fila.attributes.LONG_) }}</td>
-          <td>{{ fila.attributes.UBIGEO3 }}</td>
+          <td>{{ this.ubigeoService.getNombre(fila.attributes.UBIGEO3)  }}</td>
           <td class="cell-center">
             <i class="pi pi-search" (click)="verParcela(fila)"></i>
           </td>

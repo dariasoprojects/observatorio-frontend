@@ -170,8 +170,6 @@ export class SidebarComponent  implements OnInit, OnDestroy{
   }
 
   onVerPaneles():void{
-    // this.mostrarProductor =false;
-    // this.limpiarDni.emit();
   }
 
   protected readonly FormatUtil = FormatUtil;

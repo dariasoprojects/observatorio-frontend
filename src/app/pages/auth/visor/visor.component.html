@@ -11,11 +11,26 @@
 
   <!-- TOP-WIDE -->
   <section class="top-wide">
-    <app-busqueda-dni
-      (buscarDni)="onBuscarDni()"
-      (limpiarDni)="onLimpiarDni()"
-    >
-    </app-busqueda-dni>
+    <div class="topbar">
+      <div class="topbar-right">
+        <div class="usr-info">
+          <i class="pi pi-search"
+             role="button"
+             aria-label="Buscar dni"
+             title="Buscar dni"
+             (click)="dialogVisibleBusquedaDni=true"
+             >
+          </i>
+        </div>
+        <p-avatar label="RA" shape="circle" styleClass="usr-avatar" (click)="menu.toggle($event)"></p-avatar>
+        <p-menu #menu [model]="items" [popup]="true" />
+        <div class="usr-info">
+          <div class="usr-name">Roberto Aranda</div>
+          <div class="usr-role">Analista del Sistema</div>
+        </div>
+
+      </div>
+    </div>
   </section>
 
   <!-- CENTRO: MAPA -->
@@ -48,7 +63,7 @@
   </p-dialog>
 
   <p-dialog
-    header="GeoAnalítica"
+    header="GeoPerfil"
     [(visible)]="dialogVisibleConsultaMultiple"
     [modal]="false"
     [style]="{ width: '830px' }"
@@ -58,6 +73,26 @@
     <app-consulta-multiple></app-consulta-multiple>
   </p-dialog>
 
+  <p-dialog
+    [(visible)]="dialogVisibleBusquedaDni"
+    [modal]="false"
+    [style]="{ width: '430px' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <ng-template pTemplate="header">
+      <div class="p-dialog-title">
+        Búsqueda por dni
+        <div class="dialog-subtitle ">
+          Localización de productores
+        </div>
+      </div>
+    </ng-template>
+
+    <app-busqueda-dni
+    >
+    </app-busqueda-dni>
+  </p-dialog>
 
 
 
