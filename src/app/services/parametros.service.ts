@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {ParametroResponse} from '../models/parametro/parametro.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ParametrosService {
   private readonly url =
-    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_MIL1/MapServer/5/query';
+    `${environment.arcgis.baseUrl}${environment.arcgis.parametroUrlQuery}`;
 
   constructor(private http: HttpClient) {}
 

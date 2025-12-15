@@ -10,6 +10,7 @@ import { Input } from '@angular/core';
 import {FormatUtil} from "../../shared/utils/format.util";
 import {MatIconModule} from '@angular/material/icon';
 import {MatSlideToggleChange, MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -34,7 +35,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   chart!: Highcharts.Chart;
   activeReg: string | null = null;
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/1";
+  private url = `${environment.arcgis.baseUrl}${environment.arcgis.centroEmpadronamientoUrl}`;
 
 
 

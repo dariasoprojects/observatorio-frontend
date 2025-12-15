@@ -5,6 +5,7 @@ import * as Highcharts from 'highcharts';
 // ArcGIS API
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-sumatorias',
@@ -22,8 +23,9 @@ export class SumatoriasComponent implements OnInit, AfterViewInit {
   public nroParcelas: string = '';
   public totHectareas: string = '';
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
-  private urlData = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
+  private url = `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`;
+  private urlData = `${environment.arcgis.baseUrl}${environment.arcgis.indicesUrl}`;
+  
 
   ngOnInit() {
     // Cargar datos desde el servicio

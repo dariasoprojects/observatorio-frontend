@@ -15,6 +15,7 @@ import {TipoActividadService} from '../../services/indices/tipo-actividad.servic
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
 import {IndicesUtil} from '../../shared/utils/indices.util';
+import { environment } from 'src/environments/environment';
 
 
 
@@ -53,7 +54,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
   categoriaSeleccionadaInit: string = '';
 
   //  Nueva URL sin tilde en los campos
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
+  private url =  `${environment.arcgis.baseUrl}${environment.arcgis.indicesUrl}`;
 
   constructor(
     private ubigeoService: UbigeoService,

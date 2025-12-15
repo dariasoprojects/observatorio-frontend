@@ -20,6 +20,7 @@ import {
 
 import Query from "@arcgis/core/rest/support/Query";
 import * as query from "@arcgis/core/rest/query";
+import { environment } from 'src/environments/environment';
 
 export interface CapaOption {
   label: string;
@@ -113,7 +114,7 @@ export class AnalisisEspacialComponent {
   async ejecutarEstadisticas() {
 
     const serviceLayerUrl =
-    "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
+    `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`;
 
     // -------------------------------------------------------------------
     // 1) TABLA DE GÉNERO
