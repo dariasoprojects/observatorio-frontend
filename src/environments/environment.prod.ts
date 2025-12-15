@@ -2,7 +2,7 @@ export const environment = {
   production: true,
   envName: 'PROD',
   arcgis: {
-    baseUrl: 'https://winlmprap10.midagri.gob.pe',
+    baseUrl: 'https://winlmprap09.midagri.gob.pe',
     indicesUrl: '/winjmprap12/rest/services/CapaObservatorio22/MapServer/4',
     indicesUrlQuery: '/winjmprap12/rest/services/CapaObservatorio22/MapServer/4/query',
     productorConsolidadoUrl: '/winjmprap12/rest/services/CapaObservatorio22/MapServer/0',
