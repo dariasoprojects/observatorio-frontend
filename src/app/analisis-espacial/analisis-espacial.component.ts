@@ -9,6 +9,7 @@ import * as query from '@arcgis/core/rest/query';
 import { MapCommService } from '../services/map-comm.service';
 
 import { DraggableDirective } from '../directivas/draggable.directive';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-analisis-espacial',
@@ -19,7 +20,7 @@ import { DraggableDirective } from '../directivas/draggable.directive';
 })
 export class AnalisisEspacialComponent implements OnInit, OnDestroy {
   // configura estos dos desde el padre o aquí mismo:
-  @Input() mapServerUrl = 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer';
+  @Input() mapServerUrl = `${environment.arcgis.baseUrl}${environment.arcgis.parcelaPadronCapaUrl}`;
   @Input() layerId = 0; // <-- pon el layer id de análisis
 
   coberturaPolygon: Polygon | null = null;

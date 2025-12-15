@@ -5,6 +5,7 @@ import { Input } from '@angular/core';
 import {FormatUtil} from "../../shared/utils/format.util";
 import {FuenteIngresoService} from '../../services/indices/fuente-ingreso.service';
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -28,7 +29,7 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
 
   tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
+  private url = `${environment.arcgis.baseUrl}${environment.arcgis.indicesUrl}`;
 
   constructor(
     private fuenteIngresoService: FuenteIngresoService

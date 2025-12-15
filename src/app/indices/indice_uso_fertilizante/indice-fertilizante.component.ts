@@ -16,6 +16,7 @@ import { MapCommService } from '../../services/map-comm.service';
 import { DialogExportarComponent } from './dialog-exportar/dialog-exportar.component';
 import {UsoFertilizanteService} from '../../services/indices/uso-fertilizante.service';
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-indice-fertilizante',
@@ -49,7 +50,7 @@ export class IndiceFertilizanteComponent implements OnInit {
 
   categoriaSeleccionada: string = '';
 
-  private urlParcelas = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
+  private urlParcelas = `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`;
 
 
   constructor(private ubigeoSrv: UbigeoService,

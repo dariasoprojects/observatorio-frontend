@@ -17,6 +17,7 @@ import MapView from "@arcgis/core/views/MapView";
 import { MapCommService } from '../services/map-comm.service';
 
 import { DraggableDirective } from '../directivas/draggable.directive';
+import { environment } from 'src/environments/environment';
 
 
 interface Consulta {
@@ -90,9 +91,9 @@ export class ConsultaMultipleComponent implements OnInit {
   resultados: any[] = [];
 
 
-  private urlCSV = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/3";
+  private urlCSV = `${environment.arcgis.baseUrl}${environment.arcgis.consultaMultipleUrl}`;
 
-  urlShape = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0";
+  urlShape = `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`;
 
   constructor(private comm: MapCommService) {}  // <-- solo para inyectar
 

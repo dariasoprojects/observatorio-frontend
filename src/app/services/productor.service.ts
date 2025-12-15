@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, catchError, from, map, of, throwError} from 'rxjs';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 export class ProductorService {
 
   private readonly urlProductor =
-    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0';
+    `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`;
 
   private productorSubject = new BehaviorSubject<__esri.Graphic[] | null>(null);
   productor$ = this.productorSubject.asObservable();

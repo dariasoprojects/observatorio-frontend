@@ -16,7 +16,8 @@ import AreaMeasurement2D from '@arcgis/core/widgets/AreaMeasurement2D';
 import Print from '@arcgis/core/widgets/Print';
 import Extent from '@arcgis/core/geometry/Extent';
 import Polygon from '@arcgis/core/geometry/Polygon';
-import Point from "@arcgis/core/geometry/Point";  
+import Point from "@arcgis/core/geometry/Point";
+import { environment } from 'src/environments/environment';
 
 
 export class Mapa {
@@ -70,14 +71,14 @@ export class Mapa {
   private highlightLayerKml: GraphicsLayer = new GraphicsLayer();
   private estadoInicialParcelas: any = null;
 
-  
-  
+
+
   constructor(
-      private mapDiv: HTMLDivElement,       
-      private comm: MapCommService,         
-      private sceneDiv: HTMLDivElement   
+      private mapDiv: HTMLDivElement,
+      private comm: MapCommService,
+      private sceneDiv: HTMLDivElement
     ) {
-        
+
     this.mapDiv = mapDiv;
     this.sceneDiv = sceneDiv;
     this.comm = comm;
@@ -248,15 +249,15 @@ export class Mapa {
     let url = "";
 
     if (layer === "junta") {
-      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/6";
+      url = `${environment.arcgis.baseUrl}${environment.arcgis.juntaCapaUrl}`;
     } else if (layer === "comite") {
-      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/7";
+      url = `${environment.arcgis.baseUrl}${environment.arcgis.comiteCapaUrl}`;
     }else if (layer === "unidadhidro") {
-      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/10";
+      url = `${environment.arcgis.baseUrl}${environment.arcgis.unidadHidricaCapaUrl}`;
     }else if (layer === "sectores") {
-      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/9";
+      url = `${environment.arcgis.baseUrl}${environment.arcgis.sectoresCapaUrl}`;
     }else if (layer === "microcuencas") {
-      url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/8";
+      url = `${environment.arcgis.baseUrl}${environment.arcgis.microcuencasCapaUrl}`;
     }
 
 
@@ -270,7 +271,7 @@ export class Mapa {
   }
 
 
- 
+
 
 
   private async cargarRendererOriginalParcelas(): Promise<void> {
@@ -717,7 +718,7 @@ export class Mapa {
       console.log(" Iniciando mapa 2D...");
       // --- Crear capas ---
       this.capaParcelasPadron = new MapImageLayer({
-        url: "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/",
+        url: `${environment.arcgis.baseUrl}${environment.arcgis.parcelaPadronCapaUrl}/`,
         title: "Parcelas Productores",
         visible: false
       });
@@ -737,7 +738,7 @@ export class Mapa {
       }
 
 
-      
+
 
       this.capaMapServer = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/SectoresEstadisticos/MapServer/",
@@ -770,7 +771,7 @@ export class Mapa {
       });
 
       this.capaCluster = new FeatureLayer({
-        url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/1',
+        url: `${environment.arcgis.baseUrl}${environment.arcgis.centroEmpadronamientoUrl}`,
         visible: false,
         outFields: ['*'],
         featureReduction: {
@@ -795,7 +796,7 @@ export class Mapa {
       });
 
       this.capaClusterPpa = new FeatureLayer({
-        url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0',
+        url: `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`,
         visible: false,
         outFields: ['*'],
         featureReduction: {
@@ -852,7 +853,7 @@ export class Mapa {
       await this.mapView.when();
       console.log(" MAPA 2D listo");
 
-      
+
       this.activarCoordenadasEnVivo();
 
 
@@ -945,7 +946,7 @@ export class Mapa {
       query.spatialRelationship = "intersects";
       query.returnGeometry = true;
       query.maxAllowableOffset = 30;  // recomendado
-      query.geometryPrecision = 4; 
+      query.geometryPrecision = 4;
 
       const res = await this.queryTask.queryFeatures(query);
 
@@ -977,7 +978,7 @@ export class Mapa {
 
       // Enviar evento para panel u otro componente
       this.comm.sendFeatureSelected(feature);
-      this.comm.sendGeometry(feature.geometry); 
+      this.comm.sendGeometry(feature.geometry);
 
       console.log("OBJECTID encontrado:", feature.attributes.OBJECTID);
 
@@ -1050,7 +1051,7 @@ export class Mapa {
 
     // Centrar y zoom inicial
     if (this.mapView) {
-            
+
       if(this.mapView?.popup){
          this.mapView.popup.visible = false;
       }
@@ -1058,7 +1059,7 @@ export class Mapa {
       this.mapView.goTo({
         center: [-75.015, -9.19],
         zoom: 6
-      });      
+      });
     }
 
     // Ocultar paneles de leyenda y TOC
@@ -1230,7 +1231,7 @@ export class Mapa {
     if (this.mapView){
       this.currentView = this.mapView;
     }
-    
+
     this.toc_3D.onclick = () => this.toggle3D();
 
     // Botón principal
@@ -1328,7 +1329,7 @@ export class Mapa {
 
     this.printBtn.onclick = () => {
       this.printDiv.style.display = this.printDiv.style.display === "none" ? "block" : "none";
-    };   
+    };
 
     // Botón Multi (GeoPerfil)
     this.multiQyBtn = document.createElement("div");
@@ -1337,18 +1338,18 @@ export class Mapa {
     this.multiQyBtn.title = "Consulta Múltiple";
 
     //  BOTÓN MIDAGRI – Más grande y más visible sobre azul
-    this.multiQyBtn.style.background = "#155f31";       
+    this.multiQyBtn.style.background = "#155f31";
     this.multiQyBtn.style.color = "white";
-    this.multiQyBtn.style.border = "4px solid #ffffff";   // 
-    this.multiQyBtn.style.borderRadius = "12px";          // 
+    this.multiQyBtn.style.border = "4px solid #ffffff";   //
+    this.multiQyBtn.style.borderRadius = "12px";          //
 
     //  Tamaño aumentado
     this.multiQyBtn.style.padding = "14px 20px";          //
-    this.multiQyBtn.style.fontSize = "22px";              // 
+    this.multiQyBtn.style.fontSize = "22px";              //
     this.multiQyBtn.style.margin = "8px";
 
     //  Mejor presencia visual
-    this.multiQyBtn.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)"; 
+    this.multiQyBtn.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
 
     // Configuración general
     this.multiQyBtn.style.display = "flex";
@@ -1374,7 +1375,7 @@ export class Mapa {
     this.multiQyBtn.onclick = () => {
       this.comm.abrirDialogConsultaMultiple();
     };
-    
+
     // Botón GeoAnalítica (estilo unificado)
     this.btnAnalisis = document.createElement("div");
     this.btnAnalisis.className = "esri-widget esri-widget--button esri-interactive";
@@ -1382,14 +1383,14 @@ export class Mapa {
     this.btnAnalisis.title = "GeoAnalítica";
 
     // Estilo institucional (igual que el anterior)
-    this.btnAnalisis.style.background = "#155f31";       
+    this.btnAnalisis.style.background = "#155f31";
     this.btnAnalisis.style.color = "white";
-    this.btnAnalisis.style.border = "4px solid #ffffff";   
-    this.btnAnalisis.style.borderRadius = "12px";          
+    this.btnAnalisis.style.border = "4px solid #ffffff";
+    this.btnAnalisis.style.borderRadius = "12px";
 
     // Tamaño grande
-    this.btnAnalisis.style.padding = "14px 20px";          
-    this.btnAnalisis.style.fontSize = "22px";              
+    this.btnAnalisis.style.padding = "14px 20px";
+    this.btnAnalisis.style.fontSize = "22px";
     this.btnAnalisis.style.margin = "8px";
 
     // Mayor presencia visual en el mapa
@@ -1585,7 +1586,7 @@ export class Mapa {
     view.ui.add(this.btnAnalisis,"top-left");
 
   }
-  
+
 
   generarTOC(panel: HTMLElement) {
     panel.innerHTML = '';
@@ -1665,7 +1666,7 @@ export class Mapa {
       //         s.renderer = null;
       //       }
       //     });
-      //   } 
+      //   }
       //   // Si es FeatureLayer (cluster, puntos, etc)
       //   else {
       //     layer.visible = checked;
@@ -1680,7 +1681,7 @@ export class Mapa {
 
 
   activarIdentify() {
-    
+
     this.identifyActive = true;
 
     if (this.mapView && this.mapView.container){
@@ -1710,7 +1711,7 @@ export class Mapa {
 
   queryByDepartamento(ubigeo: string, features: __esri.Graphic[]):void {
 
-    this.addResultsToMap(features);    
+    this.addResultsToMap(features);
     if (this.capaMapServer) {
       this.setSubLayerVisibility(this.capaMapServer, [0]);
       this.setSubLayerFilters(this.capaMapServer, {

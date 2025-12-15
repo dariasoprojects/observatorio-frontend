@@ -5,6 +5,7 @@ import { Input } from '@angular/core';
 import {FormatUtil} from "../../shared/utils/format.util";
 import {SuperficieSembradaService} from '../../services/indices/superficie-sembrada.service';
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -27,7 +28,8 @@ export class IndiceSuperfiSembComponent implements OnInit {
 
   tablaDatos: { ddescr: string; productores: number; hectareaTotal: number; parcelas: number ; hectariaSembrada: number }[] = [];
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
+  private url = `${environment.arcgis.baseUrl}${environment.arcgis.indicesUrl}`;
+  
 
   constructor(
     private superficieSembradaService: SuperficieSembradaService
