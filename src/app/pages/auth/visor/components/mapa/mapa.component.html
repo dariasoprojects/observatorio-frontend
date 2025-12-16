@@ -1,21 +1,9 @@
-<div class="map-wrapper" style="width:100%;height:100%;">
-  <div id="mapDiv" #mapDiv style="width:100%;height:100%;"></div>
-  <!-- COORDENADAS EN VIVO -->
- <div id="coords"
-     style="position:absolute;
-            bottom:20px;          /* antes 10px → ahora 20px (10px más arriba) */
-            left:50%;             /* centrado */
-            transform:translateX(-50%);  /* centra exacto */
-            background:rgba(0,0,0,0.65);
-            color:white;
-            padding:6px 12px;
-            border-radius:6px;
-            font-size:14px;
-            z-index:9999;
-            pointer-events:none;  /* NO bloquea clics del mapa */
-            display:block;">
-  Move mouse...
-</div>
+<div class="map-wrapper">
+    <div id="mapDiv" #mapDiv></div>
 
-  <div id="sceneDiv" #sceneDiv style="width:100%;height:100%;display:none;"></div>
+   <div id="coords">
+    Move mouse...
+  </div>
+
+  <div id="sceneDiv" #sceneDiv></div>
 </div>
