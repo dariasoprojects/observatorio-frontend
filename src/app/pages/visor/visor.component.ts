@@ -39,6 +39,7 @@ import { AnalisisEspacialComponent  } from '../../analisis-espacial/analisis-esp
 import { MapCommService } from '../../services/map-comm.service';
 import {SidebarComponent} from './components/sidebar/sidebar.component';
 import {LayoutVerticalComponent} from './components/layout-vertical/layout-vertical.component';
+import { environment } from 'src/environments/environment';
 
 
 
@@ -803,7 +804,7 @@ export class VisorComponent implements OnInit {
 
     if (distrrr) {
       this.mapa.consultarYZoom(
-        "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0",
+        `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`,
         "TXT_NRODOC",
         distrrr
       );

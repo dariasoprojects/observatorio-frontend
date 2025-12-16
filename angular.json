@@ -35,6 +35,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 { "type": "initial", "maximumWarning": "10mb", "maximumError": "12MB" },
                 { "type": "anyComponentStyle", "maximumWarning": "10kB", "maximumError": "15kB" }
@@ -42,6 +48,14 @@
               "outputHashing": "all",
               "optimization": true,
               "sourceMap": false
+            },
+            "qa": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.qa.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -55,6 +69,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": { "buildTarget": "angularweb:build:production" },
+            "qa": { "buildTarget": "angularweb:build:qa" },
             "development": { "buildTarget": "angularweb:build:development" }
           },
           "defaultConfiguration": "development"

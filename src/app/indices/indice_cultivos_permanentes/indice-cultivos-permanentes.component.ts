@@ -1,16 +1,28 @@
 import { Component, OnInit , Input} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-import Query from "@arcgis/core/rest/support/Query";
-import * as query from "@arcgis/core/rest/query";
 import { UbigeoService } from '../../services/ubigeo.service';
 import {FormatUtil} from '../../shared/utils/format.util';
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatIconModule} from '@angular/material/icon';
+import {CultivosPermanenteService} from '../../services/indices/cultivos-permanente.service';
+import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
+import {IndicesUtil} from '../../shared/utils/indices.util';
 
 
 @Component({
   selector: 'app-indice-cultivperm',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatSlideToggleModule,
+    MatIconModule
+  ],
   templateUrl: './indice-cultivos-permanentes.component.html',
   styleUrls: ['./indice-cultivos-permanentes.component.css']
 })
@@ -24,18 +36,23 @@ export class IndiceCultivosPermaComponent implements OnInit {
 
   categorias: string[] = [];
   valores: number[] = [];
+  categoriasOrdenadas: string[] = [];
   chart!: Highcharts.Chart;
 
-  tablaDatos: { ubigeo: string; parcelas: number }[] = [];
+  tablaDatos: TablaIndiceUbigeo [] = [];
+  tablaFiltrada: TablaIndiceUbigeo[] = [];
+  categoriasUnicas: string[] = [];
+  categoriaSeleccionada: string = '';
+  categoriaSeleccionadaInit: string = '';
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
+  constructor(
+    private ubigeoService: UbigeoService,
+    private cultivosPermanenteService: CultivosPermanenteService,
+    private indicesUtil: IndicesUtil
+    ) {}
 
-
-  constructor(private ubigeoSrv: UbigeoService) {}
-
-  async ngOnInit() {
-    await this.ubigeoSrv.cargarTodo();
-    //this.cargarDatos();
+ async ngOnInit() {
+    await this.ubigeoService.cargarTodo();
     if (this.valorSeleccionadoProv !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
     }else{
@@ -134,149 +151,123 @@ export class IndiceCultivosPermaComponent implements OnInit {
   }
 
 
-  public async cargarDatos() {
-    const q = new Query({
-      where: "INDICE = 'CULTIPERMA' AND CAPA = 1",
-      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.HECTAREA
-        }));
-
-        //  Agrupar por UBIGEO (para la tabla)
-        const agrupadoPorUbigeo: Record<string, number> = {};
-        data.forEach(item => {
-          if (!agrupadoPorUbigeo[item.ubigeo]) agrupadoPorUbigeo[item.ubigeo] = 0;
-          agrupadoPorUbigeo[item.ubigeo] += item.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrupadoPorUbigeo).map(([ubigeo, parcelas]) => {
-          const codigo = String(ubigeo);
-          const nombre = this.ubigeoSrv.getNombre(codigo);
-          return { ubigeo: nombre, parcelas };
-        });
-
-        // Agrupar por DDESCR (para el gráfico)
-        const agrupadoPorTam: Record<string, number> = {};
-        data.forEach(item => {
-          const clave = item.ddescr || "No definido";
-          if (!agrupadoPorTam[clave]) agrupadoPorTam[clave] = 0;
-          agrupadoPorTam[clave] += item.parcelas;
-        });
-        this.categorias = Object.keys(agrupadoPorTam);
-        this.valores = Object.values(agrupadoPorTam);
-
-        // Crear el gráfico
-        this.crearGrafico();
-      }else{
+  public  cargarDatos() {
+    this.cultivosPermanenteService.getDatosIndicadores().subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(features);
+          this.tablaDatos = tabla;
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriasOrdenadas = [...categoriasOrdenadas];
+          this.categoriaSeleccionadaInit = categoriasOrdenadas[0];
+          this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categorias = [];
+          this.valores = []
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.crearGrafico();
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.categorias = [];
         this.valores = []
-        this.crearGrafico(); // envías vacío para limpiar el chart
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
+        this.crearGrafico();
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS", err);
-    }
+    });
   }
 
 
-  public async cargarDatosByDpto(ubigeo: string) {
-
-    //alert(ubigeo);
-    const q = new Query({
-       where: `INDICE = 'CULTIPERMA' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.HECTAREA
-        }));
-
-        // Tabla: sumar por UBIGEO
-        const agrUbigeo: Record<string, number> = {};
-        data.forEach(it => {
-          if (!agrUbigeo[it.ubigeo]) agrUbigeo[it.ubigeo] = 0;
-          agrUbigeo[it.ubigeo] += it.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrUbigeo).map(([u, p]) => ({ ubigeo: u, parcelas: p }));
-
-        // Pie: agrupar por DDESCR
-        const agrTam: Record<string, number> = {};
-        data.forEach(it => {
-          const k = it.ddescr || "No definido";
-          if (!agrTam[k]) agrTam[k] = 0;
-          agrTam[k] += it.parcelas;
-        });
-        const cats = Object.keys(agrTam);
-        const vals = Object.values(agrTam);
-
-        this.actualizarDatos(cats, vals);
-      } else {
+  public cargarDatosByDpto(ubigeo: string) {
+    this.cultivosPermanenteService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(features);
+          this.tablaDatos = tabla;
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriasOrdenadas = [...categoriasOrdenadas];
+          this.categoriaSeleccionadaInit = categoriasOrdenadas[0];
+          this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categorias = [];
+          this.valores = []
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
+        this.categorias = [];
+        this.valores = []
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
         this.actualizarDatos([], []);
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Departamental)", err);
-    }
+    });
+
   }
 
-  public async cargarDatosByProv(ubigeo: string) {
-    const q = new Query({
-      where: `INDICE = 'CULTIPERMA' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["UBIGEO", "DDESCR", "HECTAREA"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        const data = response.features.map(f => ({
-          ubigeo: f.attributes.UBIGEO,
-          ddescr: f.attributes.DDESCR,
-          parcelas: f.attributes.HECTAREA
-        }));
-
-        // Tabla: sumar por UBIGEO
-        const agrUbigeo: Record<string, number> = {};
-        data.forEach(it => {
-          if (!agrUbigeo[it.ubigeo]) agrUbigeo[it.ubigeo] = 0;
-          agrUbigeo[it.ubigeo] += it.parcelas;
-        });
-        this.tablaDatos = Object.entries(agrUbigeo).map(([u, p]) => ({ ubigeo: u, parcelas: p }));
-
-        // Pie: agrupar por DDESCR
-        const agrTam: Record<string, number> = {};
-        data.forEach(it => {
-          const k = it.ddescr || "No definido";
-          if (!agrTam[k]) agrTam[k] = 0;
-          agrTam[k] += it.parcelas;
-        });
-        const cats = Object.keys(agrTam);
-        const vals = Object.values(agrTam);
-
-        this.actualizarDatos(cats, vals);
-      } else {
+  public cargarDatosByProv(ubigeo: string) {
+    this.cultivosPermanenteService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores, categoriasOrdenadas } = this.indicesUtil.procesarDatosUbigeoOtros(features);
+          this.tablaDatos = tabla;
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriasOrdenadas = [...categoriasOrdenadas];
+          this.categoriaSeleccionadaInit = categoriasOrdenadas[0];
+          this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categorias = [];
+          this.valores = []
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
+        this.categorias = [];
+        this.valores = []
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
         this.actualizarDatos([], []);
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Provincial)", err);
+    });
+  }
+
+
+
+  filtrarPorCategoria() {
+    if (!this.categoriaSeleccionada) {
+      this.tablaFiltrada = [...this.tablaDatos];
+      return;
     }
+    this.tablaFiltrada = this.tablaDatos.filter(
+      x => x.ddescr === this.categoriaSeleccionada
+    );
   }
 
   private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[]) {

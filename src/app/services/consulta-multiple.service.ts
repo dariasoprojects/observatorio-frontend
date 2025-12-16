@@ -4,6 +4,7 @@ import {from, map, Observable} from 'rxjs';
 import {CategoriaResponse} from '../models/consulta-multiple/categoria.model';
 import {ConsultaResponse} from '../models/consulta-multiple/consulta.model';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +13,11 @@ export class ConsultaMultipleService {
 
 
   private readonly url =
-    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/3/query';
+    `${environment.arcgis.baseUrl}${environment.arcgis.consultaMultipleUrlQuery}`;
 
 
   private urlShape =
-    "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0/query";
+    `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrlQuery}`;
 
   constructor(private http: HttpClient) {}
 

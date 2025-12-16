@@ -83,39 +83,7 @@
 }
 .brand-line{ width:100%; height:1.5px; background:#d1d5db; margin-top:4px; border-radius:1px; }
 
-/* ===== BUSCADOR ===== */
-.search {
-  position: relative;
-  margin: 6px 0 0 10px;
-}
 
-.search .icon-left,
-.search .icon-right {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-/* Ícono izquierda */
-.search .icon-left {
-  left: 8px;
-}
-
-/* Ícono derecha */
-.search .icon-right {
-  right: 8px;
-}
-
-.search input {
-  width: 100%;
-  height: 34px;
-  padding-left: 28px;   /* espacio para icono izquierdo */
-  padding-right: 28px;  /* espacio para icono derecho */
-  border-radius: 8px;
-}
 
 
 /* ===== LISTAS / LINKS ===== */
@@ -210,157 +178,7 @@
 }
 
 
-/* ===== PANEL DATOS DEL PRODUCTOR ===== */
 
-.producer-panel .p-panel-header {
-  display: none !important; /* 💥 elimina el header nativo */
-}
-
-/* Panel general */
-.producer-panel {
-  width: 100%;
-  border-radius: 10px;
-
-  /* 🔥 p-panel ya trae padding y shadow, así que los quitamos */
-  padding: 0;
-  box-shadow: none;
-
-  background: #ffffff;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Cabecera */
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-/* 🔥 Eliminado el estilo directo a .pi aquí
-   porque el ícono va dentro de .header-icon */
-
-/* Título */
-.panel-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #212121;
-}
-
-/* Icono de cabecera (cuadradito verde) */
-.header-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.header-icon .pi {
-  font-size: 0.9rem;
-  color: #009c5a; /* verde */
-}
-
-/* Cuerpo */
-.panel-body {
-  font-size: 12px;
-  color: #333333;
-
-  /* 🔥 p-panel ya trae padding, ajustamos solo si hace falta */
-  padding-top: 4px;
-}
-
-.field-row {
-  margin-bottom: 4px;
-}
-
-.field-label {
-  font-weight: 500;
-  color: #6b7280;
-}
-
-/* Línea divisoria */
-.panel-divider {
-  border: none;
-  border-top: 1px solid #e0e0e0;
-  margin: 10px 0 8px;
-}
-
-/* Títulos internos */
-.section-title {
-  font-size: 1rem; /* igual que p-panel header */
-  font-weight: 600; /* igual que p-panel header */
-  margin: 0; /* elimina separación extra */
-  line-height: 1.2;
-  color: #212121;
-}
-
-/* Footer */
-.panel-footer {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Botón verde */
-.map-btn {
-  width: 100%;
-  font-size: 12px;
-  border-radius: 6px;
-  background: #009c5a;
-  border: 1px solid #009c5a;
-}
-
-/* Botón “Cerrar” borde verde */
-.close-btn {
-  width: 100%;
-  font-size: 12px;
-  border-radius: 6px;
-  border-color: #009c5a !important;
-  color: #009c5a !important;
-}
-
-.msg-error {
-  color: #e63946;
-  font-size: 12px;
-  margin-top: 4px;
-  padding-left: 4px;
-}
-
-.tabla-region {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.tabla-region th,
-.tabla-region td {
-  border: 1px solid #ddd;
-  padding: 6px;
-  text-align: left;
-}
-
-.tabla-region th {
-  background-color: #f4f4f4;
-  font-weight: bold;
-}
-
-.tabla-region tr:nth-child(even) {
-  background-color: #fafafa;
-}
-
-.tabla-region th.num-col,
-.tabla-region td.num-col {
-  text-align: right;
-  padding-right: 12px;
-}
-.tabla-region td.cell-center {
-  text-align: center;
-}
 
 .panel-tight :global(.p-panel-header){ padding: 8px 12px; }
 .panel-tight :global(.p-panel-content){ padding: 8px 12px; }
@@ -397,8 +215,7 @@
    ESTADOS VACÍOS DE FILTROS
    ============================ */
 
-.filter-empty,
-.filter-empty-mini {
+.filter-empty {
   margin-top: 6px;
   padding: 10px;
   background: #f8fafc;              /* gris muy suave */
@@ -421,17 +238,7 @@
   color: #64748b;                   /* gris del ícono */
 }
 
-/* Botón minimalista para no romper el diseño */
-.btn-minimal {
-  padding: 0 !important;
-  color: #009c5a !important;
-  font-size: 12px !important;
-  box-shadow: none !important;
-}
 
-.btn-minimal:hover {
-  color: #007a46 !important;
-}
 
 /* Estado vacío de filtros */
 .filter-empty.clean {
@@ -516,24 +323,14 @@
   margin-top: 4px;
 }
 
-.siea-svg {
-  width: 30px;
-  height: auto;
-  display: block;
+
+:host ::ng-deep .panel-tight .p-panel-header-icon {
+  width: 15px;
+  height: 15px;
 }
 
-.siea-letters {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  margin-top: 2px;
-}
-
-.siea-letters span {
-  font-family:  Arial, sans-serif;
-  line-height: 1;
-  color: #000;
+:host ::ng-deep .panel-tight .p-panel-header-icon .pi {
+  font-size: 15px;
 }
 
 

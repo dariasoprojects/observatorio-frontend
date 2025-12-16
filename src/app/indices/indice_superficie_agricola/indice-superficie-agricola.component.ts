@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-import Query from "@arcgis/core/rest/support/Query";
-import * as query from "@arcgis/core/rest/query";
 import { Input } from '@angular/core';
 import {FormatUtil} from '../../shared/utils/format.util';
+import {SuperficieAgricolaService} from '../../services/indices/superficie-agricola.service';
+import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 
 
 @Component({
@@ -27,12 +27,13 @@ export class IndiceSuperfiAgriComponent implements OnInit {
 
   tablaDatos: { ddescr: string; productores: number; hectareaTotal: number; parcelas: number ; hectariaBajoRiego: number}[] = [];
 
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
 
+  constructor(
+    private superficieAgricolaService: SuperficieAgricolaService
+  ) {}
 
   ngOnInit() {
 
-    //this.cargarDatos(); // Nacional por defecto
     if (this.valorSeleccionadoProv !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
     }else{
@@ -86,103 +87,97 @@ export class IndiceSuperfiAgriComponent implements OnInit {
   }
 
   public async cargarDatos() {
-    const q = new Query({
-      where: "INDICE = 'SUPAGRI' AND CAPA = 1",
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS", "HECTAREA2"],
-      returnGeometry: false
-    });
+    this.superficieAgricolaService.getDatosIndicadores().subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          this.tablaDatos = features.map(f => ({
+            ddescr: f.attributes.DDESCR,
+            productores: f.attributes.PRODUCTORES,
+            hectareaTotal: f.attributes.HECTAREA,
+            parcelas: f.attributes.PARCELAS,
+            hectariaBajoRiego: f.attributes.HECTAREA2
+          }));
 
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
+          this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
-      if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectareaTotal: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS,
-          hectariaBajoRiego: f.attributes.HECTAREA2
-        }));
-
-        this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-
-        this.crearGrafico(); // Crear gráfico cuando ya hay datos
-
-      }else{
+          this.crearGrafico();
+        } else {
+          this.tablaDatos = [];
+          this.categorias = [];
+          this.crearGrafico();
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.categorias = [];
-        this.crearGrafico(); // envías vacío para limpiar el chart
+        this.crearGrafico();
       }
-
-    } catch (err) {
-      console.error("Error al consultar ArcGIS", err);
-    }
+    });
   }
 
   public async cargarDatosByDpto(ubigeo: string) {
-    const q = new Query({
-      where: `INDICE = 'SUPAGRI' AND CAPA = 2 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS", "HECTAREA2"],
-      returnGeometry: false
-    });
+    this.superficieAgricolaService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          this.tablaDatos = features.map(f => ({
+            ddescr: f.attributes.DDESCR,
+            productores: f.attributes.PRODUCTORES,
+            hectareaTotal: f.attributes.HECTAREA,
+            parcelas: f.attributes.PARCELAS,
+            hectariaBajoRiego: f.attributes.HECTAREA2
+          }));
 
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
+          this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
-      if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectareaTotal: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS,
-          hectariaBajoRiego: f.attributes.HECTAREA2
-        }));
-
-        this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-
-        this.crearGrafico();
-      }else{
+          this.crearGrafico();
+        } else {
+          this.tablaDatos = [];
+          this.categorias = [];
+          this.crearGrafico();
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.categorias = [];
-        this.crearGrafico(); // envías vacío para limpiar el chart
+        this.crearGrafico();
       }
-
-
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Departamental)", err);
-    }
+    });
   }
 
   public async cargarDatosByProv(ubigeo: string) {
-    const q = new Query({
-      where: `INDICE = 'SUPAGRI' AND CAPA = 3 AND UBIGEO LIKE '${ubigeo}%'`,
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS", "HECTAREA2"],
-      returnGeometry: false
-    });
+    this.superficieAgricolaService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          this.tablaDatos = features.map(f => ({
+            ddescr: f.attributes.DDESCR,
+            productores: f.attributes.PRODUCTORES,
+            hectareaTotal: f.attributes.HECTAREA,
+            parcelas: f.attributes.PARCELAS,
+            hectariaBajoRiego: f.attributes.HECTAREA2
+          }));
 
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
+          this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
 
-      if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectareaTotal: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS,
-          hectariaBajoRiego: f.attributes.HECTAREA2
-        }));
-
-        this.categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-
-        this.crearGrafico();
-      }else{
+          this.crearGrafico();
+        } else {
+          this.tablaDatos = [];
+          this.categorias = [];
+          this.crearGrafico();
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.categorias = [];
-        this.crearGrafico(); // envías vacío para limpiar el chart
+        this.crearGrafico();
       }
-    } catch (err) {
-      console.error("Error al consultar ArcGIS (Provincial)", err);
-    }
+    });
+
   }
 
 

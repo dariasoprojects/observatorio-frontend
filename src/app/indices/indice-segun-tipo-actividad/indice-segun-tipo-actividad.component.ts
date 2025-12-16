@@ -1,10 +1,6 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
-
-// ArcGIS API
-import Query from "@arcgis/core/rest/support/Query";
-import * as query from "@arcgis/core/rest/query";
 import { Input } from '@angular/core';
 import {FormatUtil} from '../../shared/utils/format.util';
 import {MapCommService} from '../../services/map-comm.service';
@@ -12,14 +8,26 @@ import {MatDialog} from '@angular/material/dialog';
 import {DialogExportarComponent} from '../../dialog-exportar/dialog-exportar.component';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSlideToggleChange, MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {UbigeoService} from '../../services/ubigeo.service';
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {TipoActividadService} from '../../services/indices/tipo-actividad.service';
+import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
+import {IndicesUtil} from '../../shared/utils/indices.util';
+import { environment } from 'src/environments/environment';
+
+
 
 @Component({
   selector: 'app-indice-tipo-activ',
   standalone: true,
   imports: [
     CommonModule,
-    MatIconModule,
-    MatSlideToggleModule
+    MatSelectModule,
+    MatFormFieldModule,
+    MatSlideToggleModule,
+    MatIconModule
   ],
   templateUrl: './indice-segun-tipo-actividad.component.html',
   styleUrls: ['./indice-segun-tipo-actividad.component.css']
@@ -34,37 +42,39 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
 
 
   categorias: string[] = [];
+  categoriasOrdenadas: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
   activeReg: string | null = null;
 
-  tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
+  tablaDatos: TablaIndiceUbigeo [] = [];
+  tablaFiltrada: TablaIndiceUbigeo[] = [];
+  categoriasUnicas: string[] = [];
+  categoriaSeleccionada: string = '';
+  categoriaSeleccionadaInit: string = '';
 
   //  Nueva URL sin tilde en los campos
-  private url = "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4";
+  private url =  `${environment.arcgis.baseUrl}${environment.arcgis.indicesUrl}`;
 
   constructor(
+    private ubigeoService: UbigeoService,
     private mapComm: MapCommService,
-    private dialog: MatDialog)
+    private dialog: MatDialog,
+    private tipoActividadService: TipoActividadService,
+    private indicesUtil: IndicesUtil
+    )
   {}  // <-- solo para inyectar
 
 
-  ngOnInit() {
-    //this.cargarDatos(); // Nacional por defecto
+  async ngOnInit() {
+    await this.ubigeoService.cargarTodo();
 
-    //  Cargar datos desde el servicio
-    console.log('Valor inicial combo dpto:', this.valorSeleccionado);
-    console.log('Valor inicial combo dpto text:', this.valorSeleccionadoText);
-    console.log('Valor inicial combo prov:', this.valorSeleccionadoProv);
-
-    if (this.valorSeleccionadoProv !== null) {
+    if (this.valorSeleccionadoProv) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
+    }else if (this.valorSeleccionado) {
+      this.cargarDatosByDpto(this.valorSeleccionado);
     }else{
-      if (this.valorSeleccionado !== null) {
-        this.cargarDatosByDpto(this.valorSeleccionado);
-      }else{
-        this.cargarDatos();
-      }
+      this.cargarDatos();
     }
 
 
@@ -105,110 +115,114 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit {
     this.chart = Highcharts.chart('container-tipoactiv', options);
   }
 
-  public async cargarDatos() {
-    const q = new Query({
-      where: "INDICE = 'TIPACT' AND CAPA = 1",
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
-      returnGeometry: false
+  public cargarDatos() {
+    this.tipoActividadService.getDatosIndicadores().subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(features);
+          this.tablaDatos = tabla;
+          this.categoriasOrdenadas =categorias.sort((a, b) =>
+            a.localeCompare(b)
+          );
+          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
+        this.tablaDatos = [];
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
+        this.actualizarDatos([], []);
+      }
     });
 
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        // Pie chart solo con productores
-        const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-        const valores = this.tablaDatos.map(d => d.productores);
-
-        this.actualizarDatos(categorias, valores);
-
-      }else{
-
-        this.tablaDatos = [];
-        this.actualizarDatos([], []); // envías vacío para limpiar el chart
-      }
-
-    } catch (err) {
-      console.error(" Error al consultar ArcGIS", err);
-    }
   }
 
   public async cargarDatosByDpto(ubigeo: string) {
-
-    //alert(ubigeo);
-    const q = new Query({
-      where: `INDICE = 'TIPACT' AND CAPA = 2 AND UBIGEO  = '${ubigeo}'`,
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-
-
-      console.log("DDDD : ", response.features.length);
-
-      if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-        const valores = this.tablaDatos.map(d => d.productores);
-
-        this.actualizarDatos(categorias, valores);
-
-      } else{
+    this.tipoActividadService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(features);
+          this.tablaDatos = tabla;
+          this.categoriasOrdenadas =categorias.sort((a, b) =>
+            a.localeCompare(b)
+          );
+          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
-        this.actualizarDatos([], []); // envías vacío para limpiar el chart
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
+        this.actualizarDatos([], []);
       }
-
-    } catch (err) {
-      console.error(" Error al consultar ArcGIS (Departamental)", err);
-    }
+    });
   }
 
   public async cargarDatosByProv(ubigeo: string) {
-    //alert(ubigeo);
-    const q = new Query({
-      where: `INDICE = 'TIPACT' AND CAPA = 3 AND UBIGEO = '${ubigeo}'`,
-      outFields: ["DDESCR", "PRODUCTORES", "HECTAREA", "PARCELAS"],
-      returnGeometry: false
-    });
-
-    try {
-      const response = await query.executeQueryJSON(this.url, q);
-
-      if (response.features.length > 0) {
-        this.tablaDatos = response.features.map(f => ({
-          ddescr: f.attributes.DDESCR,
-          productores: f.attributes.PRODUCTORES,
-          hectarea: f.attributes.HECTAREA,
-          parcelas: f.attributes.PARCELAS
-        }));
-
-        const categorias = this.tablaDatos.map(d => d.ddescr || "No definido");
-        const valores = this.tablaDatos.map(d => d.productores);
-
-        this.actualizarDatos(categorias, valores);
-      } else{
+    this.tipoActividadService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
+      next: (response: IndicadoresSumatoriaResponse) => {
+        const features = response?.features ?? [];
+        if (features.length > 0) {
+          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeo(features);
+          this.tablaDatos = tabla;
+          this.categoriasOrdenadas =categorias.sort((a, b) =>
+            a.localeCompare(b)
+          );
+          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
+          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.tablaFiltrada = [...this.tablaDatos];
+          this.actualizarDatos(categorias, valores);
+          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.filtrarPorCategoria();
+        } else {
+          this.tablaDatos = [];
+          this.categoriasUnicas = [];
+          this.tablaFiltrada = [];
+          this.actualizarDatos([], []);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
-        this.actualizarDatos([], []); // envías vacío para limpiar el chart
+        this.categoriasUnicas = [];
+        this.tablaFiltrada = [];
+        this.actualizarDatos([], []);
       }
-    } catch (err) {
-      console.error(" Error al consultar ArcGIS (Provincial)", err);
+    });
+  }
+
+  filtrarPorCategoria() {
+    if (!this.categoriaSeleccionada) {
+      this.tablaFiltrada = [...this.tablaDatos];
+      return;
     }
+    this.tablaFiltrada = this.tablaDatos.filter(
+      x => x.ddescr === this.categoriaSeleccionada
+    );
   }
 
   private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[]) {

@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {AnalisisGeometricoResponse} from '../models/analisis-geometrico/analisis-geometrico.model';
 import Polygon from '@arcgis/core/geometry/Polygon';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import Polygon from '@arcgis/core/geometry/Polygon';
 export class AnalisisGeometricoService {
 
   private readonly url =
-    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0/query';
+    `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrlQuery}`;
 
   constructor(private http: HttpClient) {}
 

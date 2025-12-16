@@ -141,17 +141,32 @@
         </p-panel>
 
         <p-panel *ngSwitchCase="'sec_indi_16'" styleClass="panel-tight">
-          <app-indice-fertilizante></app-indice-fertilizante>
+          <app-indice-fertilizante
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-fertilizante>
         </p-panel>
 
 
         <p-panel *ngSwitchCase="'sec_indi_17'" styleClass="panel-tight">
-          <app-indice-bienes-recibidos></app-indice-bienes-recibidos>
+          <app-indice-bienes-recibidos
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-bienes-recibidos>
         </p-panel>
 
 
         <p-panel *ngSwitchCase="'sec_indi_18'" styleClass="panel-tight">
-          <app-indice-servicios-recibidos></app-indice-servicios-recibidos>
+          <app-indice-servicios-recibidos
+            [valorSeleccionadoProv]="valorSeleccionadoProv"
+            [valorSeleccionadoProvText]="valorSeleccionadoProvText"
+            [valorSeleccionado]="valorSeleccionado"
+            [valorSeleccionadoText]="valorSeleccionadoText">
+          </app-indice-servicios-recibidos>
         </p-panel>
       </div>
 

@@ -5,6 +5,7 @@ import {ProductoresSumatoriaResponse} from '../models/Sumatorias/productores-sum
 import {ParcelasSumatoriaResponse} from '../models/Sumatorias/parcelas-sumatoria.model';
 import {HectariasSumatoriaResponse} from '../models/Sumatorias/hectarias-sumatoria.model';
 import {IndicadoresSumatoriaResponse} from '../models/Sumatorias/indicadores-sumatoria.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +13,10 @@ import {IndicadoresSumatoriaResponse} from '../models/Sumatorias/indicadores-sum
 export class SumatoriasService {
 
   private readonly url =
-    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0/query';
+    `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrlQuery}`;
 
   private readonly urlIndice =
-    'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/4/query';
+    `${environment.arcgis.baseUrl}${environment.arcgis.indicesUrlQuery}`;;
 
   constructor(private http: HttpClient) {}
 
