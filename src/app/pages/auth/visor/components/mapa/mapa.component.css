@@ -23,3 +23,18 @@
 #sceneDiv {
   display: none;
 }
+
+#coords {
+  position: absolute;
+  bottom: 12px;                 /* separación desde abajo */
+  left: 50%;
+  transform: translateX(-50%);  /* centra horizontalmente */
+  
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  border-radius: 6px;
+  pointer-events: none;         /* no bloquea el mapa */
+  z-index: 10;                  /* por encima del mapa */
+}

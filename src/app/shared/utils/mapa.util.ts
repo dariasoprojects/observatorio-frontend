@@ -1584,7 +1584,7 @@ export class Mapa {
       view.ui.add(this.toc_Draw, "top-right");
       view.ui.add(this.sketsch, "top-right");
       view.ui.add(this.toc_MedirRegla, "top-right");
-      view.ui.add(this.toc_3D, "top-right");
+      //view.ui.add(this.toc_3D, "top-right");
       view.ui.add(this.basemapContainer, "top-right");
       view.ui.add(this.printBtn, "top-right");
 
@@ -1776,14 +1776,14 @@ export class Mapa {
       lbl.style.userSelect = "none";
       lbl.style.fontWeight = "500";
 
-<<<<<<< HEAD
+
       //  Si es Parcelas Productores → lo resaltamos
       if ((layer.title || "").toUpperCase().includes("PARCELAS PRODUCTORES")) {
-        item.style.background = "#155f31";
+        item.style.background = "white";
         item.style.color = "white";
         item.style.border = "1px solid #0d3c1d";
         item.style.borderRadius = "6px";
-        lbl.style.color = "white";
+        lbl.style.color = "green";
         lbl.style.fontWeight = "bold";
         lbl.style.fontSize = "14px";
       }
@@ -1863,28 +1863,7 @@ export class Mapa {
         legend.appendChild(swatch);
         item.appendChild(legend);
       }
-=======
-      // checkbox.addEventListener('change', (evt: Event) => {
-      //   const checked = (evt.target as HTMLInputElement).checked;
-      //   // Si es MapImageLayer → manejar sublayers
-      //   if (layer.type === "map-image") {
-      //     layer.sublayers.forEach((s: any) => {
-      //       if (s.id === 0) {
-      //         s.visible = checked;       // ACTIVAR solo la capa Parcelas
-      //       } else {
-      //         // APAGAR todas las demás capas internas SIEMPRE
-      //         s.visible = false;
-      //         s.definitionExpression = "1=0";
-      //         s.renderer = null;
-      //       }
-      //     });
-      //   }
-      //   // Si es FeatureLayer (cluster, puntos, etc)
-      //   else {
-      //     layer.visible = checked;
-      //   }
-      // });
->>>>>>> origin/develop
+
 
 
 
