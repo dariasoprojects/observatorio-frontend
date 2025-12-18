@@ -1,7 +1,8 @@
 :host {
   display: block;
-  width: 100%;
-  height: 100%;   /*  NECESARIO PARA 3D */
+
+  /* ===== Tokens globales (usados por todo el layout) ===== */
+  /* --hdr-h: 56px;*/
   --gap: 5px;
   --pad: 5px;
   --left-w: 260px;
@@ -29,53 +30,75 @@
   gap: var(--gap);
   padding: var(--pad);
   box-sizing: border-box;
-
-  /*  height real para transmisiones hacia el mapa */
-  height: calc(100vh - (2 * var(--pad)));
-
+  min-height: calc(100vh  - (2 * var(--pad)));
   background:
     url("/assets/img/fondo.avif") center/cover no-repeat,
     linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%);
-
-  overflow: hidden; /* mejor que overflow-x: clip */
+  overflow-x: clip;
 }
 
 @supports (height: 100svh){
-  .content-grid {
-    height: calc(100svh - (2 * var(--pad)));
+  .content-grid{
+    min-height: calc(100svh - (2 * var(--pad)));
   }
 }
 
 /* ===== Áreas del grid ===== */
 .top-wide   { grid-area: top; }
-.center-map { 
-  grid-area: map;
-  position: relative;
-  display: flex;
-  width: 100%;
-  height: 100%;     /*  clave para 3D */
-  min-height: 400px;
-  overflow: hidden;
+.center-map { grid-area: map; }
+
+app-sidebar {
+  grid-area: left;
+  display: block;       /* los custom elements son inline por defecto */
+  align-self: stretch;  /* ocupa toda la pista vertical */
+  height: 100%;         /* permite que el hijo use height:100% */
+  min-height: 0;        /* evita que el grid limite el flex interno */
+}
+
+app-side-right {
+  grid-area: right;
+  display: block;       /* los custom elements son inline por defecto */
+  align-self: stretch;  /* ocupa toda la pista vertical */
+  height: 100%;         /* permite que el hijo use height:100% */
+  min-height: 0;        /* que el grid no limite el flex interno */
+}
+
+/* ===== CONTENEDORES (otros paneles del layout) ===== */
+.top-wide {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.panel-flat .p-panel-header { display: none; }
+.panel-flat .p-panel-content { padding: 6px 10px !important; }
+
+/* ===== MAPA CENTRAL ===== */
+.center-map {
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 1px;
-}
-
-/* paneles laterales */
-app-sidebar,
-app-side-right {
-  display: block;
-  height: 100%;
+  display: flex;
   min-height: 0;
-  align-self: stretch;
+  position: relative;
 }
 
-/* ===== Angular: asegurar que el MAPA LLENE el área ===== */
-.center-map app-mapa {
-  display: block;
+.map {
+  flex: 1 1 auto;
   width: 100%;
-  height: 100%;     /*  OBLIGATORIO PARA SceneView */
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-tools {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  gap: 6px;
 }
 
 /* ===== MODO COLAPSADO ===== */
@@ -89,7 +112,9 @@ app-side-right {
 .content-grid.left-collapsed app-sidebar {
   width: 56px !important;
   min-width: 56px !important;
+  overflow: visible;
 }
+
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 700px) {
@@ -101,32 +126,42 @@ app-side-right {
       "left top"
       "left map"
       "right right";
-    height: auto;
+    min-height: auto;
   }
 
-  .center-map {
-    min-height: 520px;
-  }
+  .center-map .map { min-height: 520px; }
 }
 
 @media (max-width: 600px) {
   :host{ --left-w: 100%; --right-w: 100%; }
   .content-grid{
     grid-template-columns: 1fr;
+    /* antes: ... 60vh ... */
     grid-template-rows: auto auto minmax(420px, 65vh) auto;
     grid-template-areas:
       "left" "top" "map" "right";
   }
 }
 
+
+
 @media (max-width: 360px){
   :host{ --pad: 8px; --gap: 8px; --left-w: 200px; }
-  .center-map{ min-height: 440px; }
+  .center-map .map{ min-height: 440px; }
 }
 
 @supports (height: 100svh) {
-  .center-map {
+  .center-map .map {
     min-height: min(65svh, 520px);
+  }
+}
+
+
+@supports (height: 100svh){
+  @media (max-width: 600px){
+    .content-grid{
+      grid-template-rows: auto auto minmax(420px, 65svh) auto;
+    }
   }
 }
 
@@ -139,12 +174,15 @@ app-side-right {
     "left map right" !important;
 }
 
-.content-grid.desktop-lock app-side-right,
-.content-grid.desktop-lock app-sidebar {
+.content-grid.desktop-lock app-side-right {
   max-height: calc(100vh - (2 * var(--pad)));
-  overflow: hidden;
+  overflow: hidden;  /* scroll interno lo hace el hijo (.right-scroll) */
 }
 
+.content-grid.desktop-lock app-sidebar {
+  max-height: calc(100vh - (2 * var(--pad)));
+  overflow: hidden;  /* scroll interno lo hace el hijo (.right-scroll) */
+}
 
 
 @media (min-width: 700px) {
@@ -252,32 +290,31 @@ app-side-right {
 
 
 .center-map {
-    height: 100vh !important;
-    min-height: 100vh !important;
-    position: relative;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  position: relative;
 }
 
 #mapContainer {
-    height: 100%;
-    width: 100%;
-    display: block;
+  height: 100%;
+  width: 100%;
+  display: block;
 }
 
 #mapDiv, #sceneDiv {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width:100%;
-    height:100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width:100%;
+  height:100%;
 }
 
 
 .center-map {
-    position: relative;
-    height: 100vh;
-    width: 100%;
-    overflow: hidden;
->>>>>>> origin/develop
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 /* usuario*/
 
