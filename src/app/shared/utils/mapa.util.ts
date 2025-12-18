@@ -25,6 +25,7 @@ export class Mapa {
   private coordsDiv!: HTMLDivElement;
   private destroyed$ = new Subject<void>();
   private map!: EsriMap;
+  private map3d!: EsriMap;
   private resultsLayer!: GraphicsLayer;
   private highlightLayer!: GraphicsLayer;
   private capaCluster!: FeatureLayer;
@@ -38,13 +39,13 @@ export class Mapa {
   private capaAntenasCelular: MapImageLayer | null = null;
   private mapView: MapView | null = null;
   private legendContainer!: HTMLDivElement;
-  private tocContainer!: HTMLDivElement;
-  private currentView!: MapView | SceneView;
+  private tocContainer!: HTMLDivElement;    
+  private currentView: __esri.MapView | __esri.SceneView | null = null;
   private identifyActive = false;
   private sketsch: Sketch | null = null;
   private drawActive = false;
   private medirWidget: DistanceMeasurement2D | null = null;
-  private medirAreaWidget: AreaMeasurement2D | null = null;
+  private medirAreaWidget: AreaMeasurement2D | null = null;  
   private printWidget: Print | null = null;
   private isReady = false;
   private sceneView: SceneView | null = null;
@@ -57,7 +58,7 @@ export class Mapa {
   private toc_MedirArea!: HTMLDivElement;
   private toc_3D!: HTMLDivElement;
   private basemapContainer!: HTMLDivElement;
-  private printBtn!: HTMLDivElement;
+  private printBtn: HTMLDivElement | null = null;
   private multiQyBtn!: HTMLDivElement;
   private btnAnalisis!: HTMLDivElement;
   private basemapMenu!: HTMLDivElement;
@@ -854,6 +855,7 @@ export class Mapa {
       console.log(" MAPA 2D listo");
 
 
+
       this.activarCoordenadasEnVivo();
 
 
@@ -879,7 +881,7 @@ export class Mapa {
       });
 
 
-      this.currentView = this.mapView;
+      this.currentView = this.mapView!;
 
       // --- UI extra ---
       this.legendContainer = document.createElement('div');
@@ -989,47 +991,165 @@ export class Mapa {
   }
 
 
+  private async createSceneViewSafe() {
+
+    // Si ya existe, no crear de nuevo
+    if (this.sceneView) return this.sceneView;
+
+    // Asegurar que el contenedor sea visible
+    this.sceneDiv.style.display = "block";
+
+    // Esperar 3 frames → garantiza layout en Angular
+    await new Promise(r => requestAnimationFrame(
+      () => requestAnimationFrame(
+        () => requestAnimationFrame(r)
+      )
+    ));
+
+    // Y ahora crear el view
+    this.sceneView = new SceneView({
+      container: this.sceneDiv,
+      map: this.map3d,
+      camera: {
+        position: { x: -75, y: -9.19, z: 30000 },
+        tilt: 65
+      }
+    });
+
+    await this.sceneView.when();
+
+    console.log(" SceneView creado correctamente");
+
+    return this.sceneView;
+  }
+
+
   async toggle3D() {
 
-    const is2D = this.currentView === this.mapView;
-
-    if (is2D) {
-      // → Cambiar a 3D
-      this.mapDiv.style.display = "none";
-      this.sceneDiv.style.display = "block";
-
-      if (!this.sceneView) {
-        console.warn("SceneView aún no está inicializada");
-        return;
-      }
-
-      await this.sceneView.when();
-      this.currentView = this.sceneView;
-      this.is3D = true;
-
-      console.log("MODO 3D ACTIVADO");
-
-    } else {
-
-      // → Regresar a 2D
-      this.sceneDiv.style.display = "none";
-      this.mapDiv.style.display = "block";
-
-      if (!this.mapView) {
-        console.warn("MapView aún no está inicializada");
-        return;
-      }
-
-      await this.mapView.when();
-      this.currentView = this.mapView;
-      this.is3D = false;
-
-      console.log("🗺️ MODO 2D ACTIVADO");
+    // -----------------------------------
+    //  Antes de activar 3D → destruir PrintWidget
+    // -----------------------------------
+    if (this.printWidget) {
+      try {
+        this.printWidget.destroy();
+      } catch {}
+      this.printWidget = null;
     }
 
-    this.renderUI();
+    if (this.printBtn) {
+      try { this.printBtn.remove(); } catch {}
+      this.printBtn = null;
+    }
 
+    // -----------------------------------
+    // ACTIVAR 3D
+    // -----------------------------------
+    console.log("ACTIVANDO MODO 3D...");
+
+    this.mapDiv.style.display = "none";
+    this.sceneDiv.style.display = "block";
+
+    await this.ensureDivIsRendered(this.sceneDiv);
+
+    console.log("📏 Tamaño real:", this.sceneDiv.clientWidth, this.sceneDiv.clientHeight);
+
+    if (!this.sceneView) {
+      this.sceneView = new SceneView({
+        container: this.sceneDiv,
+        map: this.map3d,
+        camera: {
+          position: { x: -75, y: -9.19, z: 30000 },
+          tilt: 65
+        }
+      });
+
+      await this.sceneView.when();
+      console.log("🎉 SceneView creado correctamente");
+    }
+
+    // 🔧 FIX: forzar redibujo
+    setTimeout(() => {
+      try {
+        (this.sceneView as any).onResize();
+        console.log("🔧 SceneView redimensionado correctamente");
+      } catch (e) {
+        console.warn("No existe onResize() en esta build", e);
+      }
+    }, 200);
+
+    this.currentView = this.sceneView;
+    this.is3D = true;
+
+    console.log(" MODO 3D ACTIVADO");
   }
+
+
+
+
+
+
+  private disablePrintCompletely() {
+    try {
+      if (this.printWidget) {
+        this.printWidget.view = null;    //  crítico
+        this.printWidget.destroy();
+        this.printWidget = null;         //  corregido
+        console.log(" PrintWidget realmente destruido");
+      }
+
+      if (this.printBtn) {
+        this.printBtn.remove();
+        this.printBtn = null;            //  corregido
+        console.log(" printBtn eliminado del DOM");
+      }
+    } catch (e) {
+      console.warn(" Error eliminando PrintWidget:", e);
+    }
+  }
+
+
+
+  private async ensureDivIsRendered(div: HTMLElement): Promise<void> {
+    return new Promise(resolve => {
+      const check = () => {
+        if (div.clientWidth > 10 && div.clientHeight > 10) {
+          resolve();     // <-- SIN null
+        } else {
+          requestAnimationFrame(check);
+        }
+      };
+      check();
+    });
+  }
+
+
+
+
+
+  private disablePrintFor3D() {
+  try {
+
+    // destruir el widget si existe
+    if (this.printWidget) {
+      this.printWidget.destroy();
+      this.printWidget = null;
+      console.log(" PrintWidget destruido");
+    }
+
+    // eliminar el botón del DOM
+    if (this.printBtn) {
+      this.printBtn.remove();
+      this.printBtn = null;
+      console.log(" printBtn eliminado");
+    }
+
+  } catch (e) {
+    console.warn(" Error al desactivar print:", e);
+  }
+}
+
+
+
 
 
   private aplicarEstadoInicial(): void {
@@ -1456,30 +1576,25 @@ export class Mapa {
     this.btnReset.onclick = () => this.resetCompleto();
 
 
-    if (this.mapView) {
-      //this.mapView.ui.add(this.legendToggleBtn, 'top-right');
-      this.mapView.ui.add(this.toc_ToggleBtn, 'top-right');
-      //this.mapView.ui.add(this.toc_IndetifiBtn, 'top-right');
-      this.mapView.ui.add(this.toc_Draw, 'top-right');
-      this.mapView.ui.add(this.sketsch, "top-right");
-      this.mapView.ui.add(this.toc_MedirRegla, "top-right");
-      //this.mapView.ui.add(this.toc_MedirArea, "top-right");
-      //this.mapView.ui.add(this.toc_3D, "top-right");
-      // this.currentView.ui.add(basemapBtn, "top-right");
-      // this.currentView.ui.add(basemapMenu, "top-right");
-      this.currentView.ui.add(this.basemapContainer, "top-right");
-      //this.currentView.ui.add(this.printWidget, "top-right");
-      this.currentView.ui.add(this.printBtn, "top-right");
-      this.currentView.ui.add(this.multiQyBtn, "top-left");
-      this.currentView.ui.add(this.btnAnalisis, "top-left");
-      this.currentView.ui.add(this.btnReset, "top-left");   // new
+    if (this.currentView) {
 
-      // if (this.printWidget) {
-      //   this.currentView.ui.add(this.printWidget, "top-right");
-      // }
+      const view = this.currentView!;   // <-- NO NULL
+
+      view.ui.add(this.toc_ToggleBtn, "top-right");
+      view.ui.add(this.toc_Draw, "top-right");
+      view.ui.add(this.sketsch, "top-right");
+      view.ui.add(this.toc_MedirRegla, "top-right");
+      //view.ui.add(this.toc_3D, "top-right");
+      view.ui.add(this.basemapContainer, "top-right");
+      view.ui.add(this.printBtn, "top-right");
+
+      view.ui.add(this.multiQyBtn, "top-left");
+      view.ui.add(this.btnAnalisis, "top-left");
+      view.ui.add(this.btnReset, "top-left");
 
       this.sketsch.visible = false;
     }
+
 
   }
 
@@ -1572,7 +1687,7 @@ export class Mapa {
 
   private renderUI(){
 
-    const view = this.currentView;
+    const view = this.currentView!;
     view.ui.empty();
 
     view.ui.add(this.legendToggleBtn,"top-right");
@@ -1589,95 +1704,172 @@ export class Mapa {
 
 
   generarTOC(panel: HTMLElement) {
+    
+
     panel.innerHTML = '';
 
-    if (!this.map || !this.map.layers) {
-      console.warn('Mapa o capas no disponibles todavía');
-      return;
-    }
+    
 
+
+
+    panel.style.fontFamily = "Arial, sans-serif";
+    panel.style.fontSize = "13px";
+    panel.style.position = "relative";
+    panel.style.paddingTop = "22px"; // espacio para la X
+
+    // --- X para cerrar ---
+    const closeBtn = document.createElement("div");
+    closeBtn.innerHTML = "&#10005;";
+    closeBtn.style.position = "absolute";
+    closeBtn.style.top = "4px";
+    closeBtn.style.right = "6px";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.style.fontSize = "14px";
+    closeBtn.style.color = "#444";
+    closeBtn.style.padding = "1px 4px";
+    closeBtn.style.borderRadius = "4px";
+    closeBtn.onmouseover = () => (closeBtn.style.background = "#e0e0e0");
+    closeBtn.onmouseleave = () => (closeBtn.style.background = "transparent");
+    closeBtn.onclick = () => (panel.style.display = "none");
+    panel.appendChild(closeBtn);
+
+    // === LISTA DE CAPAS ===
     this.map.layers.forEach((layer: any) => {
-      const divItem = document.createElement('div');
-      divItem.style.marginBottom = '10px';
-      divItem.style.display = 'flex';
-      divItem.style.alignItems = 'center';
-      panel.appendChild(divItem);
 
-      // Checkbox
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = layer.visible;
-      checkbox.style.marginRight = '5px';
-      divItem.appendChild(checkbox);
+      if (layer === this.capaCluster) return;
+      if (layer === this.capaClusterPpa) return;
+      if (layer === this.highlightLayer) return;
+      if (layer === this.resultsLayer) return;
 
-      // Label con nombre
-      const label = document.createElement('label');
-      label.innerText = layer.title || layer.id;
-      label.style.marginRight = '10px';
-      divItem.appendChild(label);
+      const item = document.createElement("div");
+      item.style.display = "flex";
+      item.style.alignItems = "center";
+      item.style.padding = "6px 4px";
+      item.style.borderBottom = "1px solid #e0e0e0";
+      item.style.transition = "background-color 0.2s";
+      item.onmouseover = null;
+      item.onmouseleave = null;
+      panel.appendChild(item);
 
-      // Leyenda (si tiene renderer)
-      const legendSpan = document.createElement('span');
-      if (layer.renderer && layer.renderer.symbol) {
-        const symbol = layer.renderer.symbol;
-
-        if (symbol.color) {
-          // Si es símbolo simple con color (ej. SimpleFillSymbol)
-          legendSpan.style.display = 'inline-block';
-          legendSpan.style.width = '20px';
-          legendSpan.style.height = '20px';
-          legendSpan.style.backgroundColor = `rgba(${symbol.color.r},${symbol.color.g},${symbol.color.b},${symbol.color.a})`;
-          legendSpan.style.border = '1px solid #555';
-          legendSpan.style.marginLeft = '5px';
-        }
-      } else {
-        legendSpan.innerText = '[sin símbolo]';
-        legendSpan.style.fontSize = '12px';
-        legendSpan.style.color = '#999';
-      }
-
-      divItem.appendChild(legendSpan);
-
-      // Listener para visibilidad
-      checkbox.addEventListener('change', (evt: Event) => {
-        const input = evt.target as HTMLInputElement;
-        //layer.visible = input.checked;
+      // === CHECKBOX ===
+      const chk = document.createElement("input");
+      chk.type = 'checkbox';
+      chk.checked = layer.visible;
+      chk.style.marginRight = "8px";
+      chk.style.transform = "scale(1.2)";
+      chk.onchange = () => {
         if (layer.type === "map-image") {
           const sub0 = layer.findSublayerById(0);
-          if (sub0) sub0.visible = input.checked;
-          layer.visible = input.checked;
+          if (sub0) sub0.visible = chk.checked;
+          layer.visible = chk.checked;
         } else {
-          layer.visible = input.checked;
+          layer.visible = chk.checked;
         }
+      };
+      item.appendChild(chk);
 
-      });
+      // === LABEL ===
+      const lbl = document.createElement("span");
+      lbl.innerText = layer.title || layer.id;
+      lbl.style.flex = "1";
+      lbl.style.cursor = "pointer";
+      lbl.style.userSelect = "none";
+      lbl.style.fontWeight = "500";
 
-      // checkbox.addEventListener('change', (evt: Event) => {
-      //   const checked = (evt.target as HTMLInputElement).checked;
-      //   // Si es MapImageLayer → manejar sublayers
-      //   if (layer.type === "map-image") {
-      //     layer.sublayers.forEach((s: any) => {
-      //       if (s.id === 0) {
-      //         s.visible = checked;       // ACTIVAR solo la capa Parcelas
-      //       } else {
-      //         // APAGAR todas las demás capas internas SIEMPRE
-      //         s.visible = false;
-      //         s.definitionExpression = "1=0";
-      //         s.renderer = null;
-      //       }
-      //     });
-      //   }
-      //   // Si es FeatureLayer (cluster, puntos, etc)
-      //   else {
-      //     layer.visible = checked;
-      //   }
-      // });
+
+      //  Si es Parcelas Productores → lo resaltamos
+      if ((layer.title || "").toUpperCase().includes("PARCELAS PRODUCTORES")) {
+        item.style.background = "white";
+        item.style.color = "white";
+        item.style.border = "1px solid #0d3c1d";
+        item.style.borderRadius = "6px";
+        lbl.style.color = "green";
+        lbl.style.fontWeight = "bold";
+        lbl.style.fontSize = "14px";
+      }
+
+      item.appendChild(lbl);
+
+      
+      // === LEYENDA UNIVERSAL ===
+      let renderer: any = null;
+
+      // 1) FeatureLayer → renderer directo
+      if (layer.renderer) {
+        renderer = layer.renderer;
+      }
+
+      // 2) MapImageLayer → obtener renderer del sublayer 0
+      if (!renderer && layer.type === "map-image") {
+        const sub0 = layer.findSublayerById(0);
+        if (sub0) renderer = sub0.renderer;
+      }
+
+      // Si no hay renderer → no mostrar
+      if (!renderer) return;
+
+      // CONTENEDOR DE LA LEYENDA
+      const legend = document.createElement("div");
+      legend.style.display = "flex";
+      legend.style.gap = "6px";
+      legend.style.marginLeft = "6px";
+      legend.style.alignItems = "center";
+
+      // === UNIQUE VALUE RENDERER ===
+      if (renderer.type === "unique-value" && Array.isArray(renderer.uniqueValueInfos)) {
+
+        renderer.uniqueValueInfos.forEach((info: any) => {
+          const sym = info.symbol?.color;
+          if (!sym) return;
+
+          const swatch = document.createElement("div");
+          swatch.style.width = "14px";
+          swatch.style.height = "14px";
+          swatch.style.borderRadius = "3px";
+          swatch.style.border = "1px solid #555";
+
+          // soporte array [r,g,b,a] o {r,g,b,a}
+          let r = sym.r ?? sym[0];
+          let g = sym.g ?? sym[1];
+          let b = sym.b ?? sym[2];
+          let a = sym.a ?? sym[3] ?? 255;
+
+          swatch.style.backgroundColor = `rgba(${r},${g},${b},${a})`;
+
+          legend.appendChild(swatch);
+        });
+
+        item.appendChild(legend);
+        return;
+      }
+
+      // === SIMPLE SYMBOL (una sola leyenda) ===
+      if (renderer.symbol?.color) {
+        const c = renderer.symbol.color;
+
+        const swatch = document.createElement("div");
+        swatch.style.width = "16px";
+        swatch.style.height = "14px";
+        swatch.style.borderRadius = "3px";
+        swatch.style.border = "1px solid #555";
+
+        let r = c.r ?? c[0];
+        let g = c.g ?? c[1];
+        let b = c.b ?? c[2];
+        let a = c.a ?? c[3] ?? 255;
+
+        swatch.style.backgroundColor = `rgba(${r},${g},${b},${a})`;
+
+        legend.appendChild(swatch);
+        item.appendChild(legend);
+      }
+
 
 
 
     });
-
   }
+
 
 
   activarIdentify() {

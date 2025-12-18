@@ -1,36 +1,3 @@
-// import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-// import { Mapa } from '../../../../../shared/utils/mapa.util';
-// import { MapCommService } from '../../../../../services/map-comm.service';
-
-// @Component({
-//   selector: 'app-mapa',
-//   standalone: true,
-//   templateUrl: './mapa.component.html',
-//   styleUrl: './mapa.component.css'
-// })
-// export class MapaComponent implements AfterViewInit {
-
-//   @ViewChild('mapDiv', { static: true }) mapDiv!: ElementRef<HTMLDivElement>;
-//   @ViewChild('sceneDiv', { static: true }) sceneDiv!: ElementRef<HTMLDivElement>;
-
-//   mapa!: Mapa;
-
-//   constructor(private comm: MapCommService) {}
-
-//   ngAfterViewInit(): void {
-//     this.mapa = new Mapa(
-//       this.mapDiv.nativeElement,
-//       this.comm,
-//       this.sceneDiv.nativeElement
-//     );
-
-//     this.mapa.iniciar()
-//       .then(() => console.log("🟢 MAPA BÁSICO OK"))
-//       .catch(err => console.error("❌ ERROR MAPA:", err));
-//   }
-// }
-
-
 
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {MapCommService} from '../../../../../services/map-comm.service';

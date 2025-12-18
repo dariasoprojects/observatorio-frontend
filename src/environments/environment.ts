@@ -13,10 +13,12 @@ export const environment = {
     parametroUrlQuery: '/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_MIL1/MapServer/5/query',
     parcelaPadronCapaUrl: '/winjmprap12/rest/services/CapaObservatorio22/MapServer',
 
-    juntaCapaUrl: '/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/6',
-    comiteCapaUrl: '/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/7',
-    unidadHidricaCapaUrl: '/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/10',
-    sectoresCapaUrl: '/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/9',
-    microcuencasCapaUrl: '/winjmprap12/rest/services/SERVICIOS_OBSERVATORIO_BASE_MIL1/MapServer/8',
+    juntaCapaUrl: '/winjmprap12/rest/services/INFO_BASE_OBSERVATORIO/MapServer/3',
+    comiteCapaUrl: '/winjmprap12/rest/services/INFO_BASE_OBSERVATORIO/MapServer/4',
+    unidadHidricaCapaUrl: '/winjmprap12/rest/services/INFO_BASE_OBSERVATORIO/MapServer/7',
+    sectoresCapaUrl: '/winjmprap12/rest/services/INFO_BASE_OBSERVATORIO/MapServer/6',
+    microcuencasCapaUrl: '/winjmprap12/rest/services/INFO_BASE_OBSERVATORIO/MapServer/5',
+
+ 
   }
 };
