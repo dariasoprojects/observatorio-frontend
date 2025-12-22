@@ -18,7 +18,6 @@ export const environment = {
     unidadHidricaCapaUrl: '/winjmprap12/rest/services/OBSRV_INFOBASE/MapServer/7',
     sectoresCapaUrl: '/winjmprap12/rest/services/OBSRV_INFOBASE/MapServer/6',
     microcuencasCapaUrl: '/winjmprap12/rest/services/OBSRV_INFOBASE/MapServer/5',
-
-
+    
   }
 };
