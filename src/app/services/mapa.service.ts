@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import {HttpClient, } from '@angular/common/http';
 import {from, map, Observable} from 'rxjs';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import { environment } from 'src/environments/environment';
+
 
 @Injectable({
   providedIn: 'root'

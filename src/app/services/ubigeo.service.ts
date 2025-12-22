@@ -49,7 +49,7 @@ export class UbigeoService {
         };
       });
 
-      console.log("res.features zzzzzzzzzzzz:", res.features);
+      //console.log("res.features zzzzzzzzzzzz:", res.features);
 
 
       this.cargado = true;
