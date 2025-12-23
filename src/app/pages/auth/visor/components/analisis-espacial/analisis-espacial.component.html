@@ -10,17 +10,9 @@
           <span class="step-title">1. Definir cobertura</span>
         </ng-template>
 
-        <div class="p-field">
-          <button
-            pButton
-            type="button"
-            label="Dibujar polígono"
-            class="w-full btn-dibujar"
-            (click)="onDibujar()"
-          ></button>
-        </div>
+        
 
-        <div class="p-field">
+        <div class="p-field">Opción 1:
           <label class="field-title">Seleccionar capa</label>
 
           <p-dropdown
@@ -37,6 +29,19 @@
             (onChange)="onCapaChange($event)"
           ></p-dropdown>
         </div>
+
+        <div class="p-field">
+          Opción 2:  <label class="field-title">Dibuja un polígno</label>
+          <button
+            pButton
+            type="button"
+            label="Dibujar polígono"
+            class="w-full btn-dibujar"
+            (click)="onDibujar()"
+          ></button>
+        </div>
+
+
       </p-card>
 
       <!-- 2. Ejecutar análisis -->
