@@ -107,7 +107,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
     if (cat.includes('AGR')) return '#4CAF50';   // Agrícola
     if (cat.includes('API')) return '#FFC107';   // Apícola
     if (cat.includes('FOR')) return '#2E7D32';   // Forestal
-    if (cat.includes('PEC')) return '#8D6E63';   // Pecuario
+    if (cat.includes('PEC')) return '#8E24AA';   // Pecuario
 
     return '#dcdcdc';
   }
@@ -135,7 +135,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
  
   private crearGrafico() {
 
-    const paleta = ['#4CAF50', '#FFC107', '#2E7D32', '#8D6E63'];
+    const paleta = ['#4CAF50', '#FFC107', '#2E7D32', '#8E24AA'];
 
     const options: Highcharts.Options = {
       chart: { type: 'column', height: 500 },
@@ -268,6 +268,20 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
     });
   }
 
+  get totalProductores(): number {
+    return this.tablaFiltrada.reduce(
+      (acc, fila) => acc + Number(fila.productores || 0),
+      0
+    );
+  }
+
+  get totalParcelas(): number {
+    return this.tablaFiltrada.reduce(
+      (acc, fila) => acc + Number(fila.parcela || 0),
+      0
+    );
+  }
+
 
   getColorCategoriaSeleccionada(): string {
     const campoFlag = this.obtenerCampoFlagSegunCategoria();
@@ -276,7 +290,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
       case 'FLG_AGRICO':
         return '#4CAF50';
       case 'FLG_PECUAR':
-        return '#8D6E63';
+        return '#8E24AA';
       case 'FLG_FOREST':
         return '#2E7D32';
       case 'FLG_APICUL':
@@ -411,7 +425,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
     this.categorias = [...nuevasCategorias];
     this.valores = [...nuevosValores];
 
-    const paleta = ['#4CAF50', '#FFC107', '#2E7D32', '#8D6E63'];
+    const paleta = ['#4CAF50', '#FFC107', '#2E7D32', '#8E24AA'];
 
     if (this.chart) {
       this.chart.xAxis[0].setCategories(nuevasCategorias, false);

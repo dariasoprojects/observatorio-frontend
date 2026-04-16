@@ -1,5 +1,4 @@
 <div class="indice-princult">
-  <!-- Contenedor del gráfico -->
   <div id="container-princult"></div>
 
   <button class="btn-tematico" (click)="aplicarColoresTematico()">
@@ -17,7 +16,6 @@
     </mat-form-field>
   </div>
 
-  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
     <table class="tabla-princult">
       <thead>
@@ -26,6 +24,7 @@
           <th>Hectáreas</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let fila of tablaFiltrada">
           <td class="num-col">
@@ -36,6 +35,15 @@
           </td>
         </tr>
       </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareas) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>

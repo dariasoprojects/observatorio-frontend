@@ -56,3 +56,14 @@
   background: #0f4a25 !important;       /* Verde más oscuro */
   transform: scale(1.05);
 }
+
+
+.fila-total {
+  font-weight: 700;
+  background: #f5f5f5;
+  border-top: 2px solid #d0d0d0;
+}
+
+.fila-total td {
+  padding: 10px 8px;
+}

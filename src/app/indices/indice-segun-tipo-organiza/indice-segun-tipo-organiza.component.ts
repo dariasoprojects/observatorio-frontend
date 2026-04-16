@@ -37,7 +37,12 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
   ) {}  // <-- solo para inyectar
 
 
-
+  get totalProductores(): number {
+    return this.tablaDatos.reduce(
+      (acc, fila) => acc + Number(fila.productores || 0),
+      0
+    );
+  }
 
   aplicarColoresTematico() {
     

@@ -77,6 +77,12 @@ export class IndiceCultivosPermaComponent implements OnInit {
     }
   }
 
+  get totalHectareas(): number {
+    return this.tablaFiltrada.reduce(
+      (acc, fila) => acc + Number(fila.parcela || 0),
+      0
+    );
+  }
 
   private crearGrafico() {
 

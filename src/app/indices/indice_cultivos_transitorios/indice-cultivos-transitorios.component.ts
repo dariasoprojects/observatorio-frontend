@@ -68,6 +68,13 @@ export class IndiceCultivosTransitComponent implements OnInit {
     //this.aplicarColoresTematico();
   }
 
+  get totalHectareas(): number {
+    return this.tablaFiltrada.reduce(
+      (acc, fila) => acc + Number(fila.parcela || 0),
+      0
+    );
+  }
+
   aplicarColoresTematico() {
     
     if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      

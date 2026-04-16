@@ -47,6 +47,18 @@ export class IndicePadronProdComponent implements OnInit {
     this.mapComm.emitRenderTematico("RESET");
   }
 
+  get totalProductores(): number {
+    return this.tablaDatos.reduce((acc, fila) => acc + Number(fila.productores || 0), 0);
+  }
+
+  get totalHectarea(): number {
+    return this.tablaDatos.reduce((acc, fila) => acc + Number(fila.hectarea || 0), 0);
+  }
+
+  get totalParcelas(): number {
+    return this.tablaDatos.reduce((acc, fila) => acc + Number(fila.parcelas || 0), 0);
+  }
+
   private crearGrafico() {
     this.chart = Highcharts.chart('container-padronp', {
       chart: {

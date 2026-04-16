@@ -1,48 +1,50 @@
 <div class="indice-bienes-recibidos">
-
-
-
-  <!-- Contenedor del gráfico -->
   <div id="container-bienes-recibidos"></div>
 
-   <button class="btn-tematico" (click)="aplicarColoresTematico()">
+  <button class="btn-tematico" (click)="aplicarColoresTematico()">
     Ver temático
   </button>
 
-  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
-    <span> Cantidad de productores que recibieron bienes</span>
+    <span>Cantidad de productores que recibieron bienes</span>
+
     <table class="tabla-bienes-recibidos">
       <thead>
-      <tr>
-        <th>Descripción</th>
-        <th>Productores</th>
-        <th>Entidad de Apoyo</th>
-      </tr>
+        <tr>
+          <th>Descripción</th>
+          <th>Productores</th>
+          <th>Entidad de Apoyo</th>
+        </tr>
       </thead>
 
       <tbody>
-      <!-- Recorrer categorías -->
-      <ng-container *ngFor="let key of tablaKeys">
-        <ng-container *ngFor="let item of tablaDatos[key]; let i = index">
-
-          <tr>
-            <!-- SOLO SE PINTA EN LA PRIMERA FILA DE CADA GRUPO -->
-            <td *ngIf="i === 0"
+        <ng-container *ngFor="let key of tablaKeys">
+          <ng-container *ngFor="let item of tablaDatos[key]; let i = index">
+            <tr>
+              <td
+                *ngIf="i === 0"
                 [attr.rowspan]="tablaDatos[key].length"
-                class="categoria-merged">
-              {{ key }}
-            </td>
+                class="categoria-merged"
+              >
+                {{ key }}
+              </td>
 
-            <td>{{ item.productores }}</td>
-            <td>{{ item.entidadApoyo }}</td>
-          </tr>
-
+              <td class="num-col">{{ FormatUtil.formatInteger(item.productores) }}</td>
+              <td>{{ item.entidadApoyo }}</td>
+            </tr>
+          </ng-container>
         </ng-container>
-      </ng-container>
-
       </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
+          </td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
-
 </div>

@@ -4,7 +4,7 @@
     <div class="filtros-row grid">
 
       <div class="col-12 md:col-3 lg:col-3">
-        <label>Categoría</label>
+        <label>Temática Productiva</label>
        
         <p-dropdown
           [options]="categorias"
@@ -298,12 +298,13 @@
   <ng-template pTemplate="header">
     <tr>
       <th>Zoom</th>
-      <th>FID</th>
-      <th>Tip Doc</th>
+      <th>Nro Documento Identidad</th>
+      <th>Apellidos</th>
+      <th>Nombres </th>
       <th>Género</th>
-      <th>Edad</th>
-      <th>Estado Civil</th>
-      <th style="width: 3rem;"></th>
+      <!-- <th>Edad</th>
+      <th>Estado Civil</th> -->
+      <!-- <th style="width: 3rem;"></th> -->
     </tr>
   </ng-template>
 
@@ -315,15 +316,16 @@
           type="button"
           icon="pi pi-search"
           class="p-button-text p-button-rounded p-button-sm"
-          (click)="onVerZoom(row.fid)"
+          (click)="onVerZoom(row)"
         ></button>
       </td>
-      <td>{{ row.fid }}</td>
-      <td>{{ row.attributes.TDOC }}</td>
+      <td>{{ row.attributes.TXT_NRODOC }}</td>
+      <td>{{ row.attributes.APELLIDOPA }}</td>
+      <td>{{ row.attributes.NOMBRES }}</td>
       <td>{{ row.attributes.GENERO }}</td>
-      <td>{{ row.attributes.EDAD }}</td>
-      <td>{{ row.attributes.ECIVIL }}</td>
-      <td class="text-center">
+      <!-- <td>{{ row.attributes.EDAD }}</td>
+      <td>{{ row.attributes.ECIVIL }}</td> -->
+      <!-- <td class="text-center">
         <button
           pButton
           type="button"
@@ -331,7 +333,7 @@
           class="p-button-text p-button-rounded p-button-sm"
           (click)="onAbrirDetalle(row.attributes)"
         ></button>
-      </td>
+      </td> -->
     </tr>
   </ng-template>
 

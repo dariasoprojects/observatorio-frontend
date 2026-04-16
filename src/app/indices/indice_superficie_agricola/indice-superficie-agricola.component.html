@@ -1,8 +1,6 @@
 <div class="indice-supagri">
-  <!-- Contenedor del gráfico -->
   <div id="container-supagri"></div>
 
-  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
     <table class="tabla-supagri">
       <thead>
@@ -12,6 +10,7 @@
           <th>Área Bajo Riego (ha.)</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let fila of tablaDatos">
           <td>{{ fila.ddescr }}</td>
@@ -23,6 +22,18 @@
           </td>
         </tr>
       </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareaTotal) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareaBajoRiego) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>

@@ -1,8 +1,6 @@
 <div class="indice-region">
-  <!-- Contenedor del gráfico -->
   <div id="container-region"></div>
 
-  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
     <table class="tabla-region">
       <thead>
@@ -13,6 +11,7 @@
           <th>Parcelas</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let fila of tablaDatos">
           <td>{{ fila.ddescr }}</td>
@@ -27,6 +26,21 @@
           </td>
         </tr>
       </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectarea) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalParcelas) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>
