@@ -2,46 +2,74 @@
  * CONTENEDOR GENERAL
  **************************************/
 .consulta-container {
-  padding: 20px;
+  padding: 8px;
   background: #ffffff;
   font-size: 14px;
+}
+
+.wrap-scroll {
+  max-height: 75vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 /**************************************
  * BLOQUE DE FILTROS
  **************************************/
 .filtros-row {
+  background: #fafafa;
   border: 1px solid #e0e4e7;
-  border-radius: 12px;
-  padding: 22px 20px 10px 20px;
-  margin-bottom: 25px;
+  border-radius: 8px;
+  padding: 0px 0px 0px 0px;
+  margin-bottom: 18px;
 }
 
-/* Etiquetas */
 .filtros-row label {
-  font-weight: 600;
-  color: #3b4653;
-  margin-bottom: 6px;
   display: block;
-}
-
-/**************************************
- * BOTÓN AGREGAR CONDICIÓN
- **************************************/
-.add-condicion {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px 5px 0 0;
-}
-
-.add-condicion .p-button-text {
-  color: #008f49 !important;
+  margin-bottom: 4px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12.5px;
+  color: #3b4653;
+}
+
+.add-condicion-inline {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.add-condicion-inline .p-button {
+  height: 38px;
+  font-size: 13px;
+}
+
+:host ::ng-deep .filtros-row .p-dropdown {
+  width: 100%;
+  min-height: 38px;
+}
+
+:host ::ng-deep .filtros-row .p-dropdown .p-dropdown-label {
+  padding-top: 0.55rem !important;
+  padding-bottom: 0.55rem !important;
+  font-size: 13px !important;
+}
+
+:host ::ng-deep .filtros-row input[pInputText],
+:host ::ng-deep .filtros-row input[pinputtext] {
+  min-height: 38px;
+  font-size: 13px;
 }
 
 /**************************************
- * TABLAS
+ * DROPDOWNS GENERALES
+ **************************************/
+.p-dropdown {
+  width: 100%;
+  border-radius: 8px !important;
+}
+
+/**************************************
+ * TABLAS GENERALES
  **************************************/
 .p-datatable-sm thead th {
   background: #fafafa !important;
@@ -63,18 +91,66 @@
 }
 
 .text-center {
-  padding: 18px 0;
+  text-align: center;
   font-size: 13px;
   color: #7a7a7a;
 }
 
 /**************************************
- * BOTONES ACCIÓN
+ * TABLA DEFAULTS COMPACTA
+ **************************************/
+:host ::ng-deep .compacta-defaults .p-datatable-thead > tr > th {
+  padding: 4px 6px !important;
+  font-size: 13px !important;
+  line-height: 1.1 !important;
+}
+
+:host ::ng-deep .compacta-defaults .p-datatable-tbody > tr > td {
+  padding: 4px 6px !important;
+  font-size: 13px !important;
+  line-height: 1.1 !important;
+  vertical-align: middle;
+}
+
+:host ::ng-deep .compacta-defaults .p-datatable-tbody > tr {
+  height: 28px !important;
+}
+
+:host ::ng-deep .compacta-defaults .p-button {
+  width: 1.6rem !important;
+  height: 1.6rem !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .compacta-defaults .p-button .pi {
+  font-size: 0.75rem !important;
+}
+
+:host ::ng-deep .compacta-defaults .p-paginator {
+  padding: 4px 6px !important;
+}
+
+:host ::ng-deep .compacta-defaults .p-paginator .p-paginator-page,
+:host ::ng-deep .compacta-defaults .p-paginator .p-paginator-next,
+:host ::ng-deep .compacta-defaults .p-paginator .p-paginator-prev,
+:host ::ng-deep .compacta-defaults .p-paginator .p-paginator-first,
+:host ::ng-deep .compacta-defaults .p-paginator .p-paginator-last {
+  min-width: 1.8rem !important;
+  height: 1.8rem !important;
+  font-size: 11px !important;
+}
+
+:host ::ng-deep .compacta-defaults .p-paginator-current {
+  font-size: 11px !important;
+}
+
+/**************************************
+ * BOTONES DE ACCIÓN
  **************************************/
 .acciones {
-  margin: 15px 0 20px 0;
   display: flex;
   gap: 12px;
+  margin: 15px 0 20px 0;
 }
 
 .acciones .p-button-success {
@@ -85,6 +161,23 @@
 .acciones .p-button-outlined {
   border: 1px solid #008f49 !important;
   color: #008f49 !important;
+}
+
+/**************************************
+ * PAGINACIÓN RESULTADOS
+ **************************************/
+.acciones-paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin: 18px 0;
+}
+
+.pagina-info {
+  font-weight: bold;
+  color: #0a8f4d;
+  font-size: 14px;
 }
 
 /**************************************
@@ -102,44 +195,28 @@
 }
 
 /**************************************
- * DROPDOWNS
+ * TARJETA DETALLE
  **************************************/
-.p-dropdown {
-  width: 100%;
-  border-radius: 8px !important;
-}
-
-
-/* ===== Tarjetas (pasos) ===== */
 .step-card {
   border-radius: 0.75rem;
   box-shadow: 0 0 0 1px #e5e7eb;
 }
 
 .step-card .p-card-body {
-  padding-top: 0.75rem;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
 }
 
 .step-card .p-card-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: smaller !important; /* Mantiene escala */
+  font-size: smaller !important;
 }
-
-
 
 .step-title {
   font-size: smaller !important;
 }
-
-
-.step-card .p-card-body {
-  padding-top: 0.75rem !important;
-  padding-bottom: 0.75rem !important;
-}
-
-
 
 .detalle-grid {
   display: grid;
@@ -149,47 +226,175 @@
 
 .detalle-grid strong {
   display: block;
-  color: #374151;
   margin-bottom: 3px;
+  color: #374151;
 }
 
 .detalle-grid span {
-  padding: 6px;
   display: block;
+  padding: 6px;
   font-size: 0.75rem;
 }
 
-.wrap-scroll {
-  max-height: 75vh;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-}
-
-
-.paginado-manual {
-  margin: 18px 0;
+/**************************************
+ * REPORTE
+ **************************************/
+.rep-title {
   display: flex;
-  gap: 12px;
-  justify-content: center;
   align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
 }
 
-.pagina-info {
-  font-weight: bold;
-  color: #006637;
+.rep-block {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid #e6e9ef;
+  border-radius: 12px;
+  background: #fff;
 }
 
-
-.acciones-paginacion {
+.rep-block-h {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 18px;
-  margin: 18px 0;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.pagina-info {
-  font-weight: bold;
-  color: #0a8f4d;
+.rep-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.rep-badge-total {
+  background: #e9f7ef;
+  color: #1e7e34;
+  border: 1px solid #cfeedd;
+}
+
+.rep-badge-ind {
+  background: #eef3ff;
+  color: #2b50c7;
+  border: 1px solid #d8e3ff;
+}
+
+.rep-block-title {
   font-size: 14px;
+  font-weight: 700;
+}
+
+.rep-block-body {
+  padding-left: 2px;
+}
+
+.rep-total-num {
+  margin-top: 4px;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.rep-muted {
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 12.5px;
+}
+
+.rep-error {
+  color: #b42318;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.rep-table {
+  margin-top: 10px;
+}
+
+.add-condicion-mini {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.add-condicion-mini .p-button {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 !important;
+}
+
+.label-vacio {
+  display: block;
+  height: 18px;
+  margin-bottom: 4px;
+}
+
+.btn-add-mini {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  padding: 0 !important;
+}
+
+.add-condicion-inline {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+
+:host ::ng-deep .compacta-defaults .fila-default > td {
+  background: #f4fbf6 !important;
+}
+
+:host ::ng-deep .compacta-defaults .fila-default > td:first-child {
+  border-left: 3px solid #22a06b !important;
+}
+
+.cell-con-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge-base {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #e8f7ee;
+  border: 1px solid #bfe6cd;
+  color: #18794e;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+.tabla-defaults-titulo {
+  margin: 6px 0 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2f3a45;
+}
+
+.separador-suave {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.texto-ayuda-suave {
+  color:  #2f9e44;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.espacio-entre-bloques {
+  height: 10px;
 }

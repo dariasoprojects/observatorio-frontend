@@ -11,6 +11,8 @@ import {BienesRecibidosService} from '../../services/indices/bienes-recibidos.se
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import {TablaProductorBienServicio} from '../../models/indices/indices.model';
 import {IndicesUtil} from '../../shared/utils/indices.util';
+import { MapCommService } from '../../services/map-comm.service';
+
 
 
 @Component({
@@ -40,7 +42,7 @@ export class IndiceBienesRecibidosComponent {
   tablaDatos!: TablaProductorBienServicio ;
 
 
-  constructor(
+  constructor(private mapComm: MapCommService,
     private bienesRecibidosService: BienesRecibidosService
   ) {}
 
@@ -56,6 +58,16 @@ export class IndiceBienesRecibidosComponent {
     } else {
       this.activeNivel="1"
       this.cargarDatos();
+    }
+
+    //this.aplicarColoresTematico();
+  }
+
+  aplicarColoresTematico() {    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
+      this.mapComm.emitRenderTematico("BIEREC");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
     }
   }
 
@@ -215,7 +227,7 @@ export class IndiceBienesRecibidosComponent {
         name: 'Productor',
         type: 'pie',
         data: this.categorias.map((c, i) => ({ name: c, y: this.valores[i] })),
-        colors: ['#20B5B8', '#229389', '#D2DD45', '#FFE44A', '#FFB022', '#F76C4A', '#F23C3C']
+        colors: ['#20B5B8', '#229389']
       }]
     };
 

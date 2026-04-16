@@ -5,6 +5,7 @@ import { Input } from '@angular/core';
 import {FormatUtil} from '../../shared/utils/format.util';
 import {SuperficieAgricolaService} from '../../services/indices/superficie-agricola.service';
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import { MapCommService } from '../../services/map-comm.service';
 
 
 @Component({
@@ -28,7 +29,7 @@ export class IndiceSuperfiAgriComponent implements OnInit {
   tablaDatos: { ddescr: string; productores: number; hectareaTotal: number; parcelas: number ; hectariaBajoRiego: number}[] = [];
 
 
-  constructor(
+  constructor(private mapComm: MapCommService,
     private superficieAgricolaService: SuperficieAgricolaService
   ) {}
 
@@ -43,6 +44,8 @@ export class IndiceSuperfiAgriComponent implements OnInit {
         this.cargarDatos();
       }
     }
+
+    this.mapComm.emitRenderTematico("RESET");
 
   }
 

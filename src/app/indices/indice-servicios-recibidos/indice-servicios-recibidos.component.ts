@@ -11,6 +11,7 @@ import {ServiciosRecibidosService} from '../../services/indices/servicios-recibi
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import {IndicesUtil} from '../../shared/utils/indices.util';
 import {TablaProductorBienServicio} from '../../models/indices/indices.model';
+import { MapCommService } from '../../services/map-comm.service';
 
 @Component({
   selector: 'app-indice-servicios-recibidos',
@@ -41,7 +42,7 @@ export class IndiceServiciosRecibidosComponent {
 
   tablaDatos!: TablaProductorBienServicio ;
 
-  constructor(
+  constructor(private mapComm: MapCommService,
     private serviciosRecibidosService: ServiciosRecibidosService) {}  // <-- solo para inyectar
 
 
@@ -59,8 +60,17 @@ export class IndiceServiciosRecibidosComponent {
     }
   }
 
+  aplicarColoresTematico() {    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
+      this.mapComm.emitRenderTematico("SRVREC");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
+    }
+  }
+
   ngAfterViewInit() {
     this.crearGrafico();
+    //this.aplicarColoresTematico();
   }
 
   // ---------------------------------------------------

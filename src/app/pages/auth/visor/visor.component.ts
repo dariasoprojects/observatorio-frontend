@@ -18,6 +18,8 @@ import {LoaderComponent} from '../../loader/loader.component';
 import {AnalisisEspacialComponent} from './components/analisis-espacial/analisis-espacial.component';
 import {ConsultaMultipleComponent} from './components/consulta-multiple/consulta-multiple.component';
 import {BusquedaDniComponent} from './components/busqueda-dni/busqueda-dni.component';
+import {DescargasComponent} from './components/descargas/descargas.component';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-visor',
@@ -39,6 +41,7 @@ import {BusquedaDniComponent} from './components/busqueda-dni/busqueda-dni.compo
     AnalisisEspacialComponent,
     ConsultaMultipleComponent,
     BusquedaDniComponent,
+    DescargasComponent,
     Menu,
 
   ],
@@ -49,7 +52,8 @@ export class VisorComponent {
 
   constructor(private router: Router,
               private elRef: ElementRef,
-              private comm: MapCommService
+              private comm: MapCommService,
+              private authService: AuthService
               ) {}
 
   // Aplica la clase al contenedor raíz para estrechar la 1ª columna
@@ -57,17 +61,34 @@ export class VisorComponent {
     return this.isCollapsed;
   }
 
+  usuarioLogueado = '';
+  tipoUsuario = '';
+  inicialUsuario = '';
+  entidadUsuario = '';
+
 
   isCollapsed = false;
   activeSection: string | null = null;
   dialogVisible = false;
+  dialogVisibleDescarga = false;
   dialogVisibleConsultaMultiple = false;
   dialogVisibleBusquedaDni = false;
   items: MenuItem[] | undefined;
   @ViewChild('sidebar') sidebar!: SidebarComponent;
   @ViewChild('sideright') sideright!: SideRightComponent;
 
+
+  
+
   ngOnInit(): void {
+
+    this.usuarioLogueado = this.authService.obtenerUsuario();
+    this.tipoUsuario = this.authService.obtenerTipoUser();
+    this.entidadUsuario = this.authService.obtenerEntidad();
+    this.inicialUsuario = this.usuarioLogueado
+      ? this.usuarioLogueado.charAt(0).toUpperCase()
+      : 'U';
+
     this.items = [
       {
         label: 'Opciones',
@@ -92,6 +113,13 @@ export class VisorComponent {
     this.comm.abrirConsultasMultipleDialog$
       .subscribe(() => {
         this.dialogVisibleConsultaMultiple = true;
+        this.dialogVisible = false;
+        this.dialogVisibleDescarga = false;
+      });
+
+    this.comm.abrirDescargasDialog$
+    .subscribe(() => {
+        this.dialogVisibleDescarga = true;
       });
 
   }
@@ -106,7 +134,9 @@ export class VisorComponent {
   }
 
   onLogout(): void {
-    this.router.navigate(['/visor']);
+    // this.router.navigate(['/visor']);
+    this.authService.cerrarSesion();
+    this.router.navigate(['/login']);
   }
 
   onClear(): void {

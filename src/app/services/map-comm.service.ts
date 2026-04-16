@@ -3,21 +3,89 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import Polygon from '@arcgis/core/geometry/Polygon';
 
+export interface GeometryPayload {
+    geometry: Polygon | null;
+    source?: 'draw' | 'kml' | 'select';
+}
+
 @Injectable({ providedIn: 'root' })
 export class MapCommService {
 
 
   private renderTematicoSource = new Subject<string>();
-renderTematico$ = this.renderTematicoSource.asObservable();
+  renderTematico$ = this.renderTematicoSource.asObservable();
+
+  private renderTematicoLoadingSource = new Subject<boolean>();
+  renderTematicoLoading$ = this.renderTematicoLoadingSource.asObservable();
 
 
-emitRenderTematico(campo: string) {
-  this.renderTematicoSource.next(campo);
-}
+  emitRenderTematico(campo: string) {
+    this.renderTematicoSource.next(campo);
+    
+  }
+
+  setRenderTematicoLoading(estado: boolean) {
+    this.renderTematicoLoadingSource.next(estado);
+  }
+
+
+  private clearAnalysisGeometrySource = new Subject<void>();
+  clearAnalysisGeometry$ = this.clearAnalysisGeometrySource.asObservable();
+
+  clearAnalysisGeometry(): void {
+    this.clearAnalysisGeometrySource.next();
+  }
+  
+  
+  private filterRequestCentEmpSource = new Subject<{
+    nivel: 'dep' | 'prov' | 'dist';
+    reg?: string;
+    prov?: string;
+    dist?: string;
+  } | null>();
+
+  filterRequestCentEmp$ = this.filterRequestCentEmpSource.asObservable();
+
+  requestFilterCentEmp(payload: {
+    nivel: 'dep' | 'prov' | 'dist';
+    reg?: string;
+    prov?: string;
+    dist?: string;
+  } | null) {
+    this.filterRequestCentEmpSource.next(payload);
+  }
+
+
+  
+  private parcelasPadronFiltroSource = new Subject<{
+    ubigeo: string;
+    nivel: 'dep' | 'prov' | 'dist';
+    campoFlag: string;
+  } | null>();
+
+  parcelasPadronFiltro$ = this.parcelasPadronFiltroSource.asObservable();
+
+  setParcelasPadronFiltro(payload: {
+    ubigeo: string;
+    nivel: 'dep' | 'prov' | 'dist';
+    campoFlag: string;
+  } | null) {
+    this.parcelasPadronFiltroSource.next(payload);
+  }
+
+
+  private renderUbigeoSource = new Subject<{ ubigeo: string; nivel: 'dep' | 'prov' | 'dist' } | null>();
+  
+  renderUbigeo$ = this.renderUbigeoSource.asObservable();
+
+  requestRenderUbigeo(payload: { ubigeo: string; nivel: 'dep' | 'prov' | 'dist' } | null) {
+    this.renderUbigeoSource.next(payload);
+  }
 
 
 
   private selectLayerSource = new Subject<string | null>();
+  
   selectLayer$ = this.selectLayerSource.asObservable();
 
   selectLayer(layer: string | null) {
@@ -30,8 +98,31 @@ emitRenderTematico(campo: string) {
   private featureSelectedSource = new Subject<__esri.Graphic | null>();
   featureSelected$ = this.featureSelectedSource.asObservable();
 
+  
+
   sendFeatureSelected(feature: __esri.Graphic | null) {
     this.featureSelectedSource.next(feature);
+  }
+
+
+  private filterRequestTipoActividadSource = new Subject<{ ubigeo: string; campoFlag: string } | null>();
+  filterRequestTipoActividad$ = this.filterRequestTipoActividadSource.asObservable();
+
+  requestFilterTipoActividad(payload: { ubigeo: string; campoFlag: string } | null) {
+    this.filterRequestTipoActividadSource.next(payload);
+  }
+
+
+
+
+  // replaceGeometry(geom: Polygon | null): void {
+  //   this.clearAnalysisGeometrySource.next();
+  //   this.geometrySource.next(geom);
+  // }
+
+  replaceGeometry(geometry: Polygon | null, source?: 'draw' | 'kml' | 'select'): void {
+    this.clearAnalysisGeometrySource.next();
+    this.geometrySource.next({ geometry, source });
   }
 
 
@@ -46,7 +137,11 @@ emitRenderTematico(campo: string) {
   filterRequestPpa$ = this.filterRequestSourcePpa.asObservable();
 
   //  NUEVO: canal para la geometría de cobertura
-  private geometrySource = new Subject<Polygon | null>();
+  // private geometrySource = new Subject<Polygon | null>();
+  // geometry$ = this.geometrySource.asObservable();
+  
+
+  private geometrySource = new Subject<GeometryPayload>();
   geometry$ = this.geometrySource.asObservable();
 
 
@@ -66,6 +161,44 @@ emitRenderTematico(campo: string) {
 
   private abrirConsultasMultipleDialogSource = new Subject<void>();
   abrirConsultasMultipleDialog$ = this.abrirConsultasMultipleDialogSource.asObservable();
+
+  private abrirDescargasDialogSource = new Subject<void>();
+  abrirDescargasDialog$ = this.abrirDescargasDialogSource.asObservable();
+
+  private cerrarDescargasDialogSource = new Subject<void>();
+  cerrarDescargas$ = this.cerrarDescargasDialogSource.asObservable();
+
+
+  private kmlFileSubject = new Subject<File>();
+  kmlFile$ = this.kmlFileSubject.asObservable();
+
+  private removeKmlLayerSubject = new Subject<void>();
+  removeKmlLayer$ = this.removeKmlLayerSubject.asObservable();
+
+
+  private zoomGeomSubject = new Subject<__esri.Geometry>();
+  zoomGeom$ = this.zoomGeomSubject.asObservable();
+
+
+  
+
+  requestZoomGeom(geom: __esri.Geometry) {
+    this.zoomGeomSubject.next(geom);
+  }
+
+
+
+
+  
+
+  sendKmlFile(file: File): void {
+    this.kmlFileSubject.next(file);
+  }
+
+
+  removeKmlLayer(): void {
+    this.removeKmlLayerSubject.next();
+  }
 
 
   // requestRenderGenero() {
@@ -87,9 +220,13 @@ emitRenderTematico(campo: string) {
     this.filterRequestSourcePpa.next(reg);
   }
 
-  // NUEVO: método para enviar la geometría al componente de análisis
-  sendGeometry(geom: Polygon | null) {
-    this.geometrySource.next(geom);
+  // NUEVO: método para enviar la geometría al componente de análisis, sirve para todo
+  // sendGeometry(geom: Polygon | null) {
+  //   //alert("ddddddd");
+  //   this.geometrySource.next(geom);
+  // }
+  sendGeometry(geometry: Polygon | null, source?: 'draw' | 'kml' | 'select') {
+    this.geometrySource.next({ geometry, source });
   }
 
   //  NUEVO método para activar/desactivar modo dibujo
@@ -112,4 +249,14 @@ emitRenderTematico(campo: string) {
   abrirDialogConsultaMultiple() {
     this.abrirConsultasMultipleDialogSource.next();
   }
+
+  abrirDialogDescargas() {
+    this.abrirDescargasDialogSource.next();
+  }
+
+  cerrarDescargas() {
+    this.cerrarDescargasDialogSource.next();
+  }
+
+
 }

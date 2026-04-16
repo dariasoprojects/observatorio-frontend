@@ -53,13 +53,20 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
 
 
   aplicarColoresTematico() {
-    this.mapComm.emitRenderTematico("NIVEST");
+    
+
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {
+      this.mapComm.emitRenderTematico("NIVEST");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
+    }
   }
 
 
 
   ngAfterViewInit() {
     this.crearGrafico();
+    //this.aplicarColoresTematico();
   }
 
   private crearGrafico() {
@@ -120,11 +127,11 @@ export class IndiceNivelEstudioComponent implements OnInit, AfterViewInit {
 
       plotOptions: {
         pie: {
-          innerSize: '60%',                 // ✅ Donut
+          innerSize: '60%',                 //  Donut
           dataLabels: {
             enabled: true,
             format: '{point.percentage:.1f} %',
-            distance: -40,                  // ✅ Etiquetas dentro del arco
+            distance: -40,                  //  Etiquetas dentro del arco
             style: {
               fontWeight: 'bold',
               textOutline: 'none',

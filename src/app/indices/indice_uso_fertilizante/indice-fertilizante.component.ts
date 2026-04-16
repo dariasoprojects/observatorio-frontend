@@ -18,6 +18,7 @@ import {UsoFertilizanteService} from '../../services/indices/uso-fertilizante.se
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import { environment } from 'src/environments/environment';
 
+
 @Component({
   selector: 'app-indice-fertilizante',
   standalone: true,
@@ -73,12 +74,23 @@ export class IndiceFertilizanteComponent implements OnInit {
       this.activeNivel="1"
       this.cargarDatos();
     }
+    //this.aplicarColoresTematico();
   }
 
 
   aplicarColoresGenero() {
     this.mapComm.emitRenderTematico("FERTILIZA");
   }
+
+
+  aplicarColoresTematico() {    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
+      this.mapComm.emitRenderTematico("FERTILIZA");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
+    }
+  }
+
 
 
   abrirDialogoExportar(reg: string) {

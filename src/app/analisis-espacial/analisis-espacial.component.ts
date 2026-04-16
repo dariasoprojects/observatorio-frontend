@@ -76,18 +76,29 @@ export class AnalisisEspacialComponent implements OnInit, OnDestroy {
 
   constructor(private mapComm: MapCommService) {}
 
+  // ngOnInit(): void {
+  //   // recibir geometría desde el mapa
+  //   this.subs.push(
+  //     this.mapComm.geometry$.subscribe((geom: Polygon | null) => {
+  //       if (geom && geom.type === 'polygon') {
+  //         this.coberturaPolygon = geom as Polygon;
+  //         // console.log('Cobertura OK', this.coberturaPolygon);
+  //       }
+  //     })
+  //   );
+  // }
+
   ngOnInit(): void {
-    // recibir geometría desde el mapa
     this.subs.push(
-      this.mapComm.geometry$.subscribe((geom: Polygon | null) => {
+      this.mapComm.geometry$.subscribe((payload) => {
+        const geom = payload?.geometry ?? null;
+
         if (geom && geom.type === 'polygon') {
           this.coberturaPolygon = geom as Polygon;
-          // console.log('Cobertura OK', this.coberturaPolygon);
         }
       })
     );
   }
-
 
 
   onCapaChange() {

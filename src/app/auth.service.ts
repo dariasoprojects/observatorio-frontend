@@ -37,4 +37,24 @@ export class AuthService {
   getToken(): string {
     return esri.id.getCredential('https://www.arcgis.com').token;
   }
+
+  obtenerToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  estaAutenticado(): boolean {
+    return !!this.obtenerToken();
+  }
+
+  obtenerUsuario(): string {
+    return localStorage.getItem('usuario') || '';
+  }
+
+  obtenerTipoUser(): string {
+    const tipo = localStorage.getItem('tipoUser');
+    if (tipo === '1') return 'AD';
+    if (tipo === '2') return 'Externo';
+    return '';
+  }
+
 }

@@ -11,6 +11,8 @@ import {CultivosPermanenteService} from '../../services/indices/cultivos-permane
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
 import {IndicesUtil} from '../../shared/utils/indices.util';
+import {MapCommService} from '../../services/map-comm.service';
+
 
 
 @Component({
@@ -48,6 +50,7 @@ export class IndiceCultivosPermaComponent implements OnInit {
   constructor(
     private ubigeoService: UbigeoService,
     private cultivosPermanenteService: CultivosPermanenteService,
+    private mapComm: MapCommService,
     private indicesUtil: IndicesUtil
     ) {}
 
@@ -61,6 +64,16 @@ export class IndiceCultivosPermaComponent implements OnInit {
       }else{
         this.cargarDatos();
       }
+    }
+    //this.aplicarColoresTematico();
+  }
+
+  aplicarColoresTematico() {
+    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
+      this.mapComm.emitRenderTematico("CULTIPERMA");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
     }
   }
 

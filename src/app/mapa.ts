@@ -84,14 +84,22 @@ export class Mapa {
     // });
 
 
-    this.comm.geometry$.subscribe(geom => {
-      console.log(" Geometría recibida en map.ts:", geom);
+    // this.comm.geometry$.subscribe(geom => {
+    //   console.log(" Geometría recibida en map.ts:", geom);
+
+    //   if (geom) {
+    //     this.dibujarGeometry(geom);
+    //   }
+    // });
+    this.comm.geometry$.subscribe(payload => {
+      console.log("Geometría recibida en map.ts:", payload);
+
+      const geom = payload?.geometry ?? null;
 
       if (geom) {
         this.dibujarGeometry(geom);
       }
     });
-
 
 
     // suscripción al servicio
@@ -238,7 +246,10 @@ export class Mapa {
 
 
   filtrarClusterPorRegPpa(reg: string | null) {
+
     if (!this.capaClusterPpa) return;
+
+    //alert(reg);
 
     if (reg) {
       this.capaClusterPpa.definitionExpression = `UBIGEO3 like '${reg}%'`;
@@ -267,8 +278,12 @@ export class Mapa {
   filtrarClusterPorReg(reg: string | null) {
     if (!this.capaCluster) return;
 
+    //alert(reg);
+
     if (reg) {
-      this.capaCluster.definitionExpression = `REG = '${reg}'`;
+      //this.capaCluster.definitionExpression = `REG = '${reg}'`;
+      //this.capaCluster.definitionExpression = `REG = '${reg}'`;
+      this.capaClusterPpa.definitionExpression = `UBIGEO3 like '${reg}%'`;
       this.capaCluster.visible = true;
       console.log('Mostrando cluster para REG:', reg);
     } else {
@@ -583,7 +598,8 @@ export class Mapa {
 
 
        this.capaClusterPpa = new FeatureLayer({
-          url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0',
+          //url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/CapaObservatorio22/MapServer/0',
+          url: 'https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/OBSRV_INFOCORE/MapServer/0',
           outFields: ['*'],
           visible: false,
           featureReduction: {

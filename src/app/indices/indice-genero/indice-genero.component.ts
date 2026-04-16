@@ -37,7 +37,12 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
   ) {}  // <-- solo para inyectar
 
   aplicarColoresTematico() {
-    this.mapComm.emitRenderTematico("GEN");
+    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {
+      this.mapComm.emitRenderTematico("GEN");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
+    }
   }
 
 
@@ -57,6 +62,26 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.crearGrafico();
+    //this.aplicarColoresTematico();
+  }
+
+
+  private obtenerColorGenero(categoria: string): string {
+    const valor = (categoria || '').toUpperCase().trim();
+
+    if (valor.includes('MASCULINO') || valor.includes('HOMBRE')) {
+      return '#1A73E8'; // azul
+    }
+
+    if (valor.includes('FEMENINO') || valor.includes('MUJER')) {
+      return '#E53935'; // rojo
+    }
+
+    if (valor.includes('INDETERMINADO') || valor.includes('OTROS') || valor.includes('OTRO')) {
+      return '#1E872C'; // verde
+    }
+
+    return '#9E9E9E'; // gris fallback
   }
 
   private crearGrafico() {
@@ -115,11 +140,11 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
 
       plotOptions: {
         pie: {
-          innerSize: '60%',                 // ✅ Donut
+          innerSize: '60%',                 //  Donut
           dataLabels: {
             enabled: true,
             format: '{point.percentage:.1f} %',
-            distance: -40,                  // ✅ Etiquetas dentro del arco
+            distance: -40,                  //  Etiquetas dentro del arco
             style: {
               fontWeight: 'bold',
               textOutline: 'none',
@@ -135,9 +160,9 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
         type: 'pie',
         data: this.categorias.map((c, i) => ({
           name: c,
-          y: this.valores[i]
+          y: this.valores[i],
+          color: this.obtenerColorGenero(c)
         })),
-        colors: ['#1A73E8', '#E53935']
       }],
 
     };
@@ -237,8 +262,16 @@ export class IndiceGeneroComponent implements OnInit, AfterViewInit {
     this.valores = [...nuevosValores];
 
     if (this.chart) {
+      // this.chart.series[0].setData(
+      //   nuevasCategorias.map((c, i) => ({ name: c, y: nuevosValores[i] })),
+      //   true
+      // );
       this.chart.series[0].setData(
-        nuevasCategorias.map((c, i) => ({ name: c, y: nuevosValores[i] })),
+        nuevasCategorias.map((c, i) => ({
+          name: c,
+          y: nuevosValores[i],
+          color: this.obtenerColorGenero(c)
+        })),
         true
       );
     }

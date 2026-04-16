@@ -5,6 +5,8 @@ import { Input } from '@angular/core';
 import {FormatUtil} from '../../shared/utils/format.util';
 import {PadronProductoresService} from '../../services/indices/padron-productores.service';
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import { MapCommService } from '../../services/map-comm.service';
+
 
 
 @Component({
@@ -28,7 +30,7 @@ export class IndicePadronProdComponent implements OnInit {
   tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
 
 
-  constructor(
+  constructor(private mapComm: MapCommService,
     private padronProductoresService: PadronProductoresService
   ) {}
 
@@ -42,6 +44,7 @@ export class IndicePadronProdComponent implements OnInit {
         this.cargarDatos();
       }
     }
+    this.mapComm.emitRenderTematico("RESET");
   }
 
   private crearGrafico() {
