@@ -18,6 +18,8 @@ import Extent from '@arcgis/core/geometry/Extent';
 import Polygon from '@arcgis/core/geometry/Polygon';
 import Point from "@arcgis/core/geometry/Point";
 import { environment } from 'src/environments/environment';
+import KMLLayer from "@arcgis/core/layers/KMLLayer";
+import * as reactiveUtils from '@arcgis/core/core/reactiveUtils';
 
 
 export class Mapa {
@@ -71,6 +73,199 @@ export class Mapa {
   private modoConsulta = false;
   private highlightLayerKml: GraphicsLayer = new GraphicsLayer();
   private estadoInicialParcelas: any = null;
+  private rendererOriginalSub0: any = null;
+  private kmlBtn: HTMLDivElement | null = null;
+  private kmlPanel!: HTMLDivElement;
+  private kmlInput: HTMLInputElement | null = null;
+  private kmlLayer: KMLLayer | null = null;
+  private kmlObjectUrl: string | null = null;
+  private kmlFileLabel!: HTMLDivElement;
+  private capaCoberturas: MapImageLayer | null = null;
+
+  private loadingOverlay: HTMLDivElement | null = null;
+
+  private readonly COBERTURAS_URL =
+  "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/OBSRV_INFOBASE/MapServer";
+
+  private cobLegendCache: any | null = null;
+  private capaClusterCentEmp!: FeatureLayer;
+  private drawLayer!: GraphicsLayer;
+
+
+
+  private mostrarLoadingMapa(texto: string = 'Aplicando filtro temático al mapa...'): void {
+    if (!this.mapDiv) return;
+
+    if (this.loadingOverlay) {
+      const txt = this.loadingOverlay.querySelector('.loading-text') as HTMLDivElement | null;
+      if (txt) txt.textContent = texto;
+      this.loadingOverlay.style.display = 'flex';
+      return;
+    }
+
+    const computed = window.getComputedStyle(this.mapDiv);
+    if (computed.position === 'static') {
+      this.mapDiv.style.position = 'relative';
+    }
+
+    const overlay = document.createElement('div');
+    overlay.style.position = 'absolute';
+    overlay.style.right = '18px';
+    overlay.style.bottom = '18px';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.gap = '14px';
+    overlay.style.background = 'rgba(21,95,49,0.96)';
+    overlay.style.color = '#ffffff';
+    overlay.style.border = '2px solid #ffffff';
+    overlay.style.borderRadius = '14px';
+    overlay.style.padding = '14px 18px';
+    overlay.style.boxShadow = '0 8px 24px rgba(0,0,0,0.35)';
+    overlay.style.zIndex = '99999';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.maxWidth = '420px';
+    overlay.style.minWidth = '280px';
+
+    const spinner = document.createElement('div');
+    spinner.style.width = '26px';
+    spinner.style.height = '26px';
+    spinner.style.border = '4px solid rgba(255,255,255,0.35)';
+    spinner.style.borderTop = '4px solid #ffffff';
+    spinner.style.borderRadius = '50%';
+    spinner.style.flex = '0 0 auto';
+    spinner.style.animation = 'spinMapaTematico 0.8s linear infinite';
+
+    const txtWrap = document.createElement('div');
+    txtWrap.style.display = 'flex';
+    txtWrap.style.flexDirection = 'column';
+    txtWrap.style.gap = '4px';
+
+    const titulo = document.createElement('div');
+    titulo.textContent = 'Procesando mapa';
+    titulo.style.fontSize = '15px';
+    titulo.style.fontWeight = '800';
+    titulo.style.letterSpacing = '0.2px';
+
+    const txt = document.createElement('div');
+    txt.className = 'loading-text';
+    txt.textContent = texto;
+    txt.style.fontSize = '13px';
+    txt.style.fontWeight = '600';
+    txt.style.lineHeight = '1.35';
+    txt.style.opacity = '0.96';
+
+    if (!document.getElementById('style-spin-mapa-tematico')) {
+      const style = document.createElement('style');
+      style.id = 'style-spin-mapa-tematico';
+      style.innerHTML = `
+        @keyframes spinMapaTematico {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    txtWrap.appendChild(titulo);
+    txtWrap.appendChild(txt);
+    overlay.appendChild(spinner);
+    overlay.appendChild(txtWrap);
+
+    this.mapDiv.appendChild(overlay);
+    this.loadingOverlay = overlay;
+  }
+
+  private ocultarLoadingMapa(): void {
+    if (this.loadingOverlay) {
+      this.loadingOverlay.style.display = 'none';
+    }
+  }  
+
+
+  private async getCoberturasLegend(): Promise<any | null> {
+    if (!this.capaCoberturas?.url) return null;
+    if (this.cobLegendCache) return this.cobLegendCache;
+
+    try {
+      const url = `${this.capaCoberturas.url}/legend?f=pjson`;
+      const json = await fetch(url).then(r => r.json());
+      this.cobLegendCache = json;
+      return json;
+    } catch (e) {
+      console.warn("No se pudo cargar /legend:", e);
+      return null;
+    }
+  }
+
+  private legendImgSrc(item: any): string | null {
+    if (!item?.imageData || !item?.contentType) return null;
+    return `data:${item.contentType};base64,${item.imageData}`;
+  }
+
+
+  
+
+   private async filtrarClusterCentEmp(payload: {
+      nivel: 'dep' | 'prov' | 'dist';
+      reg?: string;
+      prov?: string;
+      dist?: string;
+    }): Promise<void> {
+      if (!this.capaClusterCentEmp) return;
+
+      this.capaClusterCentEmp.visible = false;
+      this.capaClusterCentEmp.definitionExpression = '1=0';
+
+      let expr = '';
+
+      // TEMPORAL: filtro por nombres
+      if (payload.nivel === 'dep') {
+        expr = `REG = '${payload.reg}'`;
+      } else if (payload.nivel === 'prov') {
+        expr = `REG = '${payload.reg}' AND PROV = '${payload.prov}'`;
+      } else {
+        expr = `REG = '${payload.reg}' AND PROV = '${payload.prov}' AND DIST = '${payload.dist}'`;
+      }
+
+      // FUTURO: cuando BD exponga campos codificados, reemplazar filtro temporal por nombres.
+
+      // Opción A: usando códigos separados
+      // if (payload.nivel === 'dep') {
+      //   expr = `REG_COD = '${payload.regCod}'`;
+      // } else if (payload.nivel === 'prov') {
+      //   expr = `REG_COD = '${payload.regCod}' AND PROV_COD = '${payload.provCod}'`;
+      // } else {
+      //   expr = `REG_COD = '${payload.regCod}' AND PROV_COD = '${payload.provCod}' AND DIST_COD = '${payload.distCod}'`;
+      // }
+
+      // Opción B recomendada: usando un solo campo UBIGEO
+      // if (payload.nivel === 'dep') {
+      //   expr = `UBIGEO LIKE '${payload.ubigeo}%'`;
+      // } else if (payload.nivel === 'prov') {
+      //   expr = `UBIGEO LIKE '${payload.ubigeo}%'`;
+      // } else {
+      //   expr = `UBIGEO = '${payload.ubigeo}'`;
+      // }
+
+      this.capaClusterCentEmp.definitionExpression = expr;
+      this.capaClusterCentEmp.visible = true;
+
+      console.log('Filtro cluster CentEmp aplicado:', expr);
+
+      try {
+        const q = this.capaClusterCentEmp.createQuery();
+        q.where = expr;
+        q.returnGeometry = true;
+
+        const extentResult = await this.capaClusterCentEmp.queryExtent(q);
+
+        if (extentResult.extent && this.mapView) {
+          await this.mapView.goTo(extentResult.extent.expand(1.05));
+        }
+      } catch (error) {
+        console.error('Error obteniendo extent del cluster CentEmp:', error);
+      }
+    }
 
 
 
@@ -87,14 +282,101 @@ export class Mapa {
 
     this.resultsLayer   = new GraphicsLayer({ id: 'Elemento Seleccionado' });
     this.highlightLayer = new GraphicsLayer({ id: 'highlight' });
+    this.drawLayer = new GraphicsLayer({ id: 'draw-layer' });
+    
+
+    // this.comm.filterRequestCentEmp$
+    // .pipe(takeUntil(this.destroyed$))
+    // .subscribe(ubigeo =>
+    //   ubigeo
+    //     ? this.filtrarClusterCentEmpPorDepartamento(ubigeo)
+    //     : this.desactivarClusterCentEmp()
+    // );
+    // this.comm.filterRequestCentEmp$
+    // .pipe(takeUntil(this.destroyed$))
+    // .subscribe(payload =>
+    //   payload
+    //     ? this.filtrarClusterCentEmp(payload.valor, payload.nivel)
+    //     : this.desactivarClusterCentEmp()
+    // );
+    this.comm.filterRequestCentEmp$
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(payload =>
+      payload
+        ? this.filtrarClusterCentEmp(payload)
+        : this.desactivarClusterCentEmp()
+    );
+
+    this.comm.renderUbigeo$
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(payload => {
+      if (payload) {
+        this.renderizarUbigeo(payload.ubigeo, payload.nivel);
+      } else {
+        this.resultsLayer?.removeAll();
+      }
+    });
+
+
+    this.comm.removeKmlLayer$
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(() => this.quitarKml());
+
+    this.comm.zoomGeom$
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(async (geom) => {
+      if (!this.mapView || !geom) return;
+
+      await this.mapView.goTo({ target: geom, zoom: 16 }, { duration: 700 });
+    });
+
+
+    // this.comm.parcelasPadronFiltro$
+    // .pipe(takeUntil(this.destroyed$))
+    // .subscribe(payload => {
+    //   if (payload) {
+    //     this.filtrarParcelasPorUbigeoNivel(payload.ubigeo, payload.nivel);
+    //   } else {
+    //     this.limpiarFiltroParcelasPadron();
+    //   }
+    // });
+    this.comm.parcelasPadronFiltro$
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(payload => {
+      if (payload) {
+        this.filtrarParcelasPorUbigeoNivel(
+          payload.ubigeo,
+          payload.nivel,
+          payload.campoFlag
+        );
+      } else {
+        this.limpiarFiltroParcelasPadron();
+      }
+    });
+
 
     this.comm.zoomRequest$
       .pipe(takeUntil(this.destroyed$))
       .subscribe(id => this.zoomToObjectId(id));
 
+    // this.comm.geometry$
+    //   .pipe(takeUntil(this.destroyed$))
+    //   .subscribe(id => this.zoomToObjectId2(id));
+    this.comm.geometry$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(payload => this.zoomToObjectId2(payload));
+
     this.comm.filterRequest$
       .pipe(takeUntil(this.destroyed$))
       .subscribe(reg => reg ? this.filtrarClusterPorReg(reg) : this.desactivarCluster());
+
+    this.comm.filterRequestTipoActividad$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(payload =>
+        payload
+          ? this.filtrarClusterPorTipoActividad(payload.ubigeo, payload.campoFlag)
+          : this.desactivarCluster()
+      );
 
     this.comm.filterRequestPpa$
       .pipe(takeUntil(this.destroyed$))
@@ -109,39 +391,293 @@ export class Mapa {
       .subscribe(() => this.aplicarEstadoInicial());
 
 
+    
     this.comm.renderTematico$
       .pipe(takeUntil(this.destroyed$))
-      .subscribe(campo => this.aplicarRendererTematico(campo));
+      .subscribe(async campo => {
+        this.mostrarLoadingMapa('Aplicando filtro temático al mapa...');
 
+        try {
+          await this.aplicarRendererTematico(campo);
 
+          if (this.mapView && this.capaParcelasPadron) {
+            const layerView = await this.mapView.whenLayerView(this.capaParcelasPadron);
+
+            // darle chance a que el layerView entre a updating
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            // si entró a updating, esperar a que termine
+            if (layerView.updating) {
+              await reactiveUtils.whenOnce(() => layerView.updating === false);
+            }
+
+            // colchón extra para que el usuario vea el cambio ya pintado
+            await new Promise(resolve => setTimeout(resolve, 8000));
+          } else {
+            // fallback
+            await new Promise(resolve => setTimeout(resolve, 1700));
+          }
+
+        } catch (error) {
+          console.error('Error aplicando renderer temático:', error);
+
+          // aun con error, que no desaparezca demasiado rápido
+          await new Promise(resolve => setTimeout(resolve, 1200));
+        } finally {
+          this.ocultarLoadingMapa();
+        }
+      });
+
+    
     this.comm.selectLayer$
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(campo => {
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(sel => {
 
-        console.log("Campo temático recibido:", campo);
+      console.log("Selección recibida:", sel);
 
-        // Si viene null/undefined → desactivar modo temático
-        if (!campo) {
-          this.modoConsulta = false;
-          return;
+      // Si viene null/undefined/'' → desactivar
+      if (!sel) {
+        this.modoConsulta = false;
+        this.capaSeleccionada = null;
+        this.queryTask = null;
+
+        // apagar coberturas (MapImageLayer único)
+        this.apagarCoberturas();
+
+        // cursor normal
+        if (this.mapView?.container) {
+          this.mapView.container.style.cursor = "default";
         }
 
-        this.modoConsulta = true;
+        // refrescar TOC si está abierto
+        if (this.tocContainer && this.tocContainer.style.display !== "none") {
+          this.generarTOC(this.tocContainer);
+        }
 
-        // guardar qué capa se seleccionó
-        this.capaSeleccionada = campo;
+        return;
+      }
 
-        // configurar queryTask dinámico
-        this.configurarQueryTask(campo);
+      // activar modo consulta
+      this.modoConsulta = true;
+      this.capaSeleccionada = sel;
 
-        // Cambiar cursor (si aplica)
+      //  NUEVO: si viene "cob:<id>" → activar sublayer en MapImageLayer único
+      const m = String(sel).match(/^cob:(\d+)$/);
+      if (m) {
+        const id = Number(m[1]);
+
+        // 1) Mostrar sublayer correcto en el mapa
+        this.activarCoberturaPorId(id);
+
+        // 2) Configurar queryTask para clicks (FeatureLayer /<id>)
+        this.configurarQueryTask(sel);
+
+        // 3) cursor crosshair
         if (this.mapView?.container) {
           this.mapView.container.style.cursor = "crosshair";
         }
 
+        // 4) refrescar TOC si está abierto
+        if (this.tocContainer && this.tocContainer.style.display !== "none") {
+          this.generarTOC(this.tocContainer);
+        }
+
+        return;
+      }
+
+      //  Si NO es "cob:id" (compatibilidad con strings antiguos)
+      this.configurarQueryTask(sel);
+
+      if (this.mapView?.container) {
+        this.mapView.container.style.cursor = "crosshair";
+      }
+
     });
 
   }
+
+
+  private async filtrarClusterCentEmpPorDepartamento(ubigeo: string): Promise<void> {
+    if (!this.capaClusterCentEmp) return;
+
+    this.capaClusterCentEmp.visible = false;
+    this.capaClusterCentEmp.definitionExpression = '1=0';
+
+    const expr = `REG = '${ubigeo}'`;
+    this.capaClusterCentEmp.definitionExpression = expr;
+    this.capaClusterCentEmp.visible = true;
+
+    console.log('Filtro cluster CentEmp aplicado:', expr);
+
+    try {
+      const q = this.capaClusterCentEmp.createQuery();
+      q.where = expr;
+      q.returnGeometry = true;
+
+      const extentResult = await this.capaClusterCentEmp.queryExtent(q);
+
+      if (extentResult.extent && this.mapView) {
+        await this.mapView.goTo(extentResult.extent.expand(1.05));
+      }
+    } catch (error) {
+      console.error('Error obteniendo extent del cluster CentEmp:', error);
+    }
+  }
+
+
+ 
+
+
+  private obtenerColorHexTipoActividad(campoFlag: string): string {
+    switch (campoFlag) {
+      case 'FLG_AGRICO':
+        return '#4CAF50'; // verde
+      case 'FLG_PECUAR':
+        return '#8D6E63'; // marrón
+      case 'FLG_FOREST':
+        return '#2E7D32'; // verde oscuro
+      case 'FLG_APICUL':
+      case 'TCA':
+        return '#FFC107';
+      default:
+        return '#CCCCCC';
+    }
+  }
+
+
+  private desactivarClusterCentEmp(): void {
+    if (!this.capaClusterCentEmp) return;
+
+    this.capaClusterCentEmp.definitionExpression = '1=0';
+    this.capaClusterCentEmp.visible = false;
+  }
+
+
+  private filtrarParcelasPorUbigeoNivel(ubigeo: string, nivel: 'dep' | 'prov' | 'dist', campoFlag: string  ): void {
+
+    if (!this.capaParcelasPadron?.sublayers) return;
+
+    let filtro = '';
+
+    if (nivel === 'dep') {
+      filtro = `UBIGEO3 LIKE '${ubigeo}%' AND ${campoFlag} = 1`;
+    } else if (nivel === 'prov') {
+      filtro = `UBIGEO3 LIKE '${ubigeo}%' AND ${campoFlag} = 1`;
+    } else {
+      filtro = `UBIGEO3 = '${ubigeo}' AND ${campoFlag} = 1`;
+    }
+
+    const color = this.obtenerColorHexTipoActividad(campoFlag);
+
+    this.capaParcelasPadron.visible = true;
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (sub0) {
+      sub0.visible = true;
+      sub0.definitionExpression = filtro;
+
+      sub0.renderer = {
+        type: "simple",
+        symbol: {
+          type: "simple-fill",
+          color,
+          outline: {
+            color,
+            width: 4
+          }
+        }
+      } as any;
+    }
+
+    this.capaParcelasPadron.sublayers.forEach(s => {
+      if (s.id !== 0) {
+        s.visible = false;
+        s.definitionExpression = "1=0";
+      }
+    });
+
+    console.log('Filtro aplicado a ParcelasPadron:', filtro);
+    console.log('Color aplicado a ParcelasPadron:', color);
+  }
+
+
+  // private limpiarFiltroParcelasPadron(): void {
+  //   if (!this.capaParcelasPadron) return;
+
+  //   const sub0 = this.capaParcelasPadron.findSublayerById(0);
+  //   if (sub0) {
+  //     sub0.definitionExpression = '';
+  //     sub0.visible = false;
+  //   }
+
+  //   this.capaParcelasPadron.visible = false;
+
+  //   console.log('Filtro de ParcelasPadron limpiado');
+  // }
+
+  private limpiarFiltroParcelasPadron(): void {
+    if (!this.capaParcelasPadron) return;
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (sub0) {
+      sub0.definitionExpression = '';
+      sub0.visible = false;
+    }
+
+    this.capaParcelasPadron.visible = false;
+
+    console.log('Filtro de ParcelasPadron limpiado');
+  }
+
+  
+  private async renderizarUbigeo(ubigeo: string, nivel: 'dep' | 'prov' | 'dist'  ): Promise<void> {    
+
+    try {
+      let url = '';
+      let where = '';
+
+      if (nivel === 'dep') {
+        url = `${environment.arcgis.baseUrl}${environment.arcgis.departamentosCapaUrl}`;
+        where = `CODDEP = '${ubigeo}'`;
+
+      } else if (nivel === 'prov') {
+        url = `${environment.arcgis.baseUrl}${environment.arcgis.provinciasCapaUrl}`;
+
+        const codDep = ubigeo.substring(0, 2);
+        const codProv = ubigeo.substring(2, 4);
+
+      where = `CODDEP = '${codDep}' AND CODPROV = '${codProv}'`;
+
+    } else {
+      url = `${environment.arcgis.baseUrl}${environment.arcgis.distritosCapaUrl}`;
+      where = `UBIGEO = '${ubigeo}'`;
+    }
+
+    const layer = new FeatureLayer({
+      url,
+      outFields: ['*']
+    });
+
+    const q = layer.createQuery();
+    q.where = where;
+    q.returnGeometry = true;
+    q.outFields = ['*'];
+
+    const res = await layer.queryFeatures(q);
+
+    if (!res.features.length) {
+      console.warn('No se encontró geometría para:', { ubigeo, nivel, where });
+      this.resultsLayer?.removeAll();
+      return;
+    }
+
+    this.addResultsToMap(res.features);
+    console.log('Ubigeo renderizado:', { ubigeo, nivel, where });
+
+  } catch (error) {
+    console.error('Error renderizando ubigeo:', error);
+  }
+}
 
 
   private guardarEstadoInicialParcelas() {
@@ -167,6 +703,40 @@ export class Mapa {
     this.estadoInicialParcelas = copia;
     console.log(" Estado inicial ParcelasPadron guardado (REAL!):", copia);
 
+  }
+
+  async filtrarClusterPorTipoActividad(ubigeo: string | null, campoFlag: string | null) {
+    if (!this.capaCluster) return;
+
+    if (!ubigeo || !campoFlag) {
+      this.desactivarCluster();
+      return;
+    }
+
+    this.actualizarEstiloCluster(campoFlag);
+
+    this.capaCluster.visible = false;
+    this.capaCluster.definitionExpression = `1=0`;
+
+    const expr = `UBIGEO3 LIKE '${ubigeo}%' AND ${campoFlag} = 1`;
+    this.capaCluster.definitionExpression = expr;
+    this.capaCluster.visible = true;
+
+    console.log('Filtro cluster tipo actividad aplicado:', expr);
+
+    try {
+      const q = this.capaCluster.createQuery();
+      q.where = expr;
+      q.returnGeometry = true;
+
+      const extentResult = await this.capaCluster.queryExtent(q);
+
+      if (extentResult.extent && this.mapView) {
+        await this.mapView.goTo(extentResult.extent.expand(1.05));
+      }
+    } catch (error) {
+      console.error('Error obteniendo extent del filtro tipo actividad:', error);
+    }
   }
 
 
@@ -242,25 +812,29 @@ export class Mapa {
   }
 
 
-
-
-
   private configurarQueryTask(layer: string) {
 
     let url = "";
 
-    if (layer === "junta") {
-      url = `${environment.arcgis.baseUrl}${environment.arcgis.juntaCapaUrl}`;
-    } else if (layer === "comite") {
-      url = `${environment.arcgis.baseUrl}${environment.arcgis.comiteCapaUrl}`;
-    }else if (layer === "unidadhidro") {
-      url = `${environment.arcgis.baseUrl}${environment.arcgis.unidadHidricaCapaUrl}`;
-    }else if (layer === "sectores") {
-      url = `${environment.arcgis.baseUrl}${environment.arcgis.sectoresCapaUrl}`;
-    }else if (layer === "microcuencas") {
-      url = `${environment.arcgis.baseUrl}${environment.arcgis.microcuencasCapaUrl}`;
-    }
+    // NUEVO FORMATO: cob:<id>
+    if (layer.startsWith("cob:")) {
 
+      const id = Number(layer.split(":")[1]);
+
+      if (!Number.isFinite(id)) {
+        console.warn("ID inválido:", layer);
+        return;
+      }
+
+      // Base del MapServer único
+      const base = `${environment.arcgis.baseUrl}/winjmprap12/rest/services/OBSRV_INFOBASE/MapServer`;
+
+      url = `${base}/${id}`;
+
+    } else {
+      console.warn("Formato no reconocido:", layer);
+      return;
+    }
 
     this.queryTask = new FeatureLayer({
       url,
@@ -268,7 +842,6 @@ export class Mapa {
     });
 
     console.log("QueryTask configurado:", url);
-
   }
 
 
@@ -357,16 +930,49 @@ export class Mapa {
     switch (campo) {
       case "GEN":
         await this.aplicarRendererGenero();
-        break;
-      case "FERTILIZA":
-        await this.aplicarRendererGenero();
-        break;
+        break;      
       case "NIVEST":
         await this.aplicarRendererNivelEstudio();
         break;
       case "TIPORG":
         await this.aplicarRendererTipoOrganizacion();
         break;
+      case "FUING":
+        await this.aplicarRendererTipoOrganizacion();
+        break;
+      case "TIPACT":
+        await this.aplicarRendererTipoActiv();
+        break;  
+      case "TAMPARC":
+        await this.aplicarRendererTamanioParcela();
+        break; 
+      case "REGTENE":
+        await this.aplicarRendererRegimenTenencia();
+        break;  
+      case "CULTIPRIN":
+        await this.aplicarRendererCultivoPricipal();
+        break;  
+      case "CULTITRANS":
+        await this.aplicarRendererCultivoTransitorio();
+        break;  
+      case "CULTIPERMA":
+        await this.aplicarRendererCultivoPermanente();
+        break;  
+      case "FERTILIZA":
+        await this.aplicarRendererUsoFertilizante();
+        break;  
+      case "BIEREC":
+        await this.aplicarRendererBienRecibido();
+        break;  
+      case "SRVREC":
+        await this.aplicarRendererServRecibido();
+        break;  
+      case "RESET":
+        await this.limpiarTematicoParcelas();
+        break;
+
+
+
       default:
         console.warn(" Campo no reconocido:", campo);
         return;
@@ -396,8 +1002,79 @@ export class Mapa {
     // 1 = Hombre → Azul
     // 2 = Mujer  → Rojo
     const colores: Record<string, string> = {
-      "1": "#1A73E8",   // Azul fuerte Google Style
-      "2": "#E53935"    // Rojo intenso
+      "1": "#1A73E8",   // Hombre = azul
+      "2": "#E53935",   // Mujer = rojo
+      "3": "#1E872C"    // Otros = verde
+    };
+
+    //  Símbolo simple-fill para polígonos (borde igual al color)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any);
+
+    //  RENDERER FINAL POR GENERO
+    sub0.renderer = {
+      type: "unique-value",
+      field: "GENERO",
+      uniqueValueInfos: [
+        {
+          value: "1",
+          label: "Hombre",
+          symbol: simb(colores["1"])
+        },
+        {
+          value: "2",
+          label: "Mujer",
+          symbol: simb(colores["2"])
+        },
+        {
+          value: "3",
+          label: "Otros",
+          symbol: simb(colores["3"])
+        }
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#CCCCCC",
+        outline: { color: "#CCCCCC", width: 4 }
+      },
+      defaultLabel: "Sin dato"
+    } as any;
+
+    console.log(" Renderer GÉNERO aplicado correctamente");
+
+  }
+
+
+
+  private async aplicarRendererBienRecibido() {
+
+    console.log(" Aplicando renderer por aplicarRendererBienRecibido...");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    //  Colores definitivos
+    // 1 = Hombre → Azul
+    // 2 = Mujer  → Rojo
+    const colores: Record<string, string> = {
+      "1": "#20B5B8",   // Azul fuerte Google Style
+      "2": "#229389"    // Rojo intenso
     };
 
     //  Símbolo simple-fill para polígonos (borde igual al color)
@@ -435,7 +1112,7 @@ export class Mapa {
       defaultLabel: "Sin dato"
     } as any;
 
-    console.log(" Renderer GÉNERO aplicado correctamente");
+    console.log(" Renderer aplicarRendererBienRecibido aplicado correctamente");
 
   }
 
@@ -498,9 +1175,246 @@ export class Mapa {
   }
 
 
+
+  private async aplicarRendererUsoFertilizante() {
+
+    console.log(" Aplicando renderer por aplicarRendererUsoFertilizante...");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    //  Colores Highcharts (solo 4)
+    const colores: Record<string, string> = {
+      "1": "#20B5B8",
+      "2": "#229389",
+      "3": "#D2DD45",
+      "4": "#FFE44A"
+    };
+
+    //  Símbolo para polígonos (con cast any, evita errores TS)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any);
+
+    //  RENDERER FINAL POR TORG
+    sub0.renderer = {
+      type: "unique-value",
+      field: "TORG",
+      uniqueValueInfos: [
+        { value: "1", label: "Tipo 1", symbol: simb(colores["1"]) },
+        { value: "2", label: "Tipo 2", symbol: simb(colores["2"]) },
+        { value: "3", label: "Tipo 3", symbol: simb(colores["3"]) },
+        { value: "4", label: "Tipo 4", symbol: simb(colores["4"]) },
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#CCCCCC",
+        outline: { color: "#CCCCCC", width: 4 }
+      },
+      defaultLabel: "Sin dato"
+    } as any;
+
+    console.log(" Renderer aplicarRendererUsoFertilizante aplicado correctamente");
+
+  }
+
+
+  private async aplicarRendererTipoActiv() {
+
+    console.log(" Aplicando renderer por tipact...");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    // Colores Highcharts (solo 4)
+    const colores: Record<string, string> = {
+      "1": "#4CAF50",
+      "2": "#FFC107",
+      "3": "#2E7D32",
+      "4": "#8D6E63"
+    };
+
+
+
+    // Símbolo para polígonos (con cast any, evita errores TS)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any);
+
+    //  RENDERER FINAL POR TORG
+    sub0.renderer = {
+      type: "unique-value",
+      field: "TORG",
+      uniqueValueInfos: [
+        { value: "1", label: "Tipo 1", symbol: simb(colores["1"]) },
+        { value: "2", label: "Tipo 2", symbol: simb(colores["2"]) },
+        { value: "3", label: "Tipo 3", symbol: simb(colores["3"]) },
+        { value: "4", label: "Tipo 4", symbol: simb(colores["4"]) },
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#CCCCCC",
+        outline: { color: "#CCCCCC", width: 4 }
+      },
+      defaultLabel: "Sin dato"
+    } as any;
+
+    console.log(" Renderer TIPACT aplicado correctamente");
+
+  }
+
+
+
+
+  private async aplicarRendererTamanioParcela() {
+
+    console.log(" Aplicando renderer por Tamaño parce...");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    // Colores Highcharts (solo 4)
+    const colores: Record<string, string> = {
+      "1": "#20B5B8",
+      "2": "#229389",
+      "3": "#D2DD45",
+      "4": "#FFE44A"
+    };
+
+    // Símbolo para polígonos (con cast any, evita errores TS)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any);
+
+    //  RENDERER FINAL POR TORG
+    sub0.renderer = {
+      type: "unique-value",
+      field: "TMPR",
+      uniqueValueInfos: [
+        { value: "1", label: "Tipo 1", symbol: simb(colores["1"]) },
+        { value: "2", label: "Tipo 2", symbol: simb(colores["2"]) },
+        { value: "3", label: "Tipo 3", symbol: simb(colores["3"]) }
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#CCCCCC",
+        outline: { color: "#CCCCCC", width: 4 }
+      },
+      defaultLabel: "Sin dato"
+    } as any;
+
+    console.log(" Renderer TMPR aplicado correctamente");
+
+  }
+
+
+
+  private async aplicarRendererFuenteIngreso() {
+
+    console.log(" Aplicando renderer por FUING...");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    //  Colores Highcharts (solo 4)
+    const colores: Record<string, string> = {
+      "1": "#20B5B8",
+      "2": "#229389",
+      "3": "#D2DD45",
+      "4": "#FFE44A"
+    };
+
+    //  Símbolo para polígonos (con cast any, evita errores TS)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any);
+
+    //  RENDERER FINAL POR TORG
+    sub0.renderer = {
+      type: "unique-value",
+      field: "FING",
+      uniqueValueInfos: [
+        { value: "1", label: "Tipo 1", symbol: simb(colores["1"]) },
+        { value: "2", label: "Tipo 2", symbol: simb(colores["2"]) },
+        { value: "3", label: "Tipo 3", symbol: simb(colores["3"]) },
+        { value: "4", label: "Tipo 4", symbol: simb(colores["4"]) },
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#CCCCCC",
+        outline: { color: "#CCCCCC", width: 4 }
+      },
+      defaultLabel: "Sin dato"
+    } as any;
+
+    console.log(" Renderer FING aplicado correctamente");
+
+  }
+
+
   private async aplicarRendererNivelEstudio() {
 
-    console.log(" Aplicando renderer NIVEST Highcharts...");
+    console.log(" Aplicando renderer NIVEST Highcharts... OK-");
 
     if (!this.capaParcelasPadron) return;
     await this.capaParcelasPadron.when();
@@ -559,6 +1473,314 @@ export class Mapa {
   }
 
 
+  private async aplicarRendererCultivoPricipal() {
+
+    console.log(" Aplicando renderer aplicarRendererCultivoPricipal Highcharts...pendiente de camabio");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    //  Colores Highcharts (tus colores del donut)
+    const colores: Record<number, string> = {
+      11: "#20B5B8", // Sin info
+      13: "#229389", // Primaria
+      8:  "#D2DD45", // Secundaria
+      10: "#FFE44A", // Técnico
+      9:  "#FFB022", // Universitaria
+      12: "#F76C4A"  // Posgrado
+    };
+
+    //  Símbolo compatible para MapImageSubLayer (con cast ANY)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any); // ← evita error TS
+
+    //  RENDERER FINAL
+    sub0.renderer = {
+      type: "unique-value",
+      field: "IDE_ESTUDI",
+      uniqueValueInfos: [
+        { value: 11, label: "Sin información",     symbol: simb(colores[11]) },
+        { value: 13, label: "Primaria",            symbol: simb(colores[13]) },
+        { value: 8,  label: "Secundaria",          symbol: simb(colores[8])  },
+        { value: 10, label: "Superior Técnica",    symbol: simb(colores[10]) },
+        { value: 9,  label: "Universitaria",       symbol: simb(colores[9])  },
+        { value: 12, label: "Posgrado/Maestría",   symbol: simb(colores[12]) }
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#cccccc",
+        outline: { color: "#cccccc", width: 4 }
+      }
+    } as any; // ← evita error TS también
+
+    console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
+
+  }
+
+
+
+  private async aplicarRendererCultivoTransitorio() {
+
+    console.log(" Aplicando renderer aplicarRendererCultivoTransitorio Highcharts...pendiente de camabio");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    //  Colores Highcharts (tus colores del donut)
+    const colores: Record<number, string> = {
+      11: "#20B5B8", // Sin info
+      13: "#229389", // Primaria
+      8:  "#D2DD45", // Secundaria
+      10: "#FFE44A", // Técnico
+      9:  "#FFB022", // Universitaria
+      12: "#F76C4A"  // Posgrado
+    };
+
+    //  Símbolo compatible para MapImageSubLayer (con cast ANY)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any); // ← evita error TS
+
+    //  RENDERER FINAL
+    sub0.renderer = {
+      type: "unique-value",
+      field: "IDE_ESTUDI",
+      uniqueValueInfos: [
+        { value: 11, label: "Sin información",     symbol: simb(colores[11]) },
+        { value: 13, label: "Primaria",            symbol: simb(colores[13]) },
+        { value: 8,  label: "Secundaria",          symbol: simb(colores[8])  },
+        { value: 10, label: "Superior Técnica",    symbol: simb(colores[10]) },
+        { value: 9,  label: "Universitaria",       symbol: simb(colores[9])  },
+        { value: 12, label: "Posgrado/Maestría",   symbol: simb(colores[12]) }
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#cccccc",
+        outline: { color: "#cccccc", width: 4 }
+      }
+    } as any; // ← evita error TS también
+
+    console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
+
+  }
+
+
+  private async aplicarRendererServRecibido() {
+
+    console.log(" Aplicando renderer aplicarRendererServRecibido Highcharts...pendiente de camabio");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    //  Colores Highcharts (tus colores del donut)
+    const colores: Record<number, string> = {
+      11: "#20B5B8", // Sin info
+      13: "#229389", // Primaria
+      8:  "#D2DD45", // Secundaria
+      10: "#FFE44A", // Técnico
+      9:  "#FFB022", // Universitaria
+      12: "#F76C4A"  // Posgrado
+    };
+
+    //  Símbolo compatible para MapImageSubLayer (con cast ANY)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any); // ← evita error TS
+
+    //  RENDERER FINAL
+    sub0.renderer = {
+      type: "unique-value",
+      field: "IDE_ESTUDI",
+      uniqueValueInfos: [
+        { value: 11, label: "Sin información",     symbol: simb(colores[11]) },
+        { value: 13, label: "Primaria",            symbol: simb(colores[13]) },
+        { value: 8,  label: "Secundaria",          symbol: simb(colores[8])  },
+        { value: 10, label: "Superior Técnica",    symbol: simb(colores[10]) },
+        { value: 9,  label: "Universitaria",       symbol: simb(colores[9])  },
+        { value: 12, label: "Posgrado/Maestría",   symbol: simb(colores[12]) }
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#cccccc",
+        outline: { color: "#cccccc", width: 4 }
+      }
+    } as any; // ← evita error TS también
+
+    console.log(" Renderer aplicado aplicarRendererServRecibido ");
+
+  }
+
+
+
+  private async aplicarRendererCultivoPermanente() {
+
+    console.log(" Aplicando renderer aplicarRendererCultivoPermanente Highcharts...pendiente de camabio");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    //  Colores Highcharts (tus colores del donut)
+    const colores: Record<number, string> = {
+      11: "#20B5B8", // Sin info
+      13: "#229389", // Primaria
+      8:  "#D2DD45", // Secundaria
+      10: "#FFE44A", // Técnico
+      9:  "#FFB022", // Universitaria
+      12: "#F76C4A"  // Posgrado
+    };
+
+    //  Símbolo compatible para MapImageSubLayer (con cast ANY)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any); // ← evita error TS
+
+    //  RENDERER FINAL
+    sub0.renderer = {
+      type: "unique-value",
+      field: "IDE_ESTUDI",
+      uniqueValueInfos: [
+        { value: 11, label: "Sin información",     symbol: simb(colores[11]) },
+        { value: 13, label: "Primaria",            symbol: simb(colores[13]) },
+        { value: 8,  label: "Secundaria",          symbol: simb(colores[8])  },
+        { value: 10, label: "Superior Técnica",    symbol: simb(colores[10]) },
+        { value: 9,  label: "Universitaria",       symbol: simb(colores[9])  },
+        { value: 12, label: "Posgrado/Maestría",   symbol: simb(colores[12]) }
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#cccccc",
+        outline: { color: "#cccccc", width: 4 }
+      }
+    } as any; // ← evita error TS también
+
+    console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
+
+  }
+
+
+  private async aplicarRendererRegimenTenencia() {
+
+    console.log(" Aplicando renderer regimentenencia Highcharts...pendiente de camabio");
+
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) {
+      console.error(" No se encontró el sublayer 0");
+      return;
+    }
+
+    sub0.visible = true;
+    this.capaParcelasPadron.visible = true;
+
+    //  Colores Highcharts (tus colores del donut)
+    const colores: Record<number, string> = {
+      11: "#20B5B8", // Sin info
+      13: "#229389", // Primaria
+      8:  "#D2DD45", // Secundaria
+      10: "#FFE44A", // Técnico
+      9:  "#FFB022", // Universitaria
+      12: "#F76C4A"  // Posgrado
+    };
+
+    //  Símbolo compatible para MapImageSubLayer (con cast ANY)
+    const simb = (hex: string) =>
+      ({
+        type: "simple-fill",
+        color: hex,
+        outline: {
+          color: hex,
+          width: 4
+        }
+      } as any); // ← evita error TS
+
+    //  RENDERER FINAL
+    sub0.renderer = {
+      type: "unique-value",
+      field: "IDE_ESTUDI",
+      uniqueValueInfos: [
+        { value: 11, label: "Sin información",     symbol: simb(colores[11]) },
+        { value: 13, label: "Primaria",            symbol: simb(colores[13]) },
+        { value: 8,  label: "Secundaria",          symbol: simb(colores[8])  },
+        { value: 10, label: "Superior Técnica",    symbol: simb(colores[10]) },
+        { value: 9,  label: "Universitaria",       symbol: simb(colores[9])  },
+        { value: 12, label: "Posgrado/Maestría",   symbol: simb(colores[12]) }
+      ],
+      defaultSymbol: {
+        type: "simple-fill",
+        color: "#cccccc",
+        outline: { color: "#cccccc", width: 4 }
+      }
+    } as any; // ← evita error TS también
+
+    console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
+
+  }
+
+
+
   filtrarParcelasPorUbigeo(ubigeo: string) {
 
     if (!this.capaParcelasPadron?.sublayers) return;
@@ -579,6 +1801,90 @@ export class Mapa {
 
     console.log(" Filtro aplicado a Parcelas:", filtro);
 
+  }
+
+
+  // async zoomToObjectId2(cober: Polygon | null) {
+
+  //   if (!cober) {
+  //     console.warn("No llegó geometría (cober es null)");
+  //     return;
+  //   }
+
+  //   const graphic = new Graphic({
+  //     geometry: cober,
+  //     symbol: new SimpleFillSymbol({
+  //       color: [0, 0, 0, 0],
+  //       outline: {
+  //         color: [255, 0, 255],
+  //         width: 3
+  //       }
+  //     })
+  //   });
+
+  //   this.addResultsToMap([graphic]);
+  // }
+  // async zoomToObjectId2(cober: Polygon | null) {
+  //   this.limpiarCoberturaAnalisis();
+
+  //   if (!cober) {
+  //     console.warn("No llegó geometría (cober es null)");
+  //     return;
+  //   }
+
+  //   const graphic = new Graphic({
+  //     geometry: cober,
+  //     symbol: new SimpleFillSymbol({
+  //       color: [0, 0, 0, 0],
+  //       outline: {
+  //         color: [255, 0, 255],
+  //         width: 3
+  //       }
+  //     })
+  //   });
+
+  //   this.resultsLayer.add(graphic);
+
+  //   if (this.mapView) {
+  //     await this.mapView.goTo(cober);
+  //   }
+  // }
+  async zoomToObjectId2(payload: { geometry: Polygon | null; source?: 'draw' | 'kml' | 'select' }) {
+    const cober = payload?.geometry ?? null;
+    const source = payload?.source;
+
+    this.limpiarCoberturaAnalisis();
+
+    if (!cober) {
+      console.warn("No llegó geometría (cober es null)");
+      return;
+    }
+
+    const graphic = new Graphic({
+      geometry: cober,
+      symbol: new SimpleFillSymbol({
+        color: [0, 0, 0, 0],
+        outline: {
+          color: [255, 0, 255],
+          width: 3
+        }
+      })
+    });
+
+    this.resultsLayer.add(graphic);
+
+    if (!this.mapView) return;
+
+    // Dibujo manual: NO hacer zoom
+    if (source === 'draw') {
+      return;
+    }
+
+    // KML o selección: zoom más suave
+    const extent = cober.extent;
+    if (extent) {
+      await this.mapView.goTo(extent.expand(1.8), { duration: 700 });
+    }
   }
 
 
@@ -623,30 +1929,56 @@ export class Mapa {
   }
 
 
-  filtrarClusterPorReg(reg: string | null) {
+  async  filtrarClusterPorReg(reg: string | null) {
 
+   
+    // console.log('Filtro aplicado:', expr);
     if (!this.capaCluster) return;
-    if (reg) {
-      this.capaCluster.definitionExpression = `REG = '${reg}'`;
-      this.capaCluster.visible = true;
-      console.log('Mostrando cluster REG:', reg);
-    } else {
+
+    if (!reg) {
       this.desactivarCluster();
+      return;
     }
+
+    this.capaCluster.visible = false;
+    this.capaCluster.definitionExpression = `1=0`;
+
+    const expr = `UBIGEO3 like '${reg}%'`;
+    this.capaCluster.definitionExpression = expr;
+    this.capaCluster.visible = true;
+
+    console.log('Filtro aplicado:', expr);
+
+    try {
+      const q = this.capaCluster.createQuery();
+      q.where = expr;
+      q.returnGeometry = true;
+
+      const extentResult = await this.capaCluster.queryExtent(q);
+
+      if (extentResult.extent && this.mapView) {
+        await this.mapView.goTo(extentResult.extent.expand(1.05));
+      }
+    } catch (error) {
+      console.error('Error obteniendo extent del filtro:', error);
+    }
+
 
   }
 
 
+
   desactivarCluster() {
-
     if (!this.capaCluster) return;
-    this.capaCluster.visible = false;
-    this.capaCluster.definitionExpression = '';
 
+    this.capaCluster.definitionExpression = `1=0`;
+    this.capaCluster.visible = false;
   }
 
 
   filtrarClusterPorRegPpa(reg: string | null) {
+
+    //alert(reg);
 
     if (!this.capaClusterPpa) return;
     if (reg) {
@@ -698,6 +2030,25 @@ export class Mapa {
       this.printWidget = null;
     }
 
+
+    // Panel KML + input
+    this.quitarKml();
+
+    if (this.kmlPanel) {
+      try { this.kmlPanel.remove(); } catch {}
+    }
+
+    if (this.kmlInput) {
+      try { this.kmlInput.remove(); } catch {}
+      this.kmlInput = null;
+    }
+
+    if (this.kmlBtn) {
+      try { this.kmlBtn.remove(); } catch {}
+      this.kmlBtn = null;
+    }
+
+
     // Capas temporales
     this.resultsLayer?.removeAll();
     this.highlightLayer?.removeAll();
@@ -709,7 +2060,92 @@ export class Mapa {
     (this as any).map = null;
     this.isReady = false;
 
+
+
   }
+
+  private guardarRendererOriginalSub0(): void {
+    if (!this.capaParcelasPadron) return;
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) return;
+
+    const orig = (sub0 as any)._rendererOriginal; // viene de tu fetch pjson
+    if (!orig?.symbol) {
+      console.warn("No hay _rendererOriginal válido en sub0");
+      return;
+    }
+
+    // convertir esriSFS -> simple-fill autocast
+    const sym = orig.symbol;
+    let autoSym: any = null;
+
+    if (sym.type === "esriSFS") {
+      autoSym = {
+        type: "simple-fill",
+        color: sym.color,
+        outline: {
+          type: "simple-line",
+          color: sym.outline?.color,
+          width: sym.outline?.width ?? 1
+        }
+      };
+    } else if (sym.type === "esriSMS") {
+      autoSym = {
+        type: "simple-marker",
+        color: sym.color,
+        size: sym.size,
+        outline: {
+          type: "simple-line",
+          color: sym.outline?.color,
+          width: sym.outline?.width ?? 1
+        }
+      };
+    } else if (sym.type === "esriSLS") {
+      autoSym = {
+        type: "simple-line",
+        color: sym.color,
+        width: sym.width ?? 1
+      };
+    }
+
+    if (!autoSym) {
+      console.warn("Tipo de símbolo original no soportado:", sym.type);
+      return;
+    }
+
+    this.rendererOriginalSub0 = {
+      type: "simple",
+      symbol: autoSym
+    };
+
+    console.log(" Renderer original sub0 guardado en memoria (autocast)");
+  }
+
+
+  private async limpiarTematicoParcelas(): Promise<void> {
+    if (!this.capaParcelasPadron) return;
+    await this.capaParcelasPadron.when();
+
+    const sub0 = this.capaParcelasPadron.findSublayerById(0);
+    if (!sub0) return;
+
+    //  restaurar renderer original guardado
+    if (this.rendererOriginalSub0) {
+      sub0.renderer = JSON.parse(JSON.stringify(this.rendererOriginalSub0));
+    }
+
+    // limpiar filtros
+    sub0.definitionExpression = "";
+
+    // si quieres apagar la capa (como tu reset)
+    sub0.visible = false;
+    this.capaParcelasPadron.visible = false;
+
+    console.log(" Temático limpiado y renderer original restaurado");
+  }
+
+
 
 
   async iniciar(): Promise<string> {
@@ -720,12 +2156,13 @@ export class Mapa {
       // --- Crear capas ---
       this.capaParcelasPadron = new MapImageLayer({
         url: `${environment.arcgis.baseUrl}${environment.arcgis.parcelaPadronCapaUrl}/`,
-        title: "Parcelas Productores",
+        title: "Parcelas de Productores",
         visible: false
       });
 
       await this.capaParcelasPadron.loadAll();
       await this.cargarRendererOriginalParcelas();
+      this.guardarRendererOriginalSub0();
       this.guardarEstadoInicialParcelas();
 
       if (this.capaParcelasPadron.sublayers) {
@@ -740,44 +2177,105 @@ export class Mapa {
 
 
 
-
-      this.capaMapServer = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/SectoresEstadisticos/MapServer/",
-        visible: false
+      this.capaCoberturas = new MapImageLayer({
+        url: this.COBERTURAS_URL,     //  SIN /0 /1 /etc
+        visible: false,
+        title: "Coberturas para Análisis"
       });
 
-      this.rasterBosqueAmazonico = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/UnidadHidrografica/MapServer/",
-        visible: false
-      });
+      await this.capaCoberturas.load();
 
-      this.capaClusterAlertas = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Microcuencas/MapServer/",
-        visible: false
-      });
+      // IMPORTANTE: al cargar, no mostrar nada por defecto
+      if (this.capaCoberturas.sublayers) {
+        this.capaCoberturas.sublayers.forEach(s => {
+          s.visible = false;
+          s.definitionExpression = "1=0";
+        });
+      }
+      this.capaCoberturas.visible = false;
 
-      this.capaJuntausuario = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/JuntasUsuarios/MapServer/",
-        visible: false
-      });
 
-      this.capaComiteRiego = new MapImageLayer({
-        url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/ComisionesRiego/MapServer/",
-        visible: false
-      });
+
 
       this.capaAntenasCelular = new MapImageLayer({
         url: "https://winlmprap24.midagri.gob.pe/arcgis_server/rest/services/ObservatorioPPA/Antenas/MapServer/",
         visible: false
       });
 
-      this.capaCluster = new FeatureLayer({
+
+      this.capaClusterCentEmp = new FeatureLayer({
         url: `${environment.arcgis.baseUrl}${environment.arcgis.centroEmpadronamientoUrl}`,
         visible: false,
         outFields: ['*'],
+        popupEnabled: true,
+        popupTemplate: {
+          title: "Centro de Empadronamiento",
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                { fieldName: "OBJECTID", label: "OBJECTID" },                                
+                { fieldName: "INST", label: "Institución" },
+                { fieldName: "CENTRO", label: "Centro" },
+                { fieldName: "LONG_", label: "Longitud" },
+                { fieldName: "LAT", label: "Latitud" },
+                { fieldName: "REG", label: "Región" },
+                { fieldName: "PROV", label: "Provincia" },
+                { fieldName: "DIST", label: "Distrito" }
+              ]
+            }
+          ]
+        },
+        // renderer: {
+        //   type: "simple",
+        //   symbol: {
+        //     type: "simple-marker",
+        //     style: "circle",
+        //     size: 6,
+        //     color: [255, 255, 255, 0.08],
+        //     outline: {
+        //       color: [255, 0, 0, 1],
+        //       width: 1.2
+        //     }
+        //   }
+        // },
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "picture-marker",
+            url: "/assets/icons/casa-centro.png",
+            width: "40px",
+            height: "40px"
+          }
+        },
+        // renderer: {
+        //   type: "simple",
+        //   symbol: {
+        //     type: "simple-marker",
+        //     style: "diamond",
+        //     size: 14,
+        //     color: [255, 255, 255, 1],
+        //     outline: {
+        //       color: [139, 30, 30, 1],
+        //       width: 2
+        //     }
+        //   }
+        // },
         featureReduction: {
           type: 'cluster',
-          clusterRadius: '100px',
+          clusterRadius: '25px',
+          clusterMinSize: '24px',
+          clusterMaxSize: '42px',
+          symbol: {
+            type: "simple-marker",
+            style: "circle",
+            color: [255, 255, 255, 0.05],
+            size: 28,
+            outline: {
+              color: [255, 0, 0, 1],
+              width: 2.5
+            }
+          },
           labelsVisible: true,
           labelingInfo: [
             {
@@ -796,13 +2294,67 @@ export class Mapa {
         }
       });
 
+
+      
+      this.capaCluster = new FeatureLayer({
+        url: `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`,
+        visible: false,
+        outFields: ['*'],
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "simple-marker",
+            style: "circle",
+            size: 6,
+            color: [255, 255, 255, 0.08],
+            outline: {
+              color: [255, 0, 0, 1],
+              width: 1.2
+            }
+          }
+        },
+        featureReduction: {
+          type: 'cluster',
+          clusterRadius: '50px',
+          clusterMinSize: '24px',
+          clusterMaxSize: '40px',
+          symbol: {
+            type: "simple-marker",
+            style: "circle",
+            color: [255, 255, 255, 0.05],
+            size: 28,
+            outline: {
+              color: [255, 0, 0, 1],
+              width: 2.5
+            }
+          },
+          labelsVisible: true,
+          labelingInfo: [
+            {
+              deconflictionStrategy: "none",
+              labelExpressionInfo: { expression: "$feature.cluster_count" },
+              labelPlacement: "center-center",
+              symbol: {
+                type: "text",
+                color: "white",
+                font: { size: 14, weight: "bold" },
+                haloColor: "black",
+                haloSize: 1
+              }
+            }
+          ]
+        }
+      });
+
+
+
       this.capaClusterPpa = new FeatureLayer({
         url: `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`,
         visible: false,
         outFields: ['*'],
         featureReduction: {
           type: 'cluster',
-          clusterRadius: '100px',
+          clusterRadius: '25px',
           labelsVisible: true,
           labelingInfo: [
             {
@@ -823,20 +2375,18 @@ export class Mapa {
 
       // --- Crear el mapa SOLO 2D ---
       const capas2D: any[] = [
-        this.capaParcelasPadron,
-        this.rasterBosqueAmazonico,
-        this.capaMapServer,
-        this.capaClusterAlertas,
-        this.capaJuntausuario,
-        this.capaComiteRiego,
+        this.capaParcelasPadron,                
+        this.capaCoberturas,
         this.capaAntenasCelular,
         this.capaCluster,
-        this.capaClusterPpa
+        this.capaClusterPpa,
+        this.capaClusterCentEmp
       ];
 
       // agregar opcional
       if (this.resultsLayer) capas2D.push(this.resultsLayer);
       if (this.highlightLayer) capas2D.push(this.highlightLayer);
+      if (this.drawLayer) capas2D.push(this.drawLayer);
 
       this.map = new EsriMap({
         basemap: "hybrid",
@@ -853,6 +2403,12 @@ export class Mapa {
 
       await this.mapView.when();
       console.log(" MAPA 2D listo");
+
+
+      if (this.map) {
+        this.map.reorder(this.resultsLayer, 0); // abajo
+        this.map.reorder(this.drawLayer, this.map.layers.length - 1); // arriba solo para dibujo
+      }
 
 
 
@@ -886,16 +2442,16 @@ export class Mapa {
       // --- UI extra ---
       this.legendContainer = document.createElement('div');
       this.legendContainer.classList.add('esri-widget', 'esri-widget--panel');
-      this.legendContainer.style.width = '250px';
+      this.legendContainer.style.width = '300px';
       this.legendContainer.style.display = 'none';
 
       this.tocContainer = document.createElement('div');
       this.tocContainer.classList.add('esri-widget', 'esri-widget--panel');
-      this.tocContainer.style.width = '250px';
+      this.tocContainer.style.width = '300px';
       this.tocContainer.style.display = 'none';
 
-      this.mapView.ui.add(this.legendContainer, 'bottom-right');
-      this.mapView.ui.add(this.tocContainer, 'bottom-right');
+      this.mapView.ui.add(this.legendContainer, 'bottom-left');
+      this.mapView.ui.add(this.tocContainer, 'bottom-left');
 
       this.agregarBotones();
       this.aplicarEstadoInicial();
@@ -913,6 +2469,132 @@ export class Mapa {
       throw error;
     }
 
+  }
+
+
+  private actualizarEstiloCluster(campoFlag: string): void {
+    if (!this.capaCluster) return;
+
+    const colorBorde = this.obtenerColorTipoActividad(campoFlag);
+
+    // renderer de puntos individuales
+    this.capaCluster.renderer = {
+      type: "simple",
+      symbol: {
+        type: "simple-marker",
+        style: "circle",
+        size: 6,
+        color: [255, 255, 255, 0.08],
+        outline: {
+          color: colorBorde,
+          width: 1.2
+        }
+      }
+    } as any;
+
+    // featureReduction para clusters
+    this.capaCluster.featureReduction = {
+      type: 'cluster',
+      clusterRadius: '25px',
+      clusterMinSize: '24px',
+      clusterMaxSize: '42px',
+      symbol: {
+        type: "simple-marker",
+        style: "circle",
+        color: [255, 255, 255, 0.05],
+        size: 28,
+        outline: {
+          color: colorBorde,
+          width: 2.5
+        }
+      },
+      labelsVisible: true,
+      labelingInfo: [
+        {
+          deconflictionStrategy: "none",
+          labelExpressionInfo: { expression: "$feature.cluster_count" },
+          labelPlacement: "center-center",
+          symbol: {
+            type: "text",
+            color: "white",
+            font: { size: 14, weight: "bold" },
+            haloColor: "black",
+            haloSize: 1
+          }
+        }
+      ]
+    } as any;
+  }
+
+
+  private obtenerColorTipoActividad(campoFlag: string): [number, number, number, number] {
+    switch (campoFlag) {
+      case 'FLG_AGRICO':
+        return [76, 175, 80, 1];   // 
+      case 'FLG_PECUAR':
+        return [141, 110, 99, 1];
+      case 'FLG_FOREST':
+        return [46, 125, 50, 1];   // 
+      case 'FLG_APICUL':
+      case 'TCA':
+        return [255, 193, 7, 1];
+      default:
+        return [141, 110, 99, 1];  // 
+    }
+  }
+
+
+
+  private async activarCoberturaPorId(id: number): Promise<void> {
+    if (!this.capaCoberturas) return;
+
+    await this.capaCoberturas.when(); //  asegura sublayers
+
+    if (!this.capaCoberturas.sublayers) return;
+
+    this.capaCoberturas.visible = true;
+
+    this.capaCoberturas.sublayers.forEach(s => {
+      const activo = s.id === id;
+      s.visible = activo;
+      s.definitionExpression = activo ? "" : "1=0";
+    });
+
+    console.log(" Cobertura activa sublayer:", id);
+  }
+
+  private async apagarCoberturas(): Promise<void> {
+    if (!this.capaCoberturas) return;
+
+    await this.capaCoberturas.when();
+
+    if (!this.capaCoberturas.sublayers) return;
+
+    this.capaCoberturas.visible = false;
+    this.capaCoberturas.sublayers.forEach(s => {
+      s.visible = false;
+      s.definitionExpression = "1=0";
+    });
+  }
+
+
+  private setActiveSublayer(layer: MapImageLayer | null, activeId: number, visible = true) {
+    if (!layer || !layer.sublayers) return;
+
+    // enciende/apaga capa padre
+    layer.visible = visible;
+
+    // solo un sublayer visible: el activeId
+    layer.sublayers.forEach(s => {
+      const isActive = s.id === activeId;
+      s.visible = isActive;
+
+      // evita que los otros “se pinten” o consuman
+      if (!isActive) s.definitionExpression = "1=0";
+      else s.definitionExpression = ""; // o conserva el filtro si aplicas alguno
+    });
+
+    console.log(` ${layer.title} => sublayer activo: ${activeId}`);
   }
 
 
@@ -980,7 +2662,8 @@ export class Mapa {
 
       // Enviar evento para panel u otro componente
       this.comm.sendFeatureSelected(feature);
-      this.comm.sendGeometry(feature.geometry);
+      //this.comm.sendGeometry(feature.geometry);
+      this.comm.sendGeometry(feature.geometry as Polygon, 'select');
 
       console.log("OBJECTID encontrado:", feature.attributes.OBJECTID);
 
@@ -1127,25 +2810,25 @@ export class Mapa {
 
 
   private disablePrintFor3D() {
-  try {
+    try {
 
-    // destruir el widget si existe
-    if (this.printWidget) {
-      this.printWidget.destroy();
-      this.printWidget = null;
-      console.log(" PrintWidget destruido");
+      // destruir el widget si existe
+      if (this.printWidget) {
+        this.printWidget.destroy();
+        this.printWidget = null;
+        console.log(" PrintWidget destruido");
+      }
+
+      // eliminar el botón del DOM
+      if (this.printBtn) {
+        this.printBtn.remove();
+        this.printBtn = null;
+        console.log(" printBtn eliminado");
+      }
+
+    } catch (e) {
+      console.warn(" Error al desactivar print:", e);
     }
-
-    // eliminar el botón del DOM
-    if (this.printBtn) {
-      this.printBtn.remove();
-      this.printBtn = null;
-      console.log(" printBtn eliminado");
-    }
-
-  } catch (e) {
-    console.warn(" Error al desactivar print:", e);
-  }
 }
 
 
@@ -1153,14 +2836,8 @@ export class Mapa {
 
 
   private aplicarEstadoInicial(): void {
-
-    // Visibilidad inicial de capas
-    //if (this.capaParcelasPadron) this.capaParcelasPadron.visible = false;
-    if (this.capaMapServer) this.capaMapServer.visible = false;
-    if (this.rasterBosqueAmazonico) this.rasterBosqueAmazonico.visible = false;
-    if (this.capaClusterAlertas) this.capaClusterAlertas.visible = false;
-    if (this.capaJuntausuario) this.capaJuntausuario.visible = false;
-    if (this.capaComiteRiego) this.capaComiteRiego.visible = false;
+    
+    this.apagarCoberturas();
     if (this.capaAntenasCelular) this.capaAntenasCelular.visible = false;
     if (this.capaCluster) this.capaCluster.visible = false;
     if (this.capaClusterPpa) this.capaClusterPpa.visible = false;
@@ -1201,10 +2878,12 @@ export class Mapa {
 
   agregarBotones() {
 
+    
+
     this.legendToggleBtn = document.createElement('div');
-    this.legendToggleBtn.className = 'esri-widget esri-widget--button esri-interactive';
-    this.legendToggleBtn.innerHTML = '<span class="esri-icon-collection" title="Mostrar/Ocultar Leyenda"></span>';
-    this.legendToggleBtn.style.margin = '5px';
+    this.legendToggleBtn.className = 'esri-widget esri-widget--button esri-interactive btn-tooltip';
+    this.legendToggleBtn.innerHTML = '<span class="esri-icon-collection" ></span><div class="gp-tooltip">Mostrar/Ocultar Leyenda</div>';
+    
 
     this.legendToggleBtn.onclick = () => {
       const isVisible = this.legendContainer.style.display !== 'none';
@@ -1212,9 +2891,9 @@ export class Mapa {
     };
 
     this.toc_ToggleBtn = document.createElement('div');
-    this.toc_ToggleBtn.className = 'esri-widget esri-widget--button esri-interactive';
-    this.toc_ToggleBtn.innerHTML = '<span class="esri-icon-layer-list" title="Mostrar/Ocultar Leyenda"></span>';
-    this.toc_ToggleBtn.style.margin = '5px';
+    this.toc_ToggleBtn.className = 'esri-widget esri-widget--button esri-interactive  btn-tooltip';
+    this.toc_ToggleBtn.innerHTML = '<span class="esri-icon-layer-list" ></span><div class="gp-tooltip">Mostrar/Ocultar Leyenda</div>';
+    
 
     this.toc_ToggleBtn.onclick = () => {
       const isVisible_toc = this.tocContainer.style.display !== 'none';
@@ -1224,9 +2903,9 @@ export class Mapa {
     };
 
     this.toc_IndetifiBtn = document.createElement('div');
-    this.toc_IndetifiBtn.className = 'esri-widget esri-widget--button esri-interactive';
-    this.toc_IndetifiBtn.innerHTML = '<span class="esri-icon-notice-round" title="Identificar elementos"></span>';
-    this.toc_IndetifiBtn.style.margin = '5px';
+    this.toc_IndetifiBtn.className = 'esri-widget esri-widget--button esri-interactive  btn-tooltip';
+    this.toc_IndetifiBtn.innerHTML = '<span class="esri-icon-notice-round" ></span><div class="gp-tooltip">Identificar elementos</div>';
+    
 
     this.toc_IndetifiBtn.onclick = () => {
       // habilita funcion identiffy para click y popup
@@ -1235,8 +2914,9 @@ export class Mapa {
 
     this.sketsch = new Sketch({
       view: this.mapView,
-      layer: this.resultsLayer ?? undefined,
+      layer: this.drawLayer ?? undefined,
       creationMode: 'single',
+      //updateOnGraphicClick: false,
       availableCreateTools: ['polygon', 'rectangle'], // Solo estos
       visibleElements: {
         createTools: {
@@ -1277,10 +2957,13 @@ export class Mapa {
     lineSym.color = [255, 0, 255];
     lineSym.width = 3;
 
+
+
+
     this.toc_Draw = document.createElement('div');
-    this.toc_Draw.className = 'esri-widget esri-widget--button esri-interactive';
-    this.toc_Draw.innerHTML = '<span class="esri-icon-edit" title="Dibujar"></span>';
-    this.toc_Draw.style.margin = '5px';
+    this.toc_Draw.className = 'esri-widget esri-widget--button esri-interactive btn-tooltip';
+    this.toc_Draw.innerHTML = '<span class="esri-icon-edit" ></span> <div class="gp-tooltip">Dibujar</div>';
+    
 
     this.toc_Draw.onclick = () => {
       // habilita funcion identiffy para click y popup
@@ -1298,9 +2981,9 @@ export class Mapa {
     };
 
     this.toc_MedirRegla = document.createElement('div');
-    this.toc_MedirRegla.className = 'esri-widget esri-widget--button esri-interactive';
-    this.toc_MedirRegla.innerHTML = '<span class="esri-icon-measure" title="Medir distancias"></span>';
-    this.toc_MedirRegla.style.margin = '5px';
+    this.toc_MedirRegla.className = 'esri-widget esri-widget--button esri-interactive btn-tooltip';
+    this.toc_MedirRegla.innerHTML = '<span class="esri-icon-measure" ></span><div class="gp-tooltip">Medir distancias</div>';
+    
 
     this.toc_MedirRegla.onclick = () => {
       // chat gpt por favr colocar el codigo para iniciar el proceso de medir
@@ -1321,9 +3004,9 @@ export class Mapa {
     };
 
     this.toc_MedirArea = document.createElement('div');
-    this.toc_MedirArea.className = 'esri-widget esri-widget--button esri-interactive';
-    this.toc_MedirArea.innerHTML = '<span class="esri-icon-polygon" title="Medir áreas"></span>';
-    this.toc_MedirArea.style.margin = '5px';
+    this.toc_MedirArea.className = 'esri-widget esri-widget--button esri-interactive btn-tooltip';
+    this.toc_MedirArea.innerHTML = '<span class="esri-icon-polygon" ></span><div class="gp-tooltip">Medir áreas</div>';
+   
 
     this.toc_MedirArea.onclick = () => {
       if (!this.mapView) return;
@@ -1345,7 +3028,7 @@ export class Mapa {
     this.toc_3D = document.createElement('div');
     this.toc_3D.className = 'esri-widget esri-widget--button esri-interactive';
     this.toc_3D.innerHTML = '<span class="esri-icon-globe" title="Cambiar vista 2D/3D"></span>';
-    this.toc_3D.style.margin = '5px';
+    
 
     // al inicio usas tu mapView normal
     if (this.mapView){
@@ -1356,9 +3039,9 @@ export class Mapa {
 
     // Botón principal
     this.basemapBtn = document.createElement("div");
-    this.basemapBtn.className = "esri-widget esri-widget--button esri-interactive";
-    this.basemapBtn.innerHTML = '<span class="esri-icon-basemap" title="Cambiar mapa base"></span>';
-    this.basemapBtn.style.margin = "5px";
+    this.basemapBtn.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
+    this.basemapBtn.innerHTML = '<span class="esri-icon-basemap" ></span><div class="gp-tooltip">Cambiar mapa base</div>';
+    
 
     // Contenedor del menú (inicialmente oculto)
     this.basemapMenu = document.createElement("div");
@@ -1411,9 +3094,9 @@ export class Mapa {
 
     // Botón de impresión
     this.printBtn = document.createElement("div");
-    this.printBtn.className = "esri-widget esri-widget--button esri-interactive";
-    this.printBtn.innerHTML = '<span class="esri-icon-printer" title="Imprimir Mapa"></span>';
-    this.printBtn.style.margin = "5px";
+    this.printBtn.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
+    this.printBtn.innerHTML = '<span class="esri-icon-printer" ></span><div class="gp-tooltip">Imprimir Mapa</div>';
+    
 
     if (!this.mapView) return;
 
@@ -1453,9 +3136,10 @@ export class Mapa {
 
     // Botón Multi (GeoPerfil)
     this.multiQyBtn = document.createElement("div");
-    this.multiQyBtn.className = "esri-widget esri-widget--button esri-interactive";
-    this.multiQyBtn.innerHTML = '<span class="esri-icon-filter"></span>';
-    this.multiQyBtn.title = "Consulta Múltiple";
+    this.multiQyBtn.className = "esri-widget esri-widget--button esri-interactive  btn-tooltip";
+    this.multiQyBtn.innerHTML =
+      '<span class="esri-icon-filter"></span>' +
+      '<div class="gp-tooltip">GeoAnalítica</div>';
 
     //  BOTÓN MIDAGRI – Más grande y más visible sobre azul
     this.multiQyBtn.style.background = "#155f31";
@@ -1463,11 +3147,7 @@ export class Mapa {
     this.multiQyBtn.style.border = "4px solid #ffffff";   //
     this.multiQyBtn.style.borderRadius = "12px";          //
 
-    //  Tamaño aumentado
-    this.multiQyBtn.style.padding = "14px 20px";          //
-    this.multiQyBtn.style.fontSize = "22px";              //
-    this.multiQyBtn.style.margin = "8px";
-
+   
     //  Mejor presencia visual
     this.multiQyBtn.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
 
@@ -1494,24 +3174,33 @@ export class Mapa {
     // Acción al presionar (mantengo la que tenías)
     this.multiQyBtn.onclick = () => {
       this.comm.abrirDialogConsultaMultiple();
+
     };
+
+    // Tamaño físico del botón
+    this.multiQyBtn.style.minWidth = "60px";
+    this.multiQyBtn.style.minHeight = "60px";
+
+    // Icono más grande
+    const icon = this.multiQyBtn.querySelector("span");
+    if (icon) {
+      icon.style.fontSize = "25px";
+    }
+
 
     // Botón GeoAnalítica (estilo unificado)
     this.btnAnalisis = document.createElement("div");
-    this.btnAnalisis.className = "esri-widget esri-widget--button esri-interactive";
-    this.btnAnalisis.innerHTML = '<span class="esri-icon-configure-popup"></span>';
-    this.btnAnalisis.title = "GeoAnalítica";
+      this.btnAnalisis.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
+      this.btnAnalisis.innerHTML = '<span class="esri-icon-configure-popup"></span><div class="gp-tooltip">GeoPerfil</div>';
+      //this.btnAnalisis.title = "GeoPerfil";
 
     // Estilo institucional (igual que el anterior)
     this.btnAnalisis.style.background = "#155f31";
-    this.btnAnalisis.style.color = "white";
-    this.btnAnalisis.style.border = "4px solid #ffffff";
-    this.btnAnalisis.style.borderRadius = "12px";
+      this.btnAnalisis.style.color = "white";
+      this.btnAnalisis.style.border = "4px solid #ffffff";
+      this.btnAnalisis.style.borderRadius = "12px";
 
-    // Tamaño grande
-    this.btnAnalisis.style.padding = "14px 20px";
-    this.btnAnalisis.style.fontSize = "22px";
-    this.btnAnalisis.style.margin = "8px";
+    
 
     // Mayor presencia visual en el mapa
     this.btnAnalisis.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
@@ -1541,45 +3230,77 @@ export class Mapa {
     };
 
 
+    // Tamaño físico del botón
+    this.btnAnalisis.style.minWidth = "60px";
+    this.btnAnalisis.style.minHeight = "60px";
+
+    // Icono más grande
+    const icon2 = this.btnAnalisis.querySelector("span");
+    if (icon2) {
+      icon2.style.fontSize = "25px";
+    }
+
+
     this.btnReset = document.createElement("div");
-    this.btnReset.className = "esri-widget esri-widget--button esri-interactive";
-    this.btnReset.innerHTML = '<span class="esri-icon-refresh"></span>';
-    this.btnReset.title = "Restablecer mapa";
+    this.btnReset.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
+    this.btnReset.innerHTML = '<span class="esri-icon-refresh"></span><div class="gp-tooltip">Restablecer mapa</div>';
+    //this.btnReset.title = "Restablecer mapa";
 
     // Estilo institucional MIDAGRI (igual que botones verdes)
-    this.btnReset.style.background = "#155f31";
-    this.btnReset.style.color = "white";
-    this.btnReset.style.border = "4px solid #ffffff";
-    this.btnReset.style.borderRadius = "12px";
-    this.btnReset.style.padding = "14px 20px";
-    this.btnReset.style.fontSize = "22px";
-    this.btnReset.style.margin = "8px";
-    this.btnReset.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
-    this.btnReset.style.display = "flex";
-    this.btnReset.style.alignItems = "center";
-    this.btnReset.style.justifyContent = "center";
-    this.btnReset.style.cursor = "pointer";
-    this.btnReset.style.transition = "0.25s";
+    // this.btnReset.style.background = "#155f31";
+    // this.btnReset.style.color = "white";
+    // this.btnReset.style.border = "4px solid #ffffff";
+    // this.btnReset.style.borderRadius = "12px";
+    // this.btnReset.style.padding = "14px 20px";
+    // this.btnReset.style.fontSize = "22px";
+    // this.btnReset.style.margin = "8px";
+    // this.btnReset.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
+    // this.btnReset.style.display = "flex";
+    // this.btnReset.style.alignItems = "center";
+    // this.btnReset.style.justifyContent = "center";
+    // this.btnReset.style.cursor = "pointer";
+    // this.btnReset.style.transition = "0.25s";
 
-    this.btnReset.onmouseover = () => {
-      this.btnReset.style.background = "#0f4a25";
-      this.btnReset.style.transform = "scale(1.18)";
-      this.btnReset.style.boxShadow = "0 0 16px rgba(0,0,0,0.85)";
-    };
-    this.btnReset.onmouseleave = () => {
-      this.btnReset.style.background = "#155f31";
-      this.btnReset.style.transform = "scale(1)";
-      this.btnReset.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
-    };
+    // this.btnReset.onmouseover = () => {
+    //   this.btnReset.style.background = "#0f4a25";
+    //   this.btnReset.style.transform = "scale(1.18)";
+    //   this.btnReset.style.boxShadow = "0 0 16px rgba(0,0,0,0.85)";
+    // };
+    // this.btnReset.onmouseleave = () => {
+    //   this.btnReset.style.background = "#155f31";
+    //   this.btnReset.style.transform = "scale(1)";
+    //   this.btnReset.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
+    // };
 
     // Acción
     this.btnReset.onclick = () => this.resetCompleto();
+
+
+    // =========================
+    // Botón y panel: KML
+    // =========================
+    this.kmlBtn = document.createElement("div");
+    this.kmlBtn.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
+    this.kmlBtn.innerHTML = `
+      <span class="esri-icon-upload"></span>
+      <div class="gp-tooltip">Cargar KML</div>
+    `;
+    
+
+    
+
+    // Mostrar/ocultar panel
+    this.kmlBtn.onclick = () => {
+      //this.kmlPanel.style.display = (this.kmlPanel.style.display === "none") ? "block" : "none";
+      this.comm.abrirDialogDescargas();
+    };
 
 
     if (this.currentView) {
 
       const view = this.currentView!;   // <-- NO NULL
 
+      view.ui.add(this.btnReset, "top-right");
       view.ui.add(this.toc_ToggleBtn, "top-right");
       view.ui.add(this.toc_Draw, "top-right");
       view.ui.add(this.sketsch, "top-right");
@@ -1587,16 +3308,68 @@ export class Mapa {
       //view.ui.add(this.toc_3D, "top-right");
       view.ui.add(this.basemapContainer, "top-right");
       view.ui.add(this.printBtn, "top-right");
+      view.ui.add(this.kmlBtn, "top-right");
 
-      view.ui.add(this.multiQyBtn, "top-left");
       view.ui.add(this.btnAnalisis, "top-left");
-      view.ui.add(this.btnReset, "top-left");
-
+      view.ui.add(this.multiQyBtn, "top-left");
+      
       this.sketsch.visible = false;
     }
 
 
   }
+
+
+  
+
+  private async cargarKmlLocal(file: File): Promise<void> {
+    try {
+      if (!this.map || !this.mapView) return;
+
+      // quitar KML anterior
+      this.quitarKml();
+
+      // URL local
+      this.kmlObjectUrl = URL.createObjectURL(file);
+
+      this.kmlLayer = new KMLLayer({
+        url: this.kmlObjectUrl,
+        title: file.name
+      });
+
+      this.map.add(this.kmlLayer);
+
+      await this.kmlLayer.when();
+
+      const ext = (this.kmlLayer as any).fullExtent;
+      if (ext) {
+        await this.mapView.goTo(ext.expand(1.2));
+      } else {
+        await this.mapView.goTo(this.kmlLayer);
+      }
+
+      console.log("KML cargado:", file.name);
+    } catch (err) {
+      console.error("Error cargando KML:", err);
+    }
+  }
+
+  private quitarKml(): void {
+    try {
+      if (this.kmlLayer) {
+        try { this.map?.remove(this.kmlLayer); } catch {}
+        try { this.kmlLayer.destroy(); } catch {}
+        this.kmlLayer = null;
+      }
+      if (this.kmlObjectUrl) {
+        try { URL.revokeObjectURL(this.kmlObjectUrl); } catch {}
+        this.kmlObjectUrl = null;
+      }
+    } catch (e) {
+      console.warn("Error quitando KML:", e);
+    }
+  }
+
 
 
   private restaurarRendererParcelas(): void {
@@ -1625,6 +3398,8 @@ export class Mapa {
   resetCompleto() {
 
     console.log(" RESET COMPLETO DEL MAPA");
+
+    this.apagarCoberturas(); 
 
     // 1) Estado y selección
     this.modoConsulta = false;
@@ -1703,19 +3478,21 @@ export class Mapa {
   }
 
 
-  generarTOC(panel: HTMLElement) {
-    
+  
+  async generarTOC(panel: HTMLElement) {
+
+    // helper: obtener sublayer activo (solo para MapImageLayer)
+    const getActiveSublayer = (mil: __esri.MapImageLayer) => {
+      const subs = mil.sublayers;
+      if (!subs) return null;
+      return subs.find(s => s.visible) ?? subs.getItemAt(0) ?? null;
+    };
 
     panel.innerHTML = '';
-
-    
-
-
-
     panel.style.fontFamily = "Arial, sans-serif";
     panel.style.fontSize = "13px";
     panel.style.position = "relative";
-    panel.style.paddingTop = "22px"; // espacio para la X
+    panel.style.paddingTop = "22px";
 
     // --- X para cerrar ---
     const closeBtn = document.createElement("div");
@@ -1733,89 +3510,311 @@ export class Mapa {
     closeBtn.onclick = () => (panel.style.display = "none");
     panel.appendChild(closeBtn);
 
-    // === LISTA DE CAPAS ===
-    this.map.layers.forEach((layer: any) => {
+    const layers = this.map.layers.toArray();
 
-      if (layer === this.capaCluster) return;
-      if (layer === this.capaClusterPpa) return;
-      if (layer === this.highlightLayer) return;
-      if (layer === this.resultsLayer) return;
+    for (const layer of layers) {
+
+      //  OJO: antes tenías return; eso cortaba TODO.
+      if (layer === this.capaCluster) continue;
+      if (layer === this.capaClusterPpa) continue;
+      if (layer === this.highlightLayer) continue;
+      if (layer === this.resultsLayer) continue;
 
       const item = document.createElement("div");
       item.style.display = "flex";
-      item.style.alignItems = "center";
+      item.style.flexDirection = "column"; //  CLAVE: ahora es vertical
       item.style.padding = "6px 4px";
       item.style.borderBottom = "1px solid #e0e0e0";
       item.style.transition = "background-color 0.2s";
-      item.onmouseover = null;
-      item.onmouseleave = null;
+      item.style.marginTop = "4px";
+
+      // estilo grupo coberturas
+      if (layer === this.capaCoberturas) {
+        item.style.background = "#fafafa";
+        item.style.borderRadius = "6px";
+        item.style.padding = "6px";
+      }
+
       panel.appendChild(item);
 
-      // === CHECKBOX ===
+      //  fila superior (checkbox + label + leyenda)
+      const rowTop = document.createElement("div");
+      rowTop.style.display = "flex";
+      rowTop.style.alignItems = "center";
+      rowTop.style.gap = "8px";          // espaciado limpio
+      rowTop.style.width = "100%";
+      item.appendChild(rowTop);
+
+      // tipado seguro
+      const isMapImage = (layer as any).type === "map-image";
+      const isFeature = (layer as any).type === "feature";
+
+      const mapImage = isMapImage ? (layer as __esri.MapImageLayer) : null;
+      const feature = isFeature ? (layer as __esri.FeatureLayer) : null;
+
+      // === CHECKBOX capa padre ===
       const chk = document.createElement("input");
       chk.type = 'checkbox';
       chk.checked = layer.visible;
       chk.style.marginRight = "8px";
       chk.style.transform = "scale(1.2)";
-      chk.onchange = () => {
-        if (layer.type === "map-image") {
-          const sub0 = layer.findSublayerById(0);
-          if (sub0) sub0.visible = chk.checked;
-          layer.visible = chk.checked;
-        } else {
-          layer.visible = chk.checked;
-        }
-      };
-      item.appendChild(chk);
+      rowTop.appendChild(chk);
 
-      // === LABEL ===
+      // === LABEL capa padre ===
       const lbl = document.createElement("span");
-      lbl.innerText = layer.title || layer.id;
+      lbl.innerText = (layer as any).title || (layer as any).id;
       lbl.style.flex = "1";
       lbl.style.cursor = "pointer";
       lbl.style.userSelect = "none";
       lbl.style.fontWeight = "500";
+      lbl.style.display = "flex";
+      lbl.style.alignItems = "center";
+      lbl.style.gap = "6px";
+      rowTop.appendChild(lbl);
 
-
-      //  Si es Parcelas Productores → lo resaltamos
-      if ((layer.title || "").toUpperCase().includes("PARCELAS PRODUCTORES")) {
+      // resaltar Parcelas
+      if (((layer as any).title || "").toUpperCase().includes("PARCELAS DE PRODUCTORES")) {
         item.style.background = "white";
-        item.style.color = "white";
-        item.style.border = "1px solid #0d3c1d";
+        //item.style.border = "1px solid #0d3c1d";
         item.style.borderRadius = "6px";
         lbl.style.color = "green";
         lbl.style.fontWeight = "bold";
         lbl.style.fontSize = "14px";
       }
 
-      item.appendChild(lbl);
+      // ==========================================================
+      // CASO ESPECIAL: COBERTURAS => sublayers siempre visibles + checkbox exclusivo
+      // ==========================================================
+      if (layer === this.capaCoberturas && mapImage) {
 
-      
-      // === LEYENDA UNIVERSAL ===
+        const cob = this.capaCoberturas;
+        if (!cob) continue;
+
+        await cob.when();
+        
+        let expanded = true;
+
+        const arrow = document.createElement("span");
+        arrow.innerHTML = "▾";
+        arrow.style.marginRight = "6px";
+        arrow.style.cursor = "pointer";
+        arrow.style.fontSize = "12px";
+
+        lbl.prepend(arrow);
+
+        const subsWrap = document.createElement("div");
+        subsWrap.style.marginLeft = "22px";
+        subsWrap.style.marginTop = "4px";
+        subsWrap.style.display = expanded ? "block" : "none";
+        subsWrap.style.borderLeft = "2px solid #e0e0e0";
+        subsWrap.style.paddingLeft = "10px";
+        
+
+        arrow.onclick = () => {
+          expanded = !expanded;
+          subsWrap.style.display = expanded ? "block" : "none";
+          arrow.innerHTML = expanded ? "▾" : "▸";
+        };
+        item.appendChild(subsWrap);
+
+        // Toggle padre: solo prende/apaga la capa Coberturas
+        // chk.onchange = () => {
+        //   cob.visible = chk.checked;
+
+        //   // Si la prendes y no hay sublayer visible, prende el primero visible o 0
+        //   if (chk.checked) {
+        //     const subsArr = cob.sublayers?.toArray?.() ?? [];
+        //     const active = subsArr.find(s => s.visible) ?? subsArr.find(s => s.id === 0) ?? subsArr[0];
+
+        //     if (active) {
+        //       this.activarCoberturaPorId(active.id);
+        //     }
+        //   }
+        // };
+        chk.onchange = () => {
+          cob.visible = chk.checked;
+
+          const subsArr = cob.sublayers?.toArray?.() ?? [];
+
+          if (!chk.checked) {
+            // apagar todo
+            subsArr.forEach(ss => {
+              ss.visible = false;
+              ss.definitionExpression = "1=0";
+            });
+          } 
+          // OJO: si lo prendes, NO actives nada automático.
+          // Solo se verá algo cuando el usuario elija un sublayer.
+
+          this.generarTOC(this.tocContainer);
+        };
+
+        // Leyenda /legend
+        const legendJson = await this.getCoberturasLegend();
+        const legendById = (id: number) => {
+          const arr = legendJson?.layers ?? [];
+          return arr.find((x: any) => Number(x.layerId) === id) ?? null;
+        };
+
+        const subs = cob.sublayers?.toArray?.() ?? [];
+
+        subs.forEach((s: any) => {
+
+
+
+          const row = document.createElement("div");
+          row.style.display = "flex";
+          row.style.alignItems = "center";
+          row.style.gap = "8px";
+          row.style.padding = "4px 0";
+          row.style.borderRadius = "4px";
+          row.style.transition = "background 0.2s";
+
+          row.onmouseover = () => row.style.background = "#f4f6f8";
+          row.onmouseleave = () => row.style.background = "transparent"; 
+
+          if (s.visible && cob.visible) {
+            row.style.background = "#e8f5e9";
+            row.style.borderRadius = "4px";
+          }
+
+          subsWrap.appendChild(row);
+
+          //  checkbox (no radio), pero comportamiento exclusivo
+          const subChk = document.createElement("input");
+          subChk.type = "checkbox";
+          subChk.checked = !!cob.visible && !!s.visible;
+          subChk.style.transform = "scale(1)";
+          subChk.style.cursor = "pointer";
+
+          // subChk.onchange = () => {
+          //   // si apaga el check activo, no lo dejamos sin ninguno (opcional)
+          //   // -> mantengo uno siempre activo si Coberturas está visible
+          //   if (!subChk.checked) {
+          //     // evitar quedar en “ninguno” si la capa está visible
+          //     if (cob.visible) {
+          //       subChk.checked = true;
+          //     }
+          //     return;
+          //   }
+
+          //   // exclusivo: solo 1 visible
+          //   this.activarCoberturaPorId(s.id);
+
+          //   // refrescar el TOC para actualizar checks
+          //   this.generarTOC(this.tocContainer);
+          // };
+          subChk.onchange = () => {
+
+            // Si lo apaga
+            if (!subChk.checked) {
+
+              // Apago SOLO ese sublayer
+              s.visible = false;
+              s.definitionExpression = "1=0";
+
+              // Si ya no queda ninguno visible -> apago la capa padre también
+              const quedaAlguno = (cob.sublayers?.toArray?.() ?? []).some(ss => ss.visible);
+              if (!quedaAlguno) {
+                cob.visible = false;
+                chk.checked = false; // checkbox del grupo (padre)
+              }
+
+              // refrescar TOC
+              this.generarTOC(this.tocContainer);
+              return;
+            }
+
+            // Si lo prende -> lo dejo como "exclusivo" (solo uno)
+            cob.visible = true;
+            chk.checked = true;
+            this.activarCoberturaPorId(s.id);
+            this.generarTOC(this.tocContainer);
+          };
+          row.appendChild(subChk);
+
+          // nombre sublayer (click también activa)
+          const name = document.createElement("span");
+          name.innerText = s.title || s.name || `Sublayer ${s.id}`;
+          name.style.flex = "1";
+          name.style.cursor = "pointer";
+          name.onclick = () => {
+            // si Coberturas está apagada, la prendemos al seleccionar
+            if (!cob.visible) {
+              cob.visible = true;
+              chk.checked = true;
+            }
+            this.activarCoberturaPorId(s.id);
+            this.generarTOC(this.tocContainer);
+          };
+          row.appendChild(name);
+
+          // mini-leyenda (imágenes del /legend)
+          const li = legendById(s.id);
+          if (li?.legend?.length) {
+            const legWrap = document.createElement("div");
+            legWrap.style.display = "flex";
+            legWrap.style.gap = "6px";
+            legWrap.style.alignItems = "center";
+
+            li.legend.forEach((it: any) => {
+              const src = this.legendImgSrc(it);
+              if (!src) return;
+
+              const img = document.createElement("img");
+              img.src = src;
+              img.title = it.label || "";
+              img.style.width = "18px";
+              img.style.height = "18px";
+              img.style.border = "1px solid #666";
+              img.style.borderRadius = "3px";
+              legWrap.appendChild(img);
+            });
+
+            row.appendChild(legWrap);
+          }
+        });
+
+        // no ejecutar leyenda universal para Coberturas (ya está)
+        continue;
+      }
+
+
+      // ==========================================================
+      // TOGGLE NORMAL (no coberturas)
+      // ==========================================================
+      chk.onchange = () => {
+        if (mapImage) {
+          // si quieres: prender/apagar sublayer activo junto con el padre
+          const active = getActiveSublayer(mapImage);
+          if (active) active.visible = chk.checked;
+          mapImage.visible = chk.checked;
+        } else {
+          layer.visible = chk.checked;
+        }
+      };
+
+      // ==========================================================
+      // LEYENDA UNIVERSAL (FeatureLayer o MapImageLayer)
+      // ==========================================================
       let renderer: any = null;
 
-      // 1) FeatureLayer → renderer directo
-      if (layer.renderer) {
-        renderer = layer.renderer;
+      if (feature?.renderer) {
+        renderer = feature.renderer;
+      } else if (mapImage) {
+        const active = getActiveSublayer(mapImage);
+        renderer = active?.renderer ?? null;
       }
 
-      // 2) MapImageLayer → obtener renderer del sublayer 0
-      if (!renderer && layer.type === "map-image") {
-        const sub0 = layer.findSublayerById(0);
-        if (sub0) renderer = sub0.renderer;
-      }
+      if (!renderer) continue;
 
-      // Si no hay renderer → no mostrar
-      if (!renderer) return;
-
-      // CONTENEDOR DE LA LEYENDA
       const legend = document.createElement("div");
       legend.style.display = "flex";
       legend.style.gap = "6px";
       legend.style.marginLeft = "6px";
       legend.style.alignItems = "center";
 
-      // === UNIQUE VALUE RENDERER ===
+      // UNIQUE-VALUE
       if (renderer.type === "unique-value" && Array.isArray(renderer.uniqueValueInfos)) {
 
         renderer.uniqueValueInfos.forEach((info: any) => {
@@ -1828,22 +3827,20 @@ export class Mapa {
           swatch.style.borderRadius = "3px";
           swatch.style.border = "1px solid #555";
 
-          // soporte array [r,g,b,a] o {r,g,b,a}
-          let r = sym.r ?? sym[0];
-          let g = sym.g ?? sym[1];
-          let b = sym.b ?? sym[2];
-          let a = sym.a ?? sym[3] ?? 255;
+          const r = sym.r ?? sym[0];
+          const g = sym.g ?? sym[1];
+          const b = sym.b ?? sym[2];
+          const a = sym.a ?? sym[3] ?? 255;
 
           swatch.style.backgroundColor = `rgba(${r},${g},${b},${a})`;
-
           legend.appendChild(swatch);
         });
 
-        item.appendChild(legend);
-        return;
+        rowTop.appendChild(legend);
+        continue;
       }
 
-      // === SIMPLE SYMBOL (una sola leyenda) ===
+      // SIMPLE
       if (renderer.symbol?.color) {
         const c = renderer.symbol.color;
 
@@ -1853,21 +3850,17 @@ export class Mapa {
         swatch.style.borderRadius = "3px";
         swatch.style.border = "1px solid #555";
 
-        let r = c.r ?? c[0];
-        let g = c.g ?? c[1];
-        let b = c.b ?? c[2];
-        let a = c.a ?? c[3] ?? 255;
+        const r = c.r ?? c[0];
+        const g = c.g ?? c[1];
+        const b = c.b ?? c[2];
+        const a = c.a ?? c[3] ?? 255;
 
         swatch.style.backgroundColor = `rgba(${r},${g},${b},${a})`;
 
         legend.appendChild(swatch);
-        item.appendChild(legend);
+        rowTop.appendChild(legend);
       }
-
-
-
-
-    });
+    }
   }
 
 
@@ -2013,22 +4006,45 @@ export class Mapa {
   }
 
 
-  private activarDibujoAnalisis() {
+  // private activarDibujoAnalisis() {
 
-    // limpiar capa si deseas
-    // this.drawLayer.removeAll();
-    // usar el mismo Sketch existente
+  //   // limpiar capa si deseas
+  //   // this.drawLayer.removeAll();
+  //   // usar el mismo Sketch existente
+  //   this.sketsch!.create('polygon');
+
+  //   // escuchar una sola vez el evento
+  //   const handler = this.sketsch!.on('create', (evt) => {
+  //     if (evt.state === 'complete') {
+  //       const geom = evt.graphic.geometry as Polygon;
+  //       this.comm.sendGeometry(geom);  // mandar al panel
+  //       handler.remove();                 // limpiar listener
+  //     }
+  //   });
+
+  // }
+  private activarDibujoAnalisis() {
+    this.limpiarCoberturaAnalisis();
+
     this.sketsch!.create('polygon');
 
-    // escuchar una sola vez el evento
     const handler = this.sketsch!.on('create', (evt) => {
       if (evt.state === 'complete') {
         const geom = evt.graphic.geometry as Polygon;
-        this.comm.sendGeometry(geom);  // mandar al panel
-        handler.remove();                 // limpiar listener
+
+        this.limpiarCoberturaAnalisis();
+
+        //this.comm.sendGeometry(geom);
+        this.comm.sendGeometry(geom, 'draw');
+        handler.remove();
       }
     });
+  }
 
+
+  private limpiarCoberturaAnalisis(): void {
+    this.resultsLayer?.removeAll();
+    this.drawLayer?.removeAll();
   }
 
 

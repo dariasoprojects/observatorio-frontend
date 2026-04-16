@@ -5,6 +5,8 @@ import { Input } from '@angular/core';
 import {FormatUtil} from '../../shared/utils/format.util';
 import {RegionNaturalService} from '../../services/indices/region-natural.service';
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import { MapCommService } from '../../services/map-comm.service';
+
 
 
 @Component({
@@ -28,7 +30,7 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
 
   tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
 
-  constructor(
+  constructor(private mapComm: MapCommService,
     private regionNaturalService: RegionNaturalService
   ) {}
 
@@ -46,7 +48,9 @@ export class IndiceSegunRegionNaturalComponent implements OnInit, AfterViewInit 
   }
 
   ngAfterViewInit() {
+
     this.crearGrafico();
+    this.mapComm.emitRenderTematico("RESET");
   }
 
   private crearGrafico() {

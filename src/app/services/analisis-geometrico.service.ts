@@ -40,4 +40,48 @@ export class AnalisisGeometricoService {
       { headers }
     );
   }
+
+  getDatosAnalisisGeometricoPaged(
+    coberturaPolygon: Polygon,
+    page: number = 1,
+    pageSize: number = 500,
+    outFields: string[] = ['*'],
+    where: string = '1=1'
+  ): Observable<AnalisisGeometricoResponse> {
+
+
+
+    const jsonGeometry = coberturaPolygon.toJSON();
+
+    const resultOffset = (page - 1) * pageSize;
+
+
+
+    const body = new HttpParams({
+      fromObject: {
+        f: 'json',
+        where,
+        outFields: outFields.join(','),
+        spatialRelationship: 'intersects',
+        returnGeometry: 'false',
+        geometryType: 'esriGeometryPolygon',
+        geometry: JSON.stringify(jsonGeometry),
+
+        //  paginación REST estándar
+        resultOffset: String(resultOffset),
+        resultRecordCount: String(pageSize),
+
+        //  para que el offset sea estable
+        orderByFields: 'OBJECTID',
+      },
+    });
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded',
+    });
+
+    return this.http.post<AnalisisGeometricoResponse>(this.url, body.toString(), { headers });
+  }
+
+
 }

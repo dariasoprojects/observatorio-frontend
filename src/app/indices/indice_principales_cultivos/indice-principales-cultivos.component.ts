@@ -11,6 +11,8 @@ import {PrincipalesCultivoService} from '../../services/indices/principales-cult
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import {IndicesUtil} from '../../shared/utils/indices.util';
 import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
+import {MapCommService} from '../../services/map-comm.service';
+
 
 @Component({
   selector: 'app-indice-princult',
@@ -48,6 +50,7 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
   constructor(
     private ubigeoService: UbigeoService,
     private principalesCultivoService: PrincipalesCultivoService,
+    private mapComm: MapCommService,
     private indicesUtil: IndicesUtil
 
   ) {}
@@ -62,6 +65,17 @@ export class IndicePrincipalesCultivosComponent implements OnInit {
       }else{
          this.cargarDatos();
       }
+    }
+
+    //this.aplicarColoresTematico();
+  }
+
+  aplicarColoresTematico() {
+    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
+      this.mapComm.emitRenderTematico("CULTIPRIN");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
     }
   }
 

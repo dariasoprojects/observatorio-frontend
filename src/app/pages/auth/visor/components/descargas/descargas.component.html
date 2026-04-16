@@ -1,0 +1,223 @@
+<div class="wrap-scroll">
+
+  <div class="descargas-container">
+
+    <!-- Tarjeta 1: Cobertura -->
+    <p-card class="step-card">
+      <ng-template pTemplate="title">
+        <span class="step-title"> Carga tu kml o dibuja un polígono</span>
+      </ng-template>
+
+      <div class="step-body">
+
+        <!-- Acciones -->
+        <div class="acciones">
+          <input
+            #fileInput
+            type="file"
+            accept=".kml"
+            style="display:none"
+            (change)="onFileSelected($event)"
+          />
+
+          <button pButton
+                  label="Cargar KML"
+                  icon="pi pi-upload"
+                  class="p-button-success"
+                  (click)="onPickFileClick(fileInput)">
+          </button>
+
+          <!-- BOTÓN DIBUJAR (lo que faltaba) -->
+          <button pButton
+                  label="Dibujar"
+                  icon="pi pi-pencil"
+                  class="p-button-outlined"
+                  (click)="onDibujar()">
+          </button>
+
+          <button pButton
+                  label="Limpiar"
+                  icon="pi pi-times"
+                  class="p-button-secondary p-button-outlined"
+                  [disabled]="!poligono"
+                  (click)="quitarKml()">
+          </button>
+        </div>
+
+        <div class="fila">
+         <!--  <div class="lbl">KML</div> -->
+          <div class="val archivo">{{ archivoNombre }}</div>
+        </div>
+
+        
+
+        <div class="hint" *ngIf="!poligono">
+          Carga un KML o dibuja una cobertura para habilitar la consulta.
+        </div>
+
+      </div>
+    </p-card>
+
+    <!-- Tarjeta 2: Consulta -->
+    <!-- <p-card class="step-card">
+      <ng-template pTemplate="title">
+        <span class="step-title">2) Consulta</span>
+      </ng-template>
+
+      <div class="step-body">
+
+        <div class="where-row">
+          <label>Where</label>
+          <input pInputText [(ngModel)]="whereFinal" placeholder="Ej: 1=1" />
+        </div>
+
+        <div class="acciones">
+          <button pButton
+                  label="Consultar"
+                  icon="pi pi-search"
+                  class="p-button-success"
+                  [disabled]="!poligono || cargando"
+                  (click)="consultarPrimeraPagina()">
+          </button>
+        </div>
+
+      </div>
+    </p-card> -->
+
+    <!-- Resultados -->
+    <!-- Resultados -->
+    <p-card class="step-card">
+      <ng-template pTemplate="title">
+        <span class="step-title"> Resultados</span>
+      </ng-template>
+
+
+      <button pButton
+        label="Excel"
+        icon="pi pi-file-excel"
+        class="p-button-success p-button-outlined"
+        [disabled]="!resultados?.length"
+        (click)="descargarExcelPaginaActual()"
+        *ngIf="resultados.length > 0">
+      </button>
+
+      
+      <button pButton
+                  label="Activar GeoAnalítica"
+                  icon="pi pi-external-link"
+                  (click)="cargaGeoAnalitica()"
+                  *ngIf="resultados.length > 0">
+          </button>
+
+      <p-table
+        [value]="resultados"
+        [paginator]="false"
+        class="p-datatable-sm tabla-resultados"
+        *ngIf="resultados?.length; else sinData"
+        [rowHover]="true"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 90px;">FID</th>
+            <th>Resumen</th>
+            <th style="width: 140px; text-align:right;">Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td class="fid">{{ row.fid }}</td>
+
+            <!-- Resumen “bonito” -->
+            <td>
+              <div class="resumen">
+                <div class="resumen-linea">
+                  <span class="tag" *ngFor="let k of resumenKeys(row.attributes)">
+                    <span class="k">{{ k }}</span>
+                    <span class="v">{{ safeVal(row.attributes[k]) }}</span>
+                  </span>
+                </div>
+
+                <div class="resumen-sub">
+                  {{ resumenFallback(row.attributes) }}
+                </div>
+              </div>
+            </td>
+
+            <!-- Acciones -->
+            <td class="acciones-cell">
+              <button pButton
+                      icon="pi pi-eye"
+                      class="p-button-rounded p-button-text"
+                      pTooltip="Ver detalle"
+                      tooltipPosition="top"
+                      (click)="verDetalle(row)">
+              </button>
+
+              <!-- opcional: si luego quieres zoom/centrar -->
+              <!--
+              <button pButton
+                      icon="pi pi-map-marker"
+                      class="p-button-rounded p-button-text"
+                      pTooltip="Zoom"
+                      tooltipPosition="top"
+                      (click)="zoomA(row)">
+              </button>
+              -->
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <ng-template #sinData>
+        <div class="text-center">
+          {{ cargando ? 'Consultando...' : 'Sin resultados' }}
+        </div>
+      </ng-template>
+
+      <!-- Paginado -->
+      <div class="acciones-paginacion">
+        <button pButton
+                icon="pi pi-angle-left"
+                label="Anterior"
+                class="p-button-outlined"
+                [disabled]="paginaActual <= 1 || cargando"
+                (click)="anteriorPagina()">
+        </button>
+
+        <span class="pagina-info">Página {{ paginaActual }}</span>
+
+        <button pButton
+                icon="pi pi-angle-right"
+                label="Siguiente"
+                class="p-button-outlined"
+                [disabled]="fin || cargando"
+                (click)="siguientePagina()">
+        </button>
+      </div>
+    </p-card>
+
+    <!-- Dialog detalle -->
+    <p-dialog
+      header="Detalle"
+      [(visible)]="detalleVisible"
+      [modal]="true"
+      [style]="{ width: '620px' }"
+      [draggable]="false"
+      [resizable]="false"
+    >
+      <ng-container *ngIf="filaSeleccionada as det">
+        <div class="detalle-grid">
+          <div class="detalle-row" *ngFor="let k of keysDetalle">
+            <div class="detalle-k">{{ k }}</div>
+            <div class="detalle-v">{{ safeVal(det[k]) }}</div>
+          </div>
+        </div>
+      </ng-container>
+    </p-dialog>
+
+
+  </div>
+
+
+</div>

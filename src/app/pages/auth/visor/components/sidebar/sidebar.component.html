@@ -56,10 +56,16 @@
       </div>
     </div>
 
+    <app-busqueda-ubigeo></app-busqueda-ubigeo>
 
-    <p-panel header="Filtros activos" styleClass="panel-tight" *ngIf="!isCollapsed">
 
-      <small class="muted">Ubicación geográfica:</small>
+    <!-- <p-panel header="Filtros activos" styleClass="panel-tight" *ngIf="!isCollapsed"> -->
+    <div style="display: none;">
+    <p-panel  header="" styleClass="panel-tight" *ngIf="!isCollapsed">  
+
+      <!-- <small class="muted">Ubicación geográfica:</small> -->
+
+      
 
       <!-- ESTADO VACÍO TOTAL -->
       <div *ngIf="!filtrosUbigeo?.nombreDepartamento && !filtrosUbigeo?.nombreProvincia"
@@ -78,6 +84,7 @@
                >
         </button>
       </div>
+
 
 
       <!-- CHIP DEPARTAMENTO -->
@@ -120,7 +127,7 @@
 
     </p-panel>
 
-
+    </div>
 
 
 
@@ -174,7 +181,8 @@
       [resizable]="false"
       (onHide)="onCloseUbicacionGeografica()"
     >
-      <app-busqueda-ubigeo></app-busqueda-ubigeo>
+      
+
     </p-dialog>
 
 

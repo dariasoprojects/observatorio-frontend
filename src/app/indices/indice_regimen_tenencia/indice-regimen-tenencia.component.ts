@@ -11,6 +11,7 @@ import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-
 import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
 import {IndicesUtil} from '../../shared/utils/indices.util';
 import {RegimenTeneciaService} from '../../services/indices/regimen-tenecia.service';
+import {MapCommService} from '../../services/map-comm.service';
 
 
 
@@ -51,6 +52,7 @@ export class IndiceRegimenTenenComponent implements OnInit {
   constructor(
     private ubigeoService: UbigeoService,
     private regimenTeneciaService: RegimenTeneciaService,
+    private mapComm: MapCommService,
     private indicesUtil: IndicesUtil
   ) {}
 
@@ -64,6 +66,17 @@ export class IndiceRegimenTenenComponent implements OnInit {
       }else{
         this.cargarDatos();
       }
+    }
+
+    //this.aplicarColoresTematico();
+  }
+
+  aplicarColoresTematico() {
+    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
+      this.mapComm.emitRenderTematico("REGTENE");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
     }
   }
 
@@ -125,11 +138,11 @@ export class IndiceRegimenTenenComponent implements OnInit {
 
       plotOptions: {
         pie: {
-          innerSize: '60%',                 // ✅ Donut
+          innerSize: '60%',                 //  Donut
           dataLabels: {
             enabled: true,
             format: '{point.percentage:.1f} %',
-            distance: -40,                  // ✅ Etiquetas dentro del arco
+            distance: -40,                  //  Etiquetas dentro del arco
             style: {
               fontWeight: 'bold',
               textOutline: 'none',

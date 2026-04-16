@@ -61,7 +61,8 @@ export class IndicesUtil {
     for (const item of datos) {
 
       tabla.push({
-        ubigeo: this.ubigeoService.getNombre(item.ubigeo),
+        //ubigeo: this.ubigeoService.getNombre(item.ubigeo),
+        ubigeo: this.ubigeoService.getNombreSimple(item.ubigeo),
         ddescr:item.ddescr ??  "No definido",
         parcela:item.parcela,
       });
@@ -94,7 +95,8 @@ export class IndicesUtil {
     for (const item of datos) {
 
       tabla.push({
-        ubigeo: this.ubigeoService.getNombre(item.ubigeo),
+        //ubigeo: this.ubigeoService.getNombre(item.ubigeo),
+        ubigeo: this.ubigeoService.getNombreSimple(item.ubigeo),
         ddescr:item.ddescr ??  "No definido",
         productores:item.productores,
         parcela:item.parcela,
@@ -125,7 +127,8 @@ export class IndicesUtil {
       const parcela = Number(f.attributes.PARCELAS);
 
       tabla.push({
-        ubigeo: this.ubigeoService.getNombre(f.attributes.UBIGEO),
+        //ubigeo: this.ubigeoService.getNombre(f.attributes.UBIGEO),
+        ubigeo: this.ubigeoService.getNombreSimple(f.attributes.UBIGEO),
         ddescr,
         productores: Number(f.attributes.PRODUCTORES),
         parcela
@@ -134,7 +137,7 @@ export class IndicesUtil {
       acumulado[ddescr] = (acumulado[ddescr] ?? 0) + parcela;
     }
 
-    // 🔹 Ordenar por mayor valor
+    //  Ordenar por mayor valor
     const ordenado = Object.entries(acumulado)
       .sort((a, b) => b[1] - a[1]);
 

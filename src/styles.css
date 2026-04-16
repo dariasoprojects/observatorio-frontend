@@ -122,3 +122,126 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 /* Ítems compactos */
 .dep-panel .p-dropdown-items .p-dropdown-item { padding: 6px 10px !important; font-size: 12px !important; }
+
+
+
+/* ===== TOOLTIP UNIVERSAL PARA BOTONES ARCGIS ===== */
+.esri-ui, .esri-ui * { overflow: visible !important; }
+
+.btn-tooltip{
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 10000 !important;
+
+  width: 40px !important;
+  height: 40px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  cursor: pointer !important;
+}
+
+.btn-tooltip * { pointer-events: none !important; }
+
+/* Tooltip base (por defecto: centrado arriba del botón) */
+.btn-tooltip .gp-tooltip{
+  position: absolute !important;
+  bottom: calc(100% + 10px) !important;
+
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  background: #1f2937 !important;
+  color: #fff !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  white-space: nowrap !important;
+
+  opacity: 0 !important;
+  visibility: hidden !important;
+
+  z-index: 9999999 !important;
+  pointer-events: none !important;
+}
+
+/* Mostrar */
+.btn-tooltip:hover .gp-tooltip{
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+
+/* ===== Ajuste automático según esquina ===== */
+
+/* Si el botón está en TOP-RIGHT: alinear tooltip hacia la izquierda del botón */
+.esri-ui-top-right .btn-tooltip .gp-tooltip{
+  left: auto !important;
+  right: 0 !important;
+  transform: none !important;
+}
+
+/* Si está en TOP-LEFT: alinear tooltip hacia la derecha del botón */
+.esri-ui-top-left .btn-tooltip .gp-tooltip{
+  left: 0 !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* Si está en BOTTOM-RIGHT: tooltip arriba y hacia la izquierda */
+.esri-ui-bottom-right .btn-tooltip .gp-tooltip{
+  left: auto !important;
+  right: 0 !important;
+  transform: none !important;
+}
+
+/* Si está en BOTTOM-LEFT: tooltip arriba y hacia la derecha */
+.esri-ui-bottom-left .btn-tooltip .gp-tooltip{
+  left: 0 !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+
+/* ===== Tooltip hacia abajo SIN romper stacking ===== */
+
+.esri-ui-top-right .btn-tooltip,
+.esri-ui-top-left .btn-tooltip{
+  z-index: 999999 !important; /* eleva el botón completo */
+}
+
+.esri-ui-top-right .btn-tooltip .gp-tooltip,
+.esri-ui-top-left .btn-tooltip .gp-tooltip{
+  bottom: auto !important;
+  top: calc(100% + 10px) !important;
+
+  z-index: 9999999 !important;
+  position: absolute !important;
+}
+
+
+
+/* TOP: mostrar tooltip ABAJO + poner el botón por encima de sus vecinos */
+.esri-ui-top-right .btn-tooltip .gp-tooltip,
+.esri-ui-top-left  .btn-tooltip .gp-tooltip{
+  bottom: auto !important;
+  top: calc(100% + 10px) !important;
+}
+
+/* CLAVE: en hover, elevamos el BOTÓN (stacking) para que no quede detrás */
+.esri-ui-top-right .btn-tooltip:hover,
+.esri-ui-top-left  .btn-tooltip:hover{
+  position: relative !important;              /* crea stacking */
+  z-index: 2147483647 !important;             /* máximo práctico */
+}
+
+/* refuerzo opcional (por si algún padre crea stacking raro) */
+.esri-ui-top-right,
+.esri-ui-top-left{
+  position: relative !important;
+  z-index: 99999 !important;
+}
+

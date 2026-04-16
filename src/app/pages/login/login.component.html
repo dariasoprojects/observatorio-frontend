@@ -56,11 +56,20 @@
             La contraseña es obligatoria.
           </small>
 
+
+
+          <small *ngIf="mensajeError" style="color:#d32f2f; display:block; margin-top:8px;">
+            {{ mensajeError }}
+          </small>
+
           <a class="forgot" href="#">Olvidé mi contraseña</a>
 
+
+
+
           <!-- Botones -->
-          <button type="submit" class="btn-auth btn-primary-auth" [disabled]="formularioLogin.invalid">
-            Iniciar sesión
+          <button type="submit" class="btn-auth btn-primary-auth" [disabled]="formularioLogin.invalid || cargando">
+            {{ cargando ? 'Ingresando...' : 'Iniciar sesión' }}
           </button>
 
           <button type="button" class="btn-auth btn-outline-auth">

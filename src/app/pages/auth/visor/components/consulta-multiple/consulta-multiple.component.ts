@@ -3,28 +3,40 @@ import {DropdownModule} from 'primeng/dropdown';
 import {TableModule} from 'primeng/table';
 import {ButtonDirective} from 'primeng/button';
 import {FormsModule} from '@angular/forms';
-
 import {ConsultaMultipleService} from '../../../../../services/consulta-multiple.service';
 import {
   CategoriaAttributes,
   CategoriaFeature,
   CategoriaResponse
 } from '../../../../../models/consulta-multiple/categoria.model';
-import {map} from 'rxjs';
 import {Card} from 'primeng/card';
 import {KeyValuePipe, NgForOf, NgIf} from '@angular/common';
+import Polygon from "@arcgis/core/geometry/Polygon";
+import Geometry from "@arcgis/core/geometry/Geometry";
+import { MapCommService } from '../../../../../services/map-comm.service';
+import { InputTextModule } from 'primeng/inputtext';
+import { CommonModule } from '@angular/common';
+import { Subject, takeUntil, forkJoin, of, map, catchError , Observable} from 'rxjs';
 
- interface CondicionItem {
+
+type CountRow = { idx: number; n: number | null };
+
+// interface CondicionItem {
+//   id: string;
+//   nombre: string;
+// }
+interface CondicionItem {
+  id: string;
+  nombre: string;
+  disabled?: boolean;
+}
+
+interface CondicionCatalogo {
   id: string;
   nombre: string;
 }
 
- interface CondicionCatalogo {
-  id: string;
-  nombre: string;
-}
-
- interface Consulta {
+interface Consulta {
   categoriaId: string | number;
   categoriaNombre: string;
   variable: string;
@@ -33,6 +45,16 @@ import {KeyValuePipe, NgForOf, NgIf} from '@angular/common';
   valorId: string | number;
   valorNombre: string;
   where: string;
+
+  esDefault?: boolean;
+  opcionesValor?: CategoriaAttributes[];
+  campoBusqueda?: string;
+  idVariable?: string | number;
+
+  tipoEntrada?: number | null;
+  tipoDato?: string | null;
+  modoIngresar?: boolean;
+  valorIngresado?: any; 
 }
 
 interface ResultadoConsulta {
@@ -49,12 +71,45 @@ interface CamposLegibles {
   [campo: string]: CampoLegibleDetalle;
 }
 
+
+// PERFIL DEFAULT (AQUÍ VA)
+//  type FiltroPredef = { campo: string; op: string; valor: string };
+
+interface ReglaRestriccion {
+  trigger: {
+    categoriaId?: number;
+    variableId?: number;
+    valorId?: number;
+  };
+  disableCategorias?: number[];
+  disableVariables?: number[];
+  disableValores?: Array<{
+    variableId: number;
+    valores: Array<number | string>;
+  }>;
+}
+
+
+const REGLAS_RESTRICCION: ReglaRestriccion[] = [
+  {
+    trigger: { categoriaId: 21, variableId: 65, valorId: 3 },
+    disableCategorias: [14],
+    disableVariables: [66, 67, 70],
+    disableValores: [
+      { variableId: 68, valores: [1, 2] }
+    ]
+  }
+];
+
+
 @Component({
   selector: 'app-consulta-multiple',
   imports: [
     DropdownModule,
+    CommonModule,
     TableModule,
     ButtonDirective,
+    InputTextModule,
     FormsModule,
     Card,
     NgIf
@@ -64,18 +119,44 @@ interface CamposLegibles {
 })
 export class ConsultaMultipleComponent {
 
+
+  private readonly CATEGORIA_SERVICIO_ALTERNO = 21;
+  private readonly VARIABLE_SERVICIO_ALTERNO = 65;
+  private readonly VALOR_SERVICIO_ALTERNO = 3;
+
+  
+  
+
+  // --- REPORTE ---
+  reporteVisible = false;
+
+  reporteLoading = false;
+  reporteError: string | null = null;
+
+  reporteTotal: number | null = null;
+
+  // detalle: lista de condiciones + su count
+  reportePorCondicion: Array<{
+    idx: number;
+    etiqueta: string;   // texto bonito para mostrar
+    where: string;
+    count: number | null;
+    loading: boolean;
+    error?: string;
+  }> = [];
+
+
+  modoIngresar = false;
+  valorIngresado: any = null;         // lo que escribe el usuario
+  tipoDatoActual: string = 'string';  // TIPODATO de la variable seleccionada
+  tipoEntradaActual: number | null = null; // por si lo quieres luego
+
   selectedCategoria:any;
   selectedVariable:any;
   selectedCondicion:any;
   selectedValor:any;
 
 
-  filtro = {
-    actividad: null,
-    fertilizante: null,
-    condicion: null,
-    valor: null,
-  };
 
   condicionesAgregadas: Consulta[] = [];
   resultados: any[] = [];
@@ -91,7 +172,7 @@ export class ConsultaMultipleComponent {
 
   condicionesCatalogo: CondicionCatalogo[] = [
     { id: '=', nombre: 'Igual a' },
-    { id: '!=', nombre: 'Diferente de' },
+    { id: '<>', nombre: 'Diferente de' },
     { id: '<', nombre: 'Menor que' },
     { id: '<=', nombre: 'Menor o igual que' },
     { id: '>', nombre: 'Mayor que' },
@@ -117,16 +198,431 @@ export class ConsultaMultipleComponent {
   };
 
   paginaActual: number = 1;
-  pageSize: number = 200;  // puedes subir o bajar este valor
-  resultadosTodos: ResultadoConsulta[] = []; 
+  //pageSize: number = 200;  // puedes subir o bajar este valor
+  //resultadosTodos: ResultadoConsulta[] = []; 
   registrosPorPagina:number = 1000;
 
+  
+
+
+  geometryInterseccion: Geometry | null = null; // o Polygon
+  usarInterseccion = false;
+
+  private destroyed$ = new Subject<void>();
+
+
+
+  private getReglasActivas(): ReglaRestriccion[] {
+    return REGLAS_RESTRICCION.filter(r =>
+      this.condicionesAgregadas.some(c =>
+        (r.trigger.categoriaId == null || Number(c.categoriaId) === Number(r.trigger.categoriaId)) &&
+        (r.trigger.variableId == null || Number(c.idVariable) === Number(r.trigger.variableId)) &&
+        (r.trigger.valorId == null || Number(c.valorId) === Number(r.trigger.valorId))
+      )
+    );
+  }
+
+  private getCategoriasRestringidas(): number[] {
+    return [...new Set(
+      this.getReglasActivas().flatMap(r => r.disableCategorias ?? [])
+    )];
+  }
+
+  private getVariablesRestringidas(): number[] {
+    return [...new Set(
+      this.getReglasActivas().flatMap(r => r.disableVariables ?? [])
+    )];
+  }
+
+  private getRestriccionesValorPorVariable(variableId: number): Array<number | string> {
+    return [
+      ...new Set(
+        this.getReglasActivas()
+          .flatMap(r => r.disableValores ?? [])
+          .filter(v => Number(v.variableId) === Number(variableId))
+          .flatMap(v => v.valores)
+      )
+    ];
+  }
+
+
+
+  private usaServicioAlterno(): boolean {
+    return this.condicionesAgregadas.some(c =>
+      Number(c.categoriaId) === this.CATEGORIA_SERVICIO_ALTERNO &&
+      Number(c.idVariable) === this.VARIABLE_SERVICIO_ALTERNO &&
+      Number(c.valorId) === this.VALOR_SERVICIO_ALTERNO
+    );
+  }
+
+  private logServicioActual(): void {
+    console.log('Servicio actual >>>', this.getServiceKeyActual());
+  }
+
+
+  private getServiceKeyActual(): 'principal' | 'alterno' {
+    return this.usaServicioAlterno() ? 'alterno' : 'principal';
+  }
+
+
+  // private getGeomActiva(): Geometry | null {
+  //   return this.usarInterseccion ? this.geometryInterseccion : null;
+  // }
+  private getGeomActiva(): Geometry | null {
+    const geom = this.usarInterseccion ? this.geometryInterseccion : null;
+    console.log('getGeomActiva >>>', geom);
+    return geom;
+  }
+
+
+  
+
+  private formatearValorSQL(registro: any, valor: any): string {
+
+    const tipo = (registro.TIPODATO ?? '').toString().toLowerCase();
+
+    switch (tipo) {
+
+      case 'number':
+      case 'integer':
+      case 'float':
+        return String(Number(valor)); // sin comillas
+
+      case 'string':
+        const limpio = String(valor).replace(/'/g, "''");
+        return `'${limpio}'`; // con comillas
+
+      case 'date':
+        return `DATE '${valor}'`;
+
+      case 'boolean':
+        return valor ? '1' : '0';
+
+      default:
+        return String(valor); // fallback seguro
+    }
+  }
+
+
+  
+  onCambioValorDefault(row: Consulta) {
+    let registro: CategoriaAttributes | undefined;
+
+    if (row.modoIngresar) {
+      registro = this.categoriasInicial.find(
+        d =>
+          Number(d.IDCATEGORIA) === Number(row.categoriaId) &&
+          Number(d.IDVARIABLE) === Number(row.idVariable) &&
+          Number(d.IDVALOR) === 0
+      );
+
+      if (!registro) {
+        console.warn('No se encontró registro base para ingreso libre', row);
+        return;
+      }
+
+      const valorLibre = row.valorIngresado;
+
+      if (valorLibre === null || valorLibre === undefined || `${valorLibre}`.trim() === '') {
+        console.warn('Debe ingresar un valor para la fila default.');
+        return;
+      }
+
+      row.valorNombre = `${valorLibre}`;
+      row.campoBusqueda = registro.CAMPO_BUSQUEDA;
+
+      const valorFormateado = this.formatearValorSQL(registro, valorLibre);
+      row.where = `${registro.CAMPO_BUSQUEDA} ${row.condicionId} ${valorFormateado}`;
+    } else {
+      registro = this.categoriasInicial.find(
+        d =>
+          Number(d.IDCATEGORIA) === Number(row.categoriaId) &&
+          Number(d.IDVARIABLE) === Number(row.idVariable) &&
+          Number(d.IDVALOR) === Number(row.valorId)
+      );
+
+      if (!registro) {
+        console.warn('No se encontró registro para actualizar default', row);
+        return;
+      }
+
+      row.valorNombre = registro.VALOR;
+      row.campoBusqueda = registro.CAMPO_BUSQUEDA;
+
+      // si el nuevo valor elegido es IDVALOR=0, cambia a modo ingresar
+      row.modoIngresar = Number(registro.IDVALOR) === 0;
+
+      if (row.modoIngresar) {
+        row.valorIngresado = '';
+        row.where = '';
+      } else {
+        row.valorIngresado = null;
+        const valorFormateado = this.formatearValorSQL(registro, registro.IDVALOR);
+        row.where = `${registro.CAMPO_BUSQUEDA} ${row.condicionId} ${valorFormateado}`;
+      }
+    }
+
+    this.whereFinal = this.condicionesAgregadas
+      .filter(c => c.where && c.where.trim() !== '')
+      .map(c => c.where)
+      .join(' AND ');
+
+    console.log('WHERE actualizado >>>', this.whereFinal);
+  }
+
+
+  getMensajeValidacionFila(row: Consulta): string {
+    const tipo = (row.tipoDato ?? 'string').toString().toLowerCase();
+
+    switch (tipo) {
+      case 'number':
+      case 'integer':
+      case 'float':
+        return 'Ingrese un número válido.';
+      case 'date':
+        return 'Ingrese una fecha válida.';
+      case 'boolean':
+        return 'Ingrese un valor verdadero o falso.';
+      default:
+        return 'Ingrese un valor válido.';
+    }
+  }
+
+
+  getRowClass = (rowData: any) => {
+    return rowData?.esDefault ? 'fila-default' : '';
+  };
+
+
+  
+  aplicarDefault(autoConsultar: boolean = false) {
+
+
+
+    const defaults = this.categoriasInicial.filter(d => Number(d.FIELD) === 1);
+
+    if (defaults.length === 0) {
+      console.warn("No existen filtros default (FIELD=1)");
+      return;
+    }
+
+    this.condicionesAgregadas = [];
+    this.whereFinal = '';
+
+    
+    const defaultsUnicos = [
+      ...new Map(
+        defaults.map(item => [`${item.IDCATEGORIA}_${item.IDVARIABLE}`, item])
+      ).values()
+    ].sort((a, b) => {
+      const oa = Number(a.ORDEN_DEF ?? 999999);
+      const ob = Number(b.ORDEN_DEF ?? 999999);
+      return oa - ob;
+    });
+
+    defaultsUnicos.forEach(registro => {
+
+      // Traer TODAS las opciones de la misma variable, no solo del mismo CAMPO_BUSQUEDA
+      const registrosVariable = this.categoriasInicial.filter(
+        d =>
+          Number(d.IDCATEGORIA) === Number(registro.IDCATEGORIA) &&
+          Number(d.IDVARIABLE) === Number(registro.IDVARIABLE)
+      );
+
+      if (!registrosVariable.length) return;
+
+      // Buscar cuál opción será la seleccionada por defecto
+      const registroDefault =
+        registrosVariable.find(d => Number(d.FIELD) === 1) ?? registrosVariable[0];
+
+      const valorBase = registroDefault.IDVALOR ?? registroDefault.VALOR;
+      const valorFormateado = this.formatearValorSQL(registroDefault, valorBase);
+      const where = `${registroDefault.CAMPO_BUSQUEDA} = ${valorFormateado}`;
+
+      const categoriaNombre =
+        this.categorias.find(c => Number(c.IDCATEGORIA) === Number(registro.IDCATEGORIA))
+          ?.CATEGORIA ?? '';
+
+      
+      const opcionesValor = [
+        ...new Map(
+          registrosVariable.map(item => [item.IDVALOR, item])
+        ).values()
+      ].sort((a, b) => {
+        const oa = Number(a.ORDEN_DEF ?? 999999);
+        const ob = Number(b.ORDEN_DEF ?? 999999);
+        return oa - ob;
+      });
+
+      this.condicionesAgregadas.push({
+        categoriaId: registroDefault.IDCATEGORIA,
+        categoriaNombre,
+        variable: registroDefault.VARIABLE ?? registroDefault.CAMPO_BUSQUEDA,
+        campoBusqueda: registroDefault.CAMPO_BUSQUEDA,
+        condicionId: '=',
+        condicionNombre: 'Igual a',
+        valorId: registroDefault.IDVALOR,
+        valorNombre: registroDefault.VALOR,
+        where,
+        esDefault: true,
+        opcionesValor,
+        idVariable: registroDefault.IDVARIABLE,
+        tipoEntrada: registroDefault.TIPOENTRADA ?? null,
+        tipoDato: registroDefault.TIPODATO ?? 'string',
+        modoIngresar: Number(registroDefault.IDVALOR) === 0,
+        valorIngresado: Number(registroDefault.IDVALOR) === 0 ? '' : null
+      });
+
+    });
+
+    this.whereFinal = this.condicionesAgregadas.map(c => c.where).join(' AND ');
+
+    console.log("WHERE default >>>", this.whereFinal);
+
+    if (autoConsultar) {
+      this.consultar();
+    }
+  }
+
+
+
+  private generarReporte(): void {
+
+
+    console.log('SERVICE KEY >>>', this.getServiceKeyActual());
+  console.log('usarInterseccion >>>', this.usarInterseccion);
+  console.log('geometryInterseccion >>>', this.geometryInterseccion);
+
+
+    this.reporteVisible = true;
+    this.reporteLoading = true;
+    this.reporteError = null;
+    this.reporteTotal = null;
+
+    // Prepara filas del reporte
+    this.reportePorCondicion = this.condicionesAgregadas.map((c, i) => ({
+      idx: i + 1,
+      etiqueta: this.buildEtiquetaCondicion(c),
+      where: c.where,
+      count: null,
+      loading: true
+    }));
+
+    const geom = this.getGeomActiva();
+    const serviceKey = this.getServiceKeyActual();
+    const whereTotal = (this.whereFinal && this.whereFinal.trim().length > 0) ? this.whereFinal : "1=1";
+
+    // Total
+    //const total$: Observable<number | null> = this.consultaMultipleService.getCount(whereTotal, geom).pipe(
+    const total$: Observable<number | null> = this.consultaMultipleService.getCount(whereTotal, geom, serviceKey).pipe(
+      catchError(err => {
+        console.error(err);
+        this.reporteError = "No se pudo calcular el total.";
+        return of(null);
+      })
+    );
+
+    // Por condición (OJO: Observable<CountRow>[] )
+    const porCondicion$: Observable<CountRow>[] = this.reportePorCondicion.map((r, idx) =>
+      //this.consultaMultipleService.getCount(r.where, geom).pipe(
+      this.consultaMultipleService.getCount(r.where, geom, serviceKey).pipe(
+        map((n: number): CountRow => ({ idx, n })),
+        catchError(err => {
+          console.error(err);
+          return of({ idx, n: null } as CountRow);
+        })
+      )
+    );
+        
+    // Ejecuta todo junto
+    forkJoin({
+      total: total$,
+      lista: forkJoin(porCondicion$) // => Observable<CountRow[]>
+    })
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe({
+      next: ({ total, lista }) => {
+        this.reporteTotal = total;
+
+        // lista es CountRow[]
+        lista.forEach((x: CountRow) => {
+          const fila = this.reportePorCondicion[x.idx];
+          fila.count = x.n;
+          fila.loading = false;
+          if (x.n === null) fila.error = "Error";
+        });
+
+        this.reporteLoading = false;
+      },
+      error: err => {
+        console.error(err);
+        this.reporteLoading = false;
+        this.reporteError = "Error generando reporte.";
+      }
+    });
+
+
+  }
+
+
+  private buildEtiquetaCondicion(c: Consulta): string {
+    // Ej: "Género = Femenino"
+    return `${c.variable} ${c.condicionNombre} ${c.valorNombre}`;
+  }
+
+
+  setInterseccion(geom: Geometry | null) {
+    this.geometryInterseccion = geom;
+    this.usarInterseccion = !!geom;
+  }
+
+
   constructor(
-    private consultaMultipleService: ConsultaMultipleService,
+    private consultaMultipleService: ConsultaMultipleService,private comm: MapCommService
   ) {}
 
   ngOnInit(): void {
     this.getCategoria();
+
+    // this.comm.geometry$
+    // .pipe(takeUntil(this.destroyed$))
+    // .subscribe(g => this.setInterseccion(g));
+    this.comm.geometry$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe((payload) => {
+        const geom = payload?.geometry ?? null;
+        if (geom) {
+          this.setInterseccion(geom);
+        } else {
+          this.setInterseccion(null);
+        }
+      });
+
+  }
+
+  get mensajeValidacion(): string {
+    switch (this.tipoDatoActual) {
+      case 'number':
+      case 'integer':
+      case 'float':
+        return 'Ingrese un número válido.';
+      case 'date':
+        return 'Ingrese una fecha válida.';
+      case 'boolean':
+        return 'Ingrese un valor verdadero o falso.';
+      default:
+        return 'Ingrese un valor válido.';
+    }
+  }
+
+
+  private refrescarCategoriasConRestriccion(): void {
+    const restringidas = this.getCategoriasRestringidas();
+
+    this.categorias = this.categorias.map(item => ({
+      ...item,
+      disabled: restringidas.includes(Number(item.IDCATEGORIA))
+    }));
   }
 
   getCategoria():void  {
@@ -137,8 +633,26 @@ export class ConsultaMultipleComponent {
           ...new Map(lista.map(item => [item.IDCATEGORIA, item])).values()
         ];
 
-        this.categorias=unicos;
+        console.log("lista ," , lista);
+        console.log("unicos ," , unicos);
+
+        //ordenar alfabéticamente
+        unicos.sort((a, b) =>
+          (a.CATEGORIA ?? '').localeCompare(b.CATEGORIA ?? '', 'es', { sensitivity: 'base' })
+        );
+
+        //this.categorias=unicos;
+        this.categorias = unicos.map(item => ({
+          ...item,
+          disabled: this.getCategoriasRestringidas().includes(Number(item.IDCATEGORIA))
+        }));
         this.categoriasInicial=lista;
+
+        this.refrescarRestriccionesUI();
+
+        // aplicar defaults apenas cargue catálogo
+        this.aplicarDefault(false); // o true para que consulte automáticamente
+
       },
       error: (err) => {
         console.error('Error cargando indicadores:', err);
@@ -146,32 +660,47 @@ export class ConsultaMultipleComponent {
     });
   }
 
-  getConsultaDatos(whereFinal: string): void {
+
+
+  // cargarPagina(p: number) {
+  //   if (p < 1) return;
+
+  //   this.paginaActual = p;
+
+  //   this.consultaMultipleService
+  //     .getConsultaDatos(
+  //       this.whereFinal,
+  //       p,
+  //       this.registrosPorPagina,
+  //       this.usarInterseccion ? this.geometryInterseccion : null
+  //     )
+  //     .subscribe((resp: __esri.FeatureSet) => {
+  //       this.resultados = this.mapResultados(resp);
+  //     });
+  // }
+  cargarPagina(p: number) {
+
+    console.log('SERVICE KEY >>>', this.getServiceKeyActual());
+console.log('usarInterseccion >>>', this.usarInterseccion);
+console.log('geometryInterseccion >>>', this.geometryInterseccion);
+    if (p < 1) return;
+
+    this.paginaActual = p;
+
+    const serviceKey = this.getServiceKeyActual();
+
     this.consultaMultipleService
-        .getConsultaDatos(whereFinal)
-        .pipe(map(result => this.mapResultados(result)))
-        .subscribe({
-          next: lista => {
-            this.resultadosTodos = lista; // guardamos todo
-            this.cargarPagina(1);         // mostramos la primera página
-          },
-          error: err => console.error('Error cargando indicadores:', err)
-        });
+      .getConsultaDatos(
+        this.whereFinal,
+        p,
+        this.registrosPorPagina,
+        this.usarInterseccion ? this.geometryInterseccion : null,
+        serviceKey
+      )
+      .subscribe((resp: __esri.FeatureSet) => {
+        this.resultados = this.mapResultados(resp);
+      });
   }
-
- cargarPagina(p:number){
-      if(p < 1) return;
-
-      this.paginaActual = p;
-
-      this.consultaMultipleService
-          .getConsultaDatos(this.whereFinal, p, this.registrosPorPagina)
-          .subscribe((resp:__esri.FeatureSet) =>{
-              this.resultados = this.mapResultados(resp);
-          });
-  }
-
-
 
 
   mapResultados(result: __esri.FeatureSet): ResultadoConsulta[] {
@@ -191,6 +720,7 @@ export class ConsultaMultipleComponent {
       };
     });
   }
+
 
   private traducirValor(campo: string, valor: any): any {
     if (valor === null || valor === undefined) {
@@ -223,43 +753,111 @@ export class ConsultaMultipleComponent {
   }
 
 
-
-
+  
   onCategoriaChange(event: any) {
-    const selectedValue = event.value ?? '0';
+    const selectedValue = event.value ?? null;
     this.selectedCategoria = selectedValue;
+
+    this.selectedVariable = null;
+    this.selectedCondicion = null;
+    this.selectedValor = null;
+    this.valorIngresado = null;
+    this.modoIngresar = false;
+
+    this.condiciones = [];
+    this.valores = [];
 
     const lista = this.categoriasInicial.filter(
       d => d.IDCATEGORIA === Number(selectedValue)
     );
 
+    // ÚNICOS por IDVARIABLE, no por CAMPO_BUSQUEDA
+    // const unicos = [
+    //   ...new Map(lista.map(item => [item.IDVARIABLE, item])).values()
+    // ];
+
+    // this.variables = unicos;
+
+    const variablesRestringidas = this.getVariablesRestringidas();
+
     const unicos = [
-      ...new Map(lista.map(item => [item.CAMPO_BUSQUEDA, item])).values()
-    ];
+      ...new Map(lista.map(item => [item.IDVARIABLE, item])).values()
+    ].map(item => ({
+      ...item,
+      disabled: variablesRestringidas.includes(Number(item.IDVARIABLE))
+    }));
 
-    this.variables=unicos;
-
+    this.variables = unicos;
   }
 
+
+  
   onVariableChange(event: any) {
-    const selectedValue = event.value ?? '0';
+    const selectedValue = event.value ?? null; // ahora será IDVARIABLE
     this.selectedVariable = selectedValue;
 
-    const item = this.categoriasInicial.find(
-      d => d.IDCATEGORIA === Number(this.selectedCategoria) && d.CAMPO_BUSQUEDA === selectedValue
+    const listaVariable = this.categoriasInicial.filter(
+      d =>
+        d.IDCATEGORIA === Number(this.selectedCategoria) &&
+        Number(d.IDVARIABLE) === Number(selectedValue)
     );
 
-    this.condiciones= this.getCondicionesPorTipoEntrada(item?.TIPOENTRADA);
+    if (!listaVariable.length) {
+      this.condiciones = [];
+      this.valores = [];
+      this.selectedCondicion = null;
+      this.selectedValor = null;
+      this.modoIngresar = false;
+      this.valorIngresado = null;
+      return;
+    }
 
-    const lista = this.categoriasInicial.filter(
-      d => d.IDCATEGORIA === Number(this.selectedCategoria)  && d.CAMPO_BUSQUEDA === selectedValue
-    );
+    // tomamos el primero como referencia para metadata general
+    const item = listaVariable[0];
+
+    this.tipoDatoActual = (item?.TIPODATO ?? 'string').toString().toLowerCase();
+    this.tipoEntradaActual = item?.TIPOENTRADA ?? null;
+
+    this.condiciones = this.getCondicionesPorTipoEntrada(item?.TIPOENTRADA);
+
+    // valores únicos por IDVALOR dentro de la variable
+    // const unicos = [
+    //   ...new Map(listaVariable.map(item => [item.IDVALOR, item])).values()
+    // ];
+
+    // this.valores = unicos;
+
+    const valoresRestringidos = this.getRestriccionesValorPorVariable(Number(selectedValue));
 
     const unicos = [
-      ...new Map(lista.map(item => [item.IDVALOR, item])).values()
-    ];
+      ...new Map(listaVariable.map(item => [item.IDVALOR, item])).values()
+    ].map(item => ({
+      ...item,
+      disabled: valoresRestringidos.includes(item.IDVALOR)
+    }));
 
-    this.valores= unicos;
+    this.valores = unicos;
+
+
+    this.selectedCondicion = null;
+    this.selectedValor = null;
+    this.modoIngresar = false;
+    this.valorIngresado = null;
+  }
+
+
+  private categoriaEstaRestringida(categoriaId: number | string): boolean {
+    return this.getCategoriasRestringidas().includes(Number(categoriaId));
+  }
+
+  private variableEstaRestringida(variableId: number | string): boolean {
+    return this.getVariablesRestringidas().includes(Number(variableId));
+  }
+
+  private valorEstaRestringido(variableId: number | string, valorId: number | string): boolean {
+    return this.getRestriccionesValorPorVariable(Number(variableId))
+      .map(v => Number(v))
+      .includes(Number(valorId));
   }
 
   getCondicionesPorTipoEntrada(tipoEntrada: number | null | undefined): CondicionItem[] {
@@ -271,7 +869,7 @@ export class ConsultaMultipleComponent {
       case 2:
         return [
           { id: "=", nombre: "Igual a" },
-          { id: "!=", nombre: "Diferente de" }
+          { id: "<>", nombre: "Diferente de" }
         ];
 
       case 1:
@@ -280,7 +878,7 @@ export class ConsultaMultipleComponent {
           { id: "<=", nombre: "Menor o igual" },
           { id: ">", nombre: "Mayor que" },
           { id: ">=", nombre: "Mayor o igual" },
-          { id: "!=", nombre: "Diferente de" }
+          { id: "<>", nombre: "Diferente de" }
         ];
 
       case 3:
@@ -290,8 +888,15 @@ export class ConsultaMultipleComponent {
   }
 
   onValorChange(event: any) {
-    const selectedValue = event.value ?? '0';
+    const selectedValue = event.value ?? null;
     this.selectedValor = selectedValue;
+
+    // Regla de BD: IDVALOR=0 => "Ingresar"
+    this.modoIngresar = (selectedValue === 0 || selectedValue === '0');
+
+    if (!this.modoIngresar) {
+      this.valorIngresado = null;
+    }
   }
 
   onCondicionChange(event: any) {
@@ -299,161 +904,189 @@ export class ConsultaMultipleComponent {
     this.selectedCondicion = selectedValue;
   }
 
-  // onAgregarCondicion() {
 
-  //   if (
-  //     this.selectedCategoria &&
-  //     this.selectedVariable &&
-  //     this.selectedCondicion &&
-  //     this.selectedValor
-  //   ) {
-  //     // Buscar registro de configuración
-  //     const registro = this.categoriasInicial.find(
-  //       d =>
-  //         d.IDCATEGORIA == this.selectedCategoria &&
-  //         d.CAMPO_BUSQUEDA == this.selectedVariable
-  //     );
+  private refrescarRestriccionesUI(): void {
+    this.refrescarCategoriasConRestriccion();
 
-  //     let valorFormateado: string | number = this.selectedValor;
-
-  //     if (registro) {
-  //       switch (registro.TIPODATO) {
-  //         case 'string':
-  //           valorFormateado = `${this.selectedValor}`;
-  //           break;
-  //         case 'number':
-  //           valorFormateado = this.selectedValor;
-  //           break;
-  //         case 'date':
-  //           valorFormateado = `DATE ${this.selectedValor}`;
-  //           break;
-  //         default:
-  //           valorFormateado = `${this.selectedValor}`;
-  //       }
-  //     }
-
-  //     const where = `${this.selectedVariable} ${this.selectedCondicion} ${valorFormateado}`;
-
-  //     //  Buscar nombres legibles
-  //     const categoriaNombre =
-  //       this.categorias.find(c => c.IDCATEGORIA === this.selectedCategoria)?.CATEGORIA ??
-  //       this.selectedCategoria;
-
-  //     const condicionNombre =
-  //       this.condicionesCatalogo.find(c => c.id === this.selectedCondicion)?.nombre ??
-  //       this.selectedCondicion;
-
-  //     const valorNombre =
-  //       this.valores.find(v => v.IDVALOR == this.selectedValor)?.VALOR ??
-  //       this.selectedValor;
-
-  //     this.condicionesAgregadas.push({
-  //       categoriaId: this.selectedCategoria,
-  //       categoriaNombre,
-  //       variable: this.selectedVariable,
-  //       condicionId: this.selectedCondicion,
-  //       condicionNombre,
-  //       valorId: this.selectedValor,
-  //       valorNombre,
-  //       where
-  //     });
-
-  //     this.whereFinal = this.condicionesAgregadas.map(c => c.where).join(' AND ');
-
-  //     console.log(this.whereFinal);
-  //   } else {
-  //     console.warn(" Faltan datos para armar la condición");
-  //   }
-  // }
-
-  onAgregarCondicion() {
-
-      if (!(this.selectedCategoria && this.selectedVariable && this.selectedCondicion && this.selectedValor)) {
-          console.warn(" Faltan datos para armar condición.");
-          return;
-      }
-
-      // Buscar configuración del campo
-      const registro = this.categoriasInicial.find(
-          d =>
-              d.IDCATEGORIA == this.selectedCategoria &&
-              d.CAMPO_BUSQUEDA == this.selectedVariable
+    if (this.selectedCategoria) {
+      const lista = this.categoriasInicial.filter(
+        d => d.IDCATEGORIA === Number(this.selectedCategoria)
       );
 
-      let valorFormateado = this.selectedValor;
+      const variablesRestringidas = this.getVariablesRestringidas();
 
-      if (registro) {
-          const tipo = registro.TIPODATO?.toLowerCase();
+      this.variables = [
+        ...new Map(lista.map(item => [item.IDVARIABLE, item])).values()
+      ].map(item => ({
+        ...item,
+        disabled: variablesRestringidas.includes(Number(item.IDVARIABLE))
+      }));
+    }
 
-          switch (tipo) {
-              case 'string':
-                  valorFormateado = `'${this.selectedValor}'`; // <-- FIX REAL
-                  break;
+    if (this.selectedCategoria && this.selectedVariable) {
+      const listaVariable = this.categoriasInicial.filter(
+        d =>
+          d.IDCATEGORIA === Number(this.selectedCategoria) &&
+          Number(d.IDVARIABLE) === Number(this.selectedVariable)
+      );
 
-              case 'number':
-              case 'integer':
-              case 'float':
-                  valorFormateado = this.selectedValor;
-                  break;
+      const valoresRestringidos = this.getRestriccionesValorPorVariable(Number(this.selectedVariable));
 
-              case 'date':
-                  valorFormateado = `DATE '${this.selectedValor}'`; // <-- FIX DATE
-                  break;
+      this.valores = [
+        ...new Map(listaVariable.map(item => [item.IDVALOR, item])).values()
+      ].map(item => ({
+        ...item,
+        disabled: valoresRestringidos.includes(item.IDVALOR)
+      }));
+    }
+  }
 
-              case 'boolean':
-                  valorFormateado = this.selectedValor ? 1 : 0;
-                  break;
+    
+  
+  onAgregarCondicion() {
 
-              default:
-                  valorFormateado = `'${this.selectedValor}'`; // fallback seguro
-          }
+
+    if (this.categoriaEstaRestringida(this.selectedCategoria)) {
+      console.warn('La categoría seleccionada no aplica con la combinación activa.');
+      return;
+    }
+
+    if (this.variableEstaRestringida(this.selectedVariable)) {
+      console.warn('La variable seleccionada no aplica con la combinación activa.');
+      return;
+    }
+
+    if (!this.modoIngresar && this.valorEstaRestringido(this.selectedVariable, this.selectedValor)) {
+      console.warn('El valor seleccionado no aplica con la combinación activa.');
+      return;
+    }
+
+    if (!(this.selectedCategoria && this.selectedVariable && this.selectedCondicion &&
+          this.selectedValor !== null && this.selectedValor !== undefined)) {
+      console.warn("Faltan datos para armar condición.");
+      return;
+    }
+
+    if (this.modoIngresar) {
+      if (!this.valorIngresado || `${this.valorIngresado}`.trim() === '') {
+        console.warn("Debe ingresar un valor.");
+        return;
+      }
+    }
+
+    // Todas las filas de la variable seleccionada
+    const registrosVariable = this.categoriasInicial.filter(
+      d =>
+        Number(d.IDCATEGORIA) === Number(this.selectedCategoria) &&
+        Number(d.IDVARIABLE) === Number(this.selectedVariable)
+    );
+
+    if (!registrosVariable.length) {
+      console.warn("No se encontró configuración de la variable");
+      return;
+    }
+
+    let registro: any = null;
+    let valorBase: any = null;
+
+    if (this.modoIngresar) {
+      // Para ingreso libre usamos el primer registro como referencia
+      registro = registrosVariable[0];
+      valorBase = this.valorIngresado;
+    } else {
+      // Para catálogo, buscamos la fila exacta por IDVALOR
+      registro = registrosVariable.find(
+        d => Number(d.IDVALOR) === Number(this.selectedValor)
+      );
+
+      if (!registro) {
+        console.warn("No se encontró configuración del valor seleccionado");
+        return;
       }
 
-      //  construir where
-      const where = `${this.selectedVariable} ${this.selectedCondicion} ${valorFormateado}`;
+      valorBase = this.selectedValor;
+    }
 
-      //  Armado visible en UI (sin afectar SQL)
-      const categoriaNombre =
-          this.categorias.find(c => c.IDCATEGORIA === this.selectedCategoria)?.CATEGORIA ??
-          this.selectedCategoria;
+    const valorFormateado = this.formatearValorSQL(registro, valorBase);
 
-      const condicionNombre =
-          this.condicionesCatalogo.find(c => c.id === this.selectedCondicion)?.nombre ??
-          this.selectedCondicion;
+    const operadorSQL = this.selectedCondicion === "!="
+      ? "<>"
+      : this.selectedCondicion;
 
-      const valorNombre =
-          this.valores.find(v => v.IDVALOR == this.selectedValor)?.VALOR ??
-          this.selectedValor;
+    const where = `${registro.CAMPO_BUSQUEDA} ${operadorSQL} ${valorFormateado}`;
 
-      this.condicionesAgregadas.push({
-          categoriaId: this.selectedCategoria,
-          categoriaNombre,
-          variable: this.selectedVariable,
-          condicionId: this.selectedCondicion,
-          condicionNombre,
-          valorId: this.selectedValor,
-          valorNombre,
-          where
-      });
+    const categoriaNombre =
+      this.categorias.find(c => Number(c.IDCATEGORIA) === Number(this.selectedCategoria))?.CATEGORIA
+      ?? this.selectedCategoria;
 
-      this.whereFinal = this.condicionesAgregadas.map(c => c.where).join(' AND ');
+    const condicionNombre =
+      this.condicionesCatalogo.find(c => c.id === this.selectedCondicion)?.nombre
+      ?? this.selectedCondicion;
 
-      console.log(" SQL Final >>> ", this.whereFinal);
+    const valorNombre = this.modoIngresar
+      ? `${this.valorIngresado}`
+      : (this.valores.find(v => Number(v.IDVALOR) === Number(this.selectedValor))?.VALOR
+        ?? this.selectedValor);
+
+    const variableNombre = registrosVariable[0]?.VARIABLE ?? this.selectedVariable;
+
+    this.condicionesAgregadas.push({
+      categoriaId: this.selectedCategoria,
+      categoriaNombre,
+      variable: variableNombre,
+      campoBusqueda: registro.CAMPO_BUSQUEDA,
+      condicionId: this.selectedCondicion,
+      condicionNombre,
+      valorId: this.selectedValor,
+      valorNombre,
+      where,
+      idVariable: this.selectedVariable
+    });
+
+    this.whereFinal = this.condicionesAgregadas.map(c => c.where).join(' AND ');
+
+    this.logServicioActual();
+
+
+    this.refrescarRestriccionesUI();
+
+    this.selectedVariable = null;
+    this.selectedCondicion = null;
+    this.selectedValor = null;
+    this.valorIngresado = null;
+    this.modoIngresar = false;
+
+    this.valores = [];
+    this.condiciones = [];
+
+    console.log("SQL Final >>> ", this.whereFinal);
   }
 
 
+  
   eliminarCondicion(row: any) {
     this.condicionesAgregadas = this.condicionesAgregadas.filter(r => r !== row);
+    this.whereFinal = this.condicionesAgregadas.map(c => c.where).join(' AND ');
+    this.refrescarRestriccionesUI();
+    this.logServicioActual();
   }
 
-  // consultar() {
-  //     console.log("Ejecutando consulta con WHERE:", this.whereFinal);
-  //     this.getConsultaDatos(this.whereFinal); // cargar datos y paginar
-  // }
+  
+  consultar() {
 
+    console.log("===== WHERE FINAL =====");
+    console.log(this.whereFinal);
+    console.log("=======================");
+    console.log("SERVICE KEY >>>", this.getServiceKeyActual());
+    console.log("=======================");
+    // 1) genera reporte (conteos)
+    this.generarReporte();
 
-  consultar(){
-    this.cargarPagina(1);  // primera página
+    // nuevo:
+    //this.generarReporteDinamico();
+
+    // 2) trae la primera página (datos)
+    this.cargarPagina(1);
   }
 
 
@@ -461,6 +1094,16 @@ export class ConsultaMultipleComponent {
   limpiar() {
     this.condicionesAgregadas = [];
     this.resultados = [];
+    this.whereFinal = '';
+
+    this.reporteVisible = false;
+    this.reportePorCondicion = [];
+    this.reporteTotal = null;
+    this.reporteError = null;
+    this.reporteLoading = false;
+
+    this.logServicioActual();
+    this.refrescarRestriccionesUI();
   }
 
   cerrar() {
@@ -481,11 +1124,55 @@ export class ConsultaMultipleComponent {
     }
   }
 
-  onVerZoom(row: any) {
-    // this.filaSeleccionada = row;
-    // this.detalleVisible = true;
-    // Promise.resolve().then(() => {
-    //   this.scrollArriba();
-    // });
+  // onVerZoom(oid: number) {
+
+  //   if (!oid) return;
+
+  //   this.consultaMultipleService.getGeomByObjectId(Number(oid))
+  //     .subscribe({
+  //       next: (geom) => {
+  //         if (!geom) {
+  //           console.warn("No se encontró geometría para el OBJECTID:", oid);
+  //           return;
+  //         }
+  //         // Envías al mapa (por comm)
+  //         this.comm.requestZoomGeom(geom as any);
+  //       },
+  //       error: (err) => console.error("Error trayendo geometría para zoom:", err)
+  //     });
+  // }
+  // onVerZoom(oid: number) {
+  //   if (!oid) return;
+
+  //   const serviceKey = this.getServiceKeyActual();
+
+  //   this.consultaMultipleService.getGeomByObjectId(Number(oid), serviceKey)
+  //     .subscribe({
+  //       next: (geom) => {
+  //         if (!geom) {
+  //           console.warn("No se encontró geometría para el OBJECTID:", oid);
+  //           return;
+  //         }
+  //         this.comm.requestZoomGeom(geom as any);
+  //       },
+  //       error: (err) => console.error("Error trayendo geometría para zoom:", err)
+  //     });
+  // }
+  onVerZoom(oid: number) {
+    if (!oid) return;
+
+    const serviceKey = this.getServiceKeyActual();
+
+    this.consultaMultipleService.getGeomByObjectId(Number(oid), serviceKey)
+      .subscribe({
+        next: (geom) => {
+          if (!geom) {
+            console.warn("No se encontró geometría para el OBJECTID:", oid);
+            return;
+          }
+          this.comm.requestZoomGeom(geom as any);
+        },
+        error: (err) => console.error("Error trayendo geometría para zoom:", err)
+      });
   }
 }

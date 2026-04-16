@@ -6,6 +6,7 @@ import {FormatUtil} from "../../shared/utils/format.util";
 import {FuenteIngresoService} from '../../services/indices/fuente-ingreso.service';
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import { environment } from 'src/environments/environment';
+import { MapCommService } from '../../services/map-comm.service';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
   private url = `${environment.arcgis.baseUrl}${environment.arcgis.indicesUrl}`;
 
   constructor(
+    private mapComm: MapCommService,
     private fuenteIngresoService: FuenteIngresoService
   ) {}
 
@@ -52,6 +54,16 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.crearGrafico();
+    //this.aplicarColoresTematico();
+  }
+
+  aplicarColoresTematico() {
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {
+      this.mapComm.emitRenderTematico("FUING");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
+    }
+    
   }
 
   private crearGrafico() {
@@ -110,11 +122,11 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
 
       plotOptions: {
         pie: {
-          innerSize: '60%',                 // ✅ Donut
+          innerSize: '60%',                 //  Donut
           dataLabels: {
             enabled: true,
             format: '{point.percentage:.1f} %',
-            distance: -40,                  // ✅ Etiquetas dentro del arco
+            distance: -40,                  //  Etiquetas dentro del arco
             style: {
               fontWeight: 'bold',
               textOutline: 'none',

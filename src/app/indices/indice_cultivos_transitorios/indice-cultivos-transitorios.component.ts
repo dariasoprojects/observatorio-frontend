@@ -11,6 +11,7 @@ import {CultivosTransitoriosService} from '../../services/indices/cultivos-trans
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import {IndicesUtil} from '../../shared/utils/indices.util';
 import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
+import {MapCommService} from '../../services/map-comm.service';
 
 
 @Component({
@@ -48,6 +49,7 @@ export class IndiceCultivosTransitComponent implements OnInit {
   constructor(
     private ubigeoService: UbigeoService,
     private cultivosTransitoriosService: CultivosTransitoriosService,
+    private mapComm: MapCommService,
     private indicesUtil: IndicesUtil
   ) {}
 
@@ -62,7 +64,19 @@ export class IndiceCultivosTransitComponent implements OnInit {
         this.cargarDatos();
       }
     }
+
+    //this.aplicarColoresTematico();
   }
+
+  aplicarColoresTematico() {
+    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
+      this.mapComm.emitRenderTematico("CULTITRANS");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
+    }
+  }
+
 
 
   private crearGrafico() {

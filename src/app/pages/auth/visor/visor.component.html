@@ -22,11 +22,11 @@
              >
           </i>
         </div>
-        <p-avatar label="RA" shape="circle" styleClass="usr-avatar" (click)="menu.toggle($event)"></p-avatar>
+        <p-avatar [label]="inicialUsuario" shape="circle" styleClass="usr-avatar" (click)="menu.toggle($event)"></p-avatar>
         <p-menu #menu [model]="items" [popup]="true" />
         <div class="usr-info">
-          <div class="usr-name">Roberto Aranda</div>
-          <div class="usr-role">Analista del Sistema</div>
+          <div class="usr-name">{{ usuarioLogueado }}</div>
+          <div class="usr-role">{{ tipoUsuario }} - {{ entidadUsuario }}</div>
         </div>
 
       </div>
@@ -50,7 +50,7 @@
   </app-side-right>
 
   <p-dialog
-    header="GeoAnalítica"
+    header="GeoPerfil"
     [(visible)]="dialogVisible"
     [modal]="false"
     [style]="{ width: '630px' }"
@@ -63,7 +63,7 @@
   </p-dialog>
 
   <p-dialog
-    header="GeoPerfil"
+    header="GeoAnalítica"
     [(visible)]="dialogVisibleConsultaMultiple"
     [modal]="false"
     [style]="{ width: '830px' }"
@@ -72,6 +72,21 @@
   >
     <app-consulta-multiple></app-consulta-multiple>
   </p-dialog>
+
+
+
+ <p-dialog
+  header="Descargas"
+  [(visible)]="dialogVisibleDescarga"
+  [modal]="false"
+  [style]="{ width: '830px' }"
+  [contentStyle]="{ height: '80vh', overflow: 'hidden' }"
+  [draggable]="true"
+  [resizable]="false"
+>
+  <app-descargas></app-descargas>
+</p-dialog>
+
 
   <p-dialog
     [(visible)]="dialogVisibleBusquedaDni"

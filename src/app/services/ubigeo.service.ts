@@ -83,6 +83,30 @@ export class UbigeoService {
     return ubigeo;
   }
 
+  getNombreSimple(ubigeo: string): string {
+    if (!ubigeo) return '';
+
+    const len = ubigeo.length;
+    let record: UbigeoRecord | undefined;
+
+    if (len === 2) {
+      record = this.cache.find(r => r.idDpto === ubigeo);
+      return record?.nomDpto || ubigeo;
+    }
+
+    if (len === 4) {
+      record = this.cache.find(r => r.idProv === ubigeo);
+      return record?.nomProv || ubigeo;
+    }
+
+    if (len === 6) {
+      record = this.cache.find(r => r.idDist === ubigeo);
+      return record?.nomDist || ubigeo;
+    }
+
+    return ubigeo;
+  }
+
 
   /** Devuelve código (2, 4 o 6 dígitos) según el nombre */
   getCodigo(nombre: string): string {
@@ -157,4 +181,18 @@ export class UbigeoService {
       { headers }
     );
   }
+
+
+  getCodigoDepartamentoPorNombre(nombre: string): string {
+    if (!nombre) return '';
+
+    const n = nombre.toLowerCase().trim();
+
+    const record = this.cache.find(
+      r => r.nomDpto?.toLowerCase().trim() === n
+    );
+
+    return record?.idDpto || '';
+  }
+  
 }

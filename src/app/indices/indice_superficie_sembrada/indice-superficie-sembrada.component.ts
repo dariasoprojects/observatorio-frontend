@@ -6,6 +6,7 @@ import {FormatUtil} from "../../shared/utils/format.util";
 import {SuperficieSembradaService} from '../../services/indices/superficie-sembrada.service';
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import { environment } from 'src/environments/environment';
+import { MapCommService } from '../../services/map-comm.service';
 
 
 @Component({
@@ -31,7 +32,7 @@ export class IndiceSuperfiSembComponent implements OnInit {
   private url = `${environment.arcgis.baseUrl}${environment.arcgis.indicesUrl}`;
   
 
-  constructor(
+  constructor(private mapComm: MapCommService,
     private superficieSembradaService: SuperficieSembradaService
   ) {}
 
@@ -45,6 +46,8 @@ export class IndiceSuperfiSembComponent implements OnInit {
         this.cargarDatos();
       }
     }
+
+    this.mapComm.emitRenderTematico("RESET");
   }
 
   private crearGrafico() {

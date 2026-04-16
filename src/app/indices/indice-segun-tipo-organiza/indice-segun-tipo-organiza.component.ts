@@ -40,7 +40,12 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
 
 
   aplicarColoresTematico() {
-    this.mapComm.emitRenderTematico("TIPORG");
+    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {
+      this.mapComm.emitRenderTematico("TIPORG");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
+    }
   }
 
 
@@ -58,6 +63,7 @@ export class IndiceTipoOrgComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.crearGrafico();
+    //this.aplicarColoresTematico();
   }
 
   private crearGrafico() {

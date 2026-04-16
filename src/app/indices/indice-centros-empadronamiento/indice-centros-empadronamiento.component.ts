@@ -55,6 +55,14 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
   ngAfterViewInit() {
     this.crearGrafico();
+    this.mapComm.emitRenderTematico("RESET");
+  }
+
+
+  private obtenerNivelActual(): 'dep' | 'prov' | 'dist' {
+    if (this.valorSeleccionadoProvText !== null) return 'dist';
+    if (this.valorSeleccionadoText !== null) return 'prov';
+    return 'dep';
   }
 
 
@@ -67,21 +75,99 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   }
 
 
+ 
+
   constructor(private mapComm: MapCommService, private dialog: MatDialog) {}  // <-- solo para inyectar
 
 
 
-   toggleCluster(event: MatSlideToggleChange, reg: string) {
-    const checked = event.checked;;
+  //  toggleCluster(event: MatSlideToggleChange, reg: string) {
+  //   const checked = event.checked;;
+
+  //   if (checked) {
+  //     console.log('Activando filtro para:', reg);
+  //     this.activeReg = reg;
+  //     //this.mapComm.requestFilter(reg);
+  //     this.mapComm.requestFilterCentEmp(reg);
+  //   } else {
+  //     console.log('Desactivando filtro');
+  //     this.activeReg = null;
+  //     //this.mapComm.requestFilter(null);
+  //     this.mapComm.requestFilterCentEmp(null);
+  //   }
+  // }
+  // toggleCluster(event: MatSlideToggleChange, reg: string) {
+  //   const checked = event.checked;
+  //   const nivel = this.obtenerNivelActual();
+
+  //   if (checked) {
+  //     console.log('Activando filtro para:', reg, 'nivel:', nivel);
+  //     this.activeReg = reg;
+
+  //     this.mapComm.requestFilterCentEmp({
+  //       valor: reg,
+  //       nivel
+  //     });
+  //   } else {
+  //     console.log('Desactivando filtro');
+  //     this.activeReg = null;
+  //     this.mapComm.requestFilterCentEmp(null);
+  //   }
+  // }
+  toggleCluster(event: MatSlideToggleChange, reg: string) {
+    
+    const checked = event.checked;
+    const nivel = this.obtenerNivelActual();
 
     if (checked) {
-      console.log('Activando filtro para:', reg);
       this.activeReg = reg;
-      this.mapComm.requestFilter(reg);
+
+      if (nivel === 'dep') {
+        this.mapComm.requestFilterCentEmp({
+          nivel,
+          reg
+        });
+        return;
+      }
+
+      if (nivel === 'prov') {
+        const nombreDpto = this.valorSeleccionadoText;
+
+        if (!nombreDpto) {
+          console.warn('No se pudo resolver el departamento actual');
+          this.activeReg = null;
+          this.mapComm.requestFilterCentEmp(null);
+          return;
+        }
+
+        this.mapComm.requestFilterCentEmp({
+          nivel,
+          reg: nombreDpto,
+          prov: reg
+        });
+        return;
+      }
+
+      const nombreDpto = this.valorSeleccionadoText;
+      const nombreProv = this.valorSeleccionadoProvText;
+
+      if (!nombreDpto || !nombreProv) {
+        console.warn('No se pudo resolver el contexto territorial actual');
+        this.activeReg = null;
+        this.mapComm.requestFilterCentEmp(null);
+        return;
+      }
+
+      this.mapComm.requestFilterCentEmp({
+        nivel,
+        reg: nombreDpto,
+        prov: nombreProv,
+        dist: reg
+      });
+
     } else {
-      console.log('Desactivando filtro');
       this.activeReg = null;
-      this.mapComm.requestFilter(null);
+      this.mapComm.requestFilterCentEmp(null);
     }
   }
 
@@ -142,6 +228,8 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
 
   public async cargarDatosByDpto(ubigeo: string) {
+
+      //alert(ubigeo);
 
      const q = new Query({
       where:  `reg = '${ubigeo}'`,

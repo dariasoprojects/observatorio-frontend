@@ -2,24 +2,38 @@
   <!-- Contenedor del gráfico -->
   <div id="container-tipoactiv" ></div>
 
+  <!-- <button class="btn-tematico" (click)="aplicarColoresTematico()">
+    Ver temático
+  </button>
+ -->
 
-  <div style="margin-bottom: 15px;">
-    <mat-form-field appearance="fill" style="width: 300px;">
-      <mat-label>Tipo de actividad</mat-label>
-      <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
-        <mat-option *ngFor="let cat of categoriasOrdenadas" [value]="cat">
-          {{ cat }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
+
+  
 
   <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
+
+    <div class="combo-tematico" [style.--color-tematico]="getColorCategoriaSeleccionada()">
+      <mat-form-field appearance="fill" style="width: 300px;">
+        <mat-label>Tipo de actividad</mat-label>
+        <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
+          <mat-option *ngFor="let cat of categoriasOrdenadas" [value]="cat">
+            {{ cat }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+
+    <div
+    class="tabla-color-header"
+    [style.background-color]="getColorCategoriaSeleccionada()"
+    ></div>
     <table class="tabla-tipoactiv">
       <thead>
         <tr>
-          <th>Regiones</th>
+          <!-- <th>Regiones</th> -->
+          <th>{{ tituloPrimeraColumna }}</th>
           <th>Productores</th>
           <th>Parcelas</th>
           <th>Datos</th>
@@ -50,8 +64,8 @@
 
             <mat-slide-toggle
               color="primary"
-              [checked]="activeReg === fila.ddescr"
-              (change)="toggleCluster($event, fila.ddescr)"
+              [checked]="activeReg === fila.ubigeo"
+              (change)="toggleCluster($event, fila)"
               class="small-toggle"
             ></mat-slide-toggle>
           </td>

@@ -29,4 +29,5 @@ export interface CategoriaAttributes {
   CAMPO_BUSQUEDA: string;
   TIPODATO: string;
   FIELD: number | null;
+  ORDEN_DEF?: number;
 }

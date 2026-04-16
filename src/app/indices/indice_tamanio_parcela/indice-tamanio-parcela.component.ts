@@ -11,6 +11,8 @@ import {TamanioParcelaService} from '../../services/indices/tamanio-parcela.serv
 import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
 import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
 import {IndicesUtil} from '../../shared/utils/indices.util';
+import {MapCommService} from '../../services/map-comm.service';
+
 
 
 @Component({
@@ -47,6 +49,7 @@ export class IndiceTamanioParceComponent implements OnInit {
   constructor(
     private ubigeoService: UbigeoService,
     private tamanioParcelaService: TamanioParcelaService,
+    private mapComm: MapCommService,
     private indicesUtil: IndicesUtil,
     ) {}
 
@@ -61,6 +64,16 @@ export class IndiceTamanioParceComponent implements OnInit {
       }else{
         this.cargarDatos();
       }
+    }
+  }
+
+
+  aplicarColoresTematico() {
+    
+    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
+      this.mapComm.emitRenderTematico("TAMPARC");
+    }else{
+      alert("Esta opción no está disponible a nivel nacional.");
     }
   }
 
@@ -122,11 +135,11 @@ export class IndiceTamanioParceComponent implements OnInit {
 
       plotOptions: {
         pie: {
-          innerSize: '60%',                 // ✅ Donut
+          innerSize: '60%',                 //  Donut
           dataLabels: {
             enabled: true,
             format: '{point.percentage:.1f} %',
-            distance: -40,                  // ✅ Etiquetas dentro del arco
+            distance: -40,                  //  Etiquetas dentro del arco
             style: {
               fontWeight: 'bold',
               textOutline: 'none',
@@ -175,6 +188,7 @@ export class IndiceTamanioParceComponent implements OnInit {
           this.categoriasUnicas = [];
           this.tablaFiltrada = [];
           this.crearGrafico();
+          //this.aplicarColoresTematico();
         }
       },
       error: (err) => {
@@ -267,6 +281,7 @@ export class IndiceTamanioParceComponent implements OnInit {
     if (!this.chart) {
       // Si todavía no existe el chart, créalo
       this.crearGrafico();
+      //this.aplicarColoresTematico();
       return;
     }
 
@@ -274,6 +289,8 @@ export class IndiceTamanioParceComponent implements OnInit {
     const serie = this.chart.series[0];
     const puntos = nuevasCategorias.map((c, i) => ({ name: c, y: nuevosValores[i] }));
     serie.setData(puntos, true); // true => redibuja
+
+    //this.aplicarColoresTematico();
   }
 
   filtrarPorCategoria() {
