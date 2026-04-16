@@ -53,6 +53,10 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
   }
 
+  get totalCantidad(): number {
+    return this.valores.reduce((acc, valor) => acc + Number(valor || 0), 0);
+  }
+
   ngAfterViewInit() {
     this.crearGrafico();
     this.mapComm.emitRenderTematico("RESET");

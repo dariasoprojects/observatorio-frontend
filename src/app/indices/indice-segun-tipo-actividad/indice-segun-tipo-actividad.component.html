@@ -1,18 +1,7 @@
 <div class="indice-tipoactiv">
-  <!-- Contenedor del gráfico -->
-  <div id="container-tipoactiv" ></div>
+  <div id="container-tipoactiv"></div>
 
-  <!-- <button class="btn-tematico" (click)="aplicarColoresTematico()">
-    Ver temático
-  </button>
- -->
-
-
-  
-
-  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
-
     <div class="combo-tematico" [style.--color-tematico]="getColorCategoriaSeleccionada()">
       <mat-form-field appearance="fill" style="width: 300px;">
         <mat-label>Tipo de actividad</mat-label>
@@ -24,15 +13,14 @@
       </mat-form-field>
     </div>
 
-
     <div
-    class="tabla-color-header"
-    [style.background-color]="getColorCategoriaSeleccionada()"
+      class="tabla-color-header"
+      [style.background-color]="getColorCategoriaSeleccionada()"
     ></div>
+
     <table class="tabla-tipoactiv">
       <thead>
         <tr>
-          <!-- <th>Regiones</th> -->
           <th>{{ tituloPrimeraColumna }}</th>
           <th>Productores</th>
           <th>Parcelas</th>
@@ -40,6 +28,7 @@
           <th>Ver en Mapa</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let fila of tablaFiltrada">
           <td>{{ fila.ubigeo }}</td>
@@ -61,7 +50,6 @@
             </button>
           </td>
           <td>
-
             <mat-slide-toggle
               color="primary"
               [checked]="activeReg === fila.ubigeo"
@@ -71,6 +59,20 @@
           </td>
         </tr>
       </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalParcelas) }}</strong>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>

@@ -50,6 +50,20 @@ export class IndiceSuperfiSembComponent implements OnInit {
     this.mapComm.emitRenderTematico("RESET");
   }
 
+  get totalHectareaTotal(): number {
+    return this.tablaDatos.reduce(
+      (acc, fila) => acc + Number(fila.hectareaTotal || 0),
+      0
+    );
+  }
+
+  get totalHectareaSembrada(): number {
+    return this.tablaDatos.reduce(
+      (acc, fila) => acc + Number(fila.hectariaSembrada || 0),
+      0
+    );
+  }
+
   private crearGrafico() {
     this.chart = Highcharts.chart('container-supsemb', {
       chart: {

@@ -359,3 +359,16 @@ body .p-dialog-content {
   box-shadow: none !important;
   outline: none !important;
 }
+
+:host ::ng-deep .mini-table tfoot td {
+  font-weight: 700;
+  background: #f8fafc;
+  border-top: 1px solid #d1d5db;
+}
+
+
+:host ::ng-deep .mini-table .fila-total td {
+  font-weight: 700;
+  background: #f8fafc;
+  border-top: 1px solid #d1d5db;
+}

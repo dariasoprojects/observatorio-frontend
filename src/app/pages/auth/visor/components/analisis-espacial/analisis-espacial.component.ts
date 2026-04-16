@@ -224,6 +224,31 @@ export class AnalisisEspacialComponent {
     this.mapComm.selectLayer(this.capaSeleccionada);
   }
 
+  getSum(rows: any[], field: string): number {
+    return (rows || []).reduce((acc, row) => {
+      const value = Number(row?.[field] ?? 0);
+      return acc + (isNaN(value) ? 0 : value);
+    }, 0);
+  }
+
+  getGridConTotal(
+    rows: any[],
+    labelField: string,
+    totalLabel: string,
+    sumFields: string[]
+  ): any[] {
+    const filaTotal: any = {
+      [labelField]: totalLabel,
+      esTotal: true
+    };
+
+    sumFields.forEach(field => {
+      filaTotal[field] = this.getSum(rows, field);
+    });
+
+    return [...(rows || []), filaTotal];
+  }
+
   private coberturaDentroDelLimite(geom: Polygon | null): boolean {
     if (!geom) return false;
 
@@ -262,7 +287,7 @@ export class AnalisisEspacialComponent {
       this.chartFerti1?.destroy();
 
       this.chartFerti1 = Highcharts.chart('chart-ferti1', {
-        chart: { type: 'column', height: 280 },
+        chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
         title: { text: 'Fertilización cultivo principal' },
         credits: { enabled: false },
         xAxis: {
@@ -297,7 +322,7 @@ export class AnalisisEspacialComponent {
       this.chartFerti2?.destroy();
 
       this.chartFerti2 = Highcharts.chart('chart-ferti2', {
-        chart: { type: 'column', height: 280 },
+        chart: { type: 'column', height: 280, backgroundColor: '#f8fafc' },
         title: { text: 'Fertilización cultivo transitorio' },
         credits: { enabled: false },
         xAxis: {
@@ -332,7 +357,7 @@ export class AnalisisEspacialComponent {
       this.chartFerti3?.destroy();
 
       this.chartFerti3 = Highcharts.chart('chart-ferti3', {
-        chart: { type: 'column', height: 280 },
+        chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
         title: { text: 'Fertilización cultivo permanente' },
         credits: { enabled: false },
         xAxis: {
@@ -456,34 +481,65 @@ export class AnalisisEspacialComponent {
 
     const ordenFijo = ['PAPA', 'MAIZ', 'CAFE', 'PASTOS', 'PALTA', 'ARROZ', 'OTROS'];
 
-    this.gridCultivos1 = ordenFijo.map(nombre => ({
+    // this.gridCultivos1 = ordenFijo.map(nombre => ({
+    //   DESCRIPCION: nombre,
+    //   TOTAL: acumulado.get(nombre) ?? 0
+    // }));
+    this.gridCultivos1 = ordenFijo
+    .map(nombre => ({
       DESCRIPCION: nombre,
       TOTAL: acumulado.get(nombre) ?? 0
-    }));
+    }))
+    .filter(r => Number(r.TOTAL ?? 0) > 0);
 
     setTimeout(() => {
       this.chartCultivos1?.destroy();
 
-      const dataGrafico = this.gridCultivos1.filter(r => r.DESCRIPCION !== 'OTROS');
+      // const dataGrafico = this.gridCultivos1.filter(r => r.DESCRIPCION !== 'OTROS');
+
+      // this.chartCultivos1 = Highcharts.chart('chart-cultivos1', {
+      //   chart: { type: 'bar', height: 320 },
+      //   title: { text: 'Cultivos principales' },
+      //   credits: { enabled: false },
+      //   xAxis: {
+      //     categories:  dataGrafico.map(r => r.DESCRIPCION),
+      //     title: { text: null }
+      //   },
+      //   yAxis: {
+      //     min: 0,
+      //     title: { text: 'Cantidad' }
+      //   },
+      //   tooltip: {
+      //     pointFormat: '<b>{point.y}</b>'
+      //   },
+      //   series: [{
+      //     type: 'bar',
+      //     name: 'Total',
+      //     data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
+      //   }]
+      // });
+      const dataGrafico = this.gridCultivos1.filter(r =>
+        r.DESCRIPCION !== 'OTROS' && Number(r.TOTAL ?? 0) > 0
+      );
 
       this.chartCultivos1 = Highcharts.chart('chart-cultivos1', {
-        chart: { type: 'bar', height: 320 },
-        title: { text: 'Cultivos principales' },
+        chart: { type: 'bar', height: 320, backgroundColor: '#f8fafc' },
+        title: { text: 'Productores por cultivo' },
         credits: { enabled: false },
         xAxis: {
-          categories:  dataGrafico.map(r => r.DESCRIPCION),
+          categories: dataGrafico.map(r => r.DESCRIPCION),
           title: { text: null }
         },
         yAxis: {
           min: 0,
-          title: { text: 'Cantidad' }
+          title: { text: '' }
         },
         tooltip: {
           pointFormat: '<b>{point.y}</b>'
         },
         series: [{
           type: 'bar',
-          name: 'Total',
+          name: 'Número de productores según cultivo',
           data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
         }]
       });
@@ -542,34 +598,65 @@ export class AnalisisEspacialComponent {
       'HABA'
     ];
 
-    this.gridCultivos2 = ordenFijo.map(nombre => ({
+    // this.gridCultivos2 = ordenFijo.map(nombre => ({
+    //   DESCRIPCION: nombre,
+    //   TOTAL: acumulado.get(nombre) ?? 0
+    // }));
+    this.gridCultivos2 = ordenFijo
+    .map(nombre => ({
       DESCRIPCION: nombre,
       TOTAL: acumulado.get(nombre) ?? 0
-    }));
+    }))
+    .filter(r => Number(r.TOTAL ?? 0) > 0);
 
     setTimeout(() => {
       this.chartCultivos2?.destroy();
 
-      const dataGrafico = this.gridCultivos2.filter(r => r.DESCRIPCION !== 'OTROS');
+      // const dataGrafico = this.gridCultivos2.filter(r => r.DESCRIPCION !== 'OTROS');
+
+      // this.chartCultivos2 = Highcharts.chart('chart-cultivos2', {
+      //   chart: { type: 'bar', height: 360 },
+      //   title: { text: 'Cultivos transitorios' },
+      //   credits: { enabled: false },
+      //   xAxis: {
+      //     categories:  dataGrafico.map(r => r.DESCRIPCION),
+      //     title: { text: null }
+      //   },
+      //   yAxis: {
+      //     min: 0,
+      //     title: { text: 'Cantidad' }
+      //   },
+      //   tooltip: {
+      //     pointFormat: '<b>{point.y}</b>'
+      //   },
+      //   series: [{
+      //     type: 'bar',
+      //     name: 'Total',
+      //     data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
+      //   }]
+      // });
+      const dataGrafico = this.gridCultivos2.filter(r =>
+        r.DESCRIPCION !== 'OTROS' && Number(r.TOTAL ?? 0) > 0
+      );
 
       this.chartCultivos2 = Highcharts.chart('chart-cultivos2', {
-        chart: { type: 'bar', height: 360 },
-        title: { text: 'Cultivos transitorios' },
+        chart: { type: 'bar', height: 360,backgroundColor: '#f8fafc' },
+        title: { text: 'Productores por cultivo' },
         credits: { enabled: false },
         xAxis: {
-          categories:  dataGrafico.map(r => r.DESCRIPCION),
+          categories: dataGrafico.map(r => r.DESCRIPCION),
           title: { text: null }
         },
         yAxis: {
           min: 0,
-          title: { text: 'Cantidad' }
+          title: { text: '' }
         },
         tooltip: {
           pointFormat: '<b>{point.y}</b>'
         },
         series: [{
           type: 'bar',
-          name: 'Total',
+          name: 'Número de productores según cultivo',
           data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
         }]
       });
@@ -632,19 +719,51 @@ export class AnalisisEspacialComponent {
 
 
 
-    this.gridCultivos3 = ordenFijo.map(nombre => ({
+    // this.gridCultivos3 = ordenFijo.map(nombre => ({
+    //   DESCRIPCION: nombre,
+    //   TOTAL: acumulado.get(nombre) ?? 0
+    // }));
+    this.gridCultivos3 = ordenFijo
+    .map(nombre => ({
       DESCRIPCION: nombre,
       TOTAL: acumulado.get(nombre) ?? 0
-    }));
+    }))
+    .filter(r => Number(r.TOTAL ?? 0) > 0);
 
     setTimeout(() => {
       this.chartCultivos3?.destroy();
 
-      const dataGrafico = this.gridCultivos3.filter(r => r.DESCRIPCION !== 'OTROS');
+      // const dataGrafico = this.gridCultivos3.filter(r => r.DESCRIPCION !== 'OTROS');
+
+      // this.chartCultivos3 = Highcharts.chart('chart-cultivos3', {
+      //   chart: { type: 'bar', height: 380 },
+      //   title: { text: 'Cultivos permanentes' },
+      //   credits: { enabled: false },
+      //   xAxis: {
+      //     categories: dataGrafico.map(r => r.DESCRIPCION),
+      //     title: { text: null }
+      //   },
+      //   yAxis: {
+      //     min: 0,
+      //     title: { text: 'Cantidad' }
+      //   },
+      //   tooltip: {
+      //     pointFormat: '<b>{point.y}</b>'
+      //   },
+      //   series: [{
+      //     type: 'bar',
+      //     name: 'Total',
+      //     data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
+      //   }]
+      // });
+
+      const dataGrafico = this.gridCultivos3.filter(r =>
+        r.DESCRIPCION !== 'OTROS' && Number(r.TOTAL ?? 0) > 0
+      );
 
       this.chartCultivos3 = Highcharts.chart('chart-cultivos3', {
-        chart: { type: 'bar', height: 380 },
-        title: { text: 'Cultivos permanentes' },
+        chart: { type: 'bar', height: 380 , backgroundColor: '#f8fafc'},
+        title: { text: 'Productores por cultivo' },
         credits: { enabled: false },
         xAxis: {
           categories: dataGrafico.map(r => r.DESCRIPCION),
@@ -652,14 +771,14 @@ export class AnalisisEspacialComponent {
         },
         yAxis: {
           min: 0,
-          title: { text: 'Cantidad' }
+          title: { text: '' }
         },
         tooltip: {
           pointFormat: '<b>{point.y}</b>'
         },
         series: [{
           type: 'bar',
-          name: 'Total',
+          name: 'Número de productores según cultivo',
           data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
         }]
       });
@@ -859,7 +978,7 @@ export class AnalisisEspacialComponent {
     const finalData = total > 0 ? data : [{ name: 'Sin datos', y: 1 }];
 
     return Highcharts.chart(containerId, {
-      chart: { type: 'pie', height: 260 },
+      chart: { type: 'pie', height: 260 , backgroundColor: '#f8fafc'},
       title: { text: titulo, align: 'center' },
       credits: { enabled: false },
       tooltip: { pointFormat: '<b>{point.y}</b> ({point.percentage:.1f}%)' },
@@ -1129,12 +1248,22 @@ export class AnalisisEspacialComponent {
         this.chartPecuario?.destroy();
         this.chartPecuarioDetalle?.destroy();
 
+        const dataPecuarioChart = this.gridPecuario.filter(r =>
+          Number(r.SUM_CAN_P29_2 ?? 0) > 0
+        );
+
+        const dataPecuarioDetalleChart = this.gridPecuario.filter(r =>
+          Number(r.SUM_CAN_P29_3_RAZA ?? 0) > 0 ||
+          Number(r.SUM_CAN_P29_3_CRIOLLO ?? 0) > 0 ||
+          Number(r.SUM_CAN_P29_3_MEJORADO ?? 0) > 0
+        );
+
         this.chartPecuario = Highcharts.chart('chart-pecuario', {
-          chart: { type: 'column', height: 280 },
+          chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
           title: { text: 'Cantidad de animales por tipo' },
           credits: { enabled: false },
           xAxis: {
-            categories: this.gridPecuario.map(r => r.TXT_P29_1),
+            categories: dataPecuarioChart.map(r => r.TXT_P29_1),
             title: { text: null }
           },
           yAxis: {
@@ -1145,18 +1274,18 @@ export class AnalisisEspacialComponent {
           series: [{
             type: 'column',
             name: 'Total',
-            data: this.gridPecuario.map(r => Number(r.SUM_CAN_P29_2 ?? 0))
+            data: dataPecuarioChart.map(r => Number(r.SUM_CAN_P29_2 ?? 0))
           }]
         });
 
         this.loadingPecuario = false;
 
         this.chartPecuarioDetalle = Highcharts.chart('chart-pecuario-detalle', {
-          chart: { type: 'column', height: 320 },
+          chart: { type: 'column', height: 320, backgroundColor: '#f8fafc' },
           title: { text: 'Composición pecuaria por tipo' },
           credits: { enabled: false },
           xAxis: {
-            categories: this.gridPecuario.map(r => r.TXT_P29_1),
+            categories: dataPecuarioDetalleChart.map(r => r.TXT_P29_1),
             title: { text: null }
           },
           yAxis: {
@@ -1169,17 +1298,17 @@ export class AnalisisEspacialComponent {
             {
               type: 'column',
               name: 'Raza',
-              data: this.gridPecuario.map(r => Number(r.SUM_CAN_P29_3_RAZA ?? 0))
+              data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_RAZA ?? 0))
             },
             {
               type: 'column',
               name: 'Criollo',
-              data: this.gridPecuario.map(r => Number(r.SUM_CAN_P29_3_CRIOLLO ?? 0))
+              data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_CRIOLLO ?? 0))
             },
             {
               type: 'column',
               name: 'Mejorado',
-              data: this.gridPecuario.map(r => Number(r.SUM_CAN_P29_3_MEJORADO ?? 0))
+              data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_MEJORADO ?? 0))
             }
           ]
         });

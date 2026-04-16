@@ -73,6 +73,16 @@ export class IndiceServiciosRecibidosComponent {
     //this.aplicarColoresTematico();
   }
 
+  get totalProductores(): number {
+    return this.tablaKeys.reduce((acc, key) => {
+      const subtotal = (this.tablaDatos[key] || []).reduce(
+        (sum, item) => sum + Number(item.productores || 0),
+        0
+      );
+      return acc + subtotal;
+    }, 0);
+  }
+
   // ---------------------------------------------------
   //  CARGA GENERAL
   // ---------------------------------------------------

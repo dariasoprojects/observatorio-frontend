@@ -1,12 +1,9 @@
 <div class="indice-cultivperm">
-  <!-- Contenedor del gráfico -->
   <div id="container-cultivperm"></div>
 
-
-    <button class="btn-tematico" (click)="aplicarColoresTematico()">
+  <button class="btn-tematico" (click)="aplicarColoresTematico()">
     Ver temático
   </button>
-  
 
   <div style="margin-bottom: 15px;">
     <mat-form-field appearance="fill" style="width: 300px;">
@@ -19,7 +16,6 @@
     </mat-form-field>
   </div>
 
-  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
     <table class="tabla-cultivperm">
       <thead>
@@ -28,17 +24,26 @@
           <th>Hectáreas</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let fila of tablaFiltrada">
           <td class="num-col">
             {{ fila.ubigeo }}
           </td>
-
           <td class="num-col">
             {{ FormatUtil.formatInteger2Digitos(fila.parcela) }}
           </td>
         </tr>
       </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareas) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>

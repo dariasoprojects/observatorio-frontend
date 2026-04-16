@@ -93,10 +93,10 @@ interface ReglaRestriccion {
 const REGLAS_RESTRICCION: ReglaRestriccion[] = [
   {
     trigger: { categoriaId: 21, variableId: 65, valorId: 3 },
-    disableCategorias: [14],
-    disableVariables: [66, 67, 70],
+    disableCategorias: [12],
+    disableVariables: [55],
     disableValores: [
-      { variableId: 68, valores: [1, 2] }
+      { variableId: 55, valores: [1, 2,3,4,5,6,7] }
     ]
   }
 ];
@@ -245,7 +245,7 @@ export class ConsultaMultipleComponent {
     ];
   }
 
-
+  
 
   private usaServicioAlterno(): boolean {
     return this.condicionesAgregadas.some(c =>
@@ -662,27 +662,12 @@ export class ConsultaMultipleComponent {
 
 
 
-  // cargarPagina(p: number) {
-  //   if (p < 1) return;
-
-  //   this.paginaActual = p;
-
-  //   this.consultaMultipleService
-  //     .getConsultaDatos(
-  //       this.whereFinal,
-  //       p,
-  //       this.registrosPorPagina,
-  //       this.usarInterseccion ? this.geometryInterseccion : null
-  //     )
-  //     .subscribe((resp: __esri.FeatureSet) => {
-  //       this.resultados = this.mapResultados(resp);
-  //     });
-  // }
+ 
   cargarPagina(p: number) {
 
     console.log('SERVICE KEY >>>', this.getServiceKeyActual());
-console.log('usarInterseccion >>>', this.usarInterseccion);
-console.log('geometryInterseccion >>>', this.geometryInterseccion);
+    console.log('usarInterseccion >>>', this.usarInterseccion);
+    console.log('geometryInterseccion >>>', this.geometryInterseccion);
     if (p < 1) return;
 
     this.paginaActual = p;
@@ -698,6 +683,8 @@ console.log('geometryInterseccion >>>', this.geometryInterseccion);
         serviceKey
       )
       .subscribe((resp: __esri.FeatureSet) => {
+        console.log('PRIMER ATTR >>>', resp?.features?.[0]?.attributes);
+        console.log('TXT_NRODOC >>>', resp?.features?.[0]?.attributes?.['TXT_NRODOC']);
         this.resultados = this.mapResultados(resp);
       });
   }
@@ -1124,53 +1111,26 @@ console.log('geometryInterseccion >>>', this.geometryInterseccion);
     }
   }
 
-  // onVerZoom(oid: number) {
-
-  //   if (!oid) return;
-
-  //   this.consultaMultipleService.getGeomByObjectId(Number(oid))
-  //     .subscribe({
-  //       next: (geom) => {
-  //         if (!geom) {
-  //           console.warn("No se encontró geometría para el OBJECTID:", oid);
-  //           return;
-  //         }
-  //         // Envías al mapa (por comm)
-  //         this.comm.requestZoomGeom(geom as any);
-  //       },
-  //       error: (err) => console.error("Error trayendo geometría para zoom:", err)
-  //     });
-  // }
-  // onVerZoom(oid: number) {
-  //   if (!oid) return;
-
-  //   const serviceKey = this.getServiceKeyActual();
-
-  //   this.consultaMultipleService.getGeomByObjectId(Number(oid), serviceKey)
-  //     .subscribe({
-  //       next: (geom) => {
-  //         if (!geom) {
-  //           console.warn("No se encontró geometría para el OBJECTID:", oid);
-  //           return;
-  //         }
-  //         this.comm.requestZoomGeom(geom as any);
-  //       },
-  //       error: (err) => console.error("Error trayendo geometría para zoom:", err)
-  //     });
-  // }
-  onVerZoom(oid: number) {
+  
+  onVerZoom(row: any) {
+    const oid = row?.fid;
     if (!oid) return;
 
     const serviceKey = this.getServiceKeyActual();
 
     this.consultaMultipleService.getGeomByObjectId(Number(oid), serviceKey)
       .subscribe({
-        next: (geom) => {
-          if (!geom) {
+        next: (feature) => {
+          if (!feature?.geometry) {
             console.warn("No se encontró geometría para el OBJECTID:", oid);
             return;
           }
-          this.comm.requestZoomGeom(geom as any);
+
+          this.comm.requestZoomPin({
+            geometry: feature.geometry,
+            attributes: feature.attributes,
+            serviceKey
+          });
         },
         error: (err) => console.error("Error trayendo geometría para zoom:", err)
       });

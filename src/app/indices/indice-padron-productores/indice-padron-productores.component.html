@@ -1,18 +1,17 @@
 <div class="indice-padronp">
-  <!-- Contenedor del gráfico -->
   <div id="container-padronp"></div>
 
-  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
     <table class="tabla-padronp">
       <thead>
         <tr>
-          <th>Regiones </th>
+          <th>Regiones</th>
           <th>Productores</th>
           <th>Hectárea</th>
           <th>Parcelas</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let fila of tablaDatos">
           <td>{{ fila.ddescr }}</td>
@@ -25,9 +24,23 @@
           <td class="num-col">
             {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
           </td>
-
         </tr>
       </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectarea) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalParcelas) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>

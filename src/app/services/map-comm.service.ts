@@ -8,6 +8,14 @@ export interface GeometryPayload {
     source?: 'draw' | 'kml' | 'select';
 }
 
+export interface ZoomPinPayload {
+  geometry: __esri.Geometry;
+  attributes?: Record<string, any>;
+  serviceKey?: 'principal' | 'alterno';
+}
+
+
+
 @Injectable({ providedIn: 'root' })
 export class MapCommService {
 
@@ -17,6 +25,9 @@ export class MapCommService {
 
   private renderTematicoLoadingSource = new Subject<boolean>();
   renderTematicoLoading$ = this.renderTematicoLoadingSource.asObservable();
+
+  private zoomPinSubject = new Subject<ZoomPinPayload>();
+  zoomPin$ = this.zoomPinSubject.asObservable();
 
 
   emitRenderTematico(campo: string) {
@@ -28,6 +39,10 @@ export class MapCommService {
     this.renderTematicoLoadingSource.next(estado);
   }
 
+
+  requestZoomPin(payload: ZoomPinPayload) {
+    this.zoomPinSubject.next(payload);
+  }
 
   private clearAnalysisGeometrySource = new Subject<void>();
   clearAnalysisGeometry$ = this.clearAnalysisGeometrySource.asObservable();

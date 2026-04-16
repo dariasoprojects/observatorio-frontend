@@ -20,6 +20,7 @@ import Point from "@arcgis/core/geometry/Point";
 import { environment } from 'src/environments/environment';
 import KMLLayer from "@arcgis/core/layers/KMLLayer";
 import * as reactiveUtils from '@arcgis/core/core/reactiveUtils';
+import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
 
 
 export class Mapa {
@@ -330,6 +331,64 @@ export class Mapa {
       await this.mapView.goTo({ target: geom, zoom: 16 }, { duration: 700 });
     });
 
+    this.comm.zoomPin$
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(async ({ geometry, attributes, serviceKey }) => {
+      const view = this.mapView;
+      if (!view || !geometry) return;
+
+      const point = this.obtenerPuntoParaPin(geometry);
+
+      const pinGraphic = point ? new Graphic({
+        geometry: point,
+        symbol: new SimpleMarkerSymbol({
+          style: "circle",
+          size: 14,
+          color: [220, 0, 0, 0.95],
+          outline: {
+            color: [255, 255, 255, 1],
+            width: 2
+          }
+        }),
+        attributes: attributes ?? {},
+        popupTemplate: this.buildPopupTemplate(serviceKey ?? 'principal', attributes ?? {})
+        // popupTemplate: {
+        //   title: "Detalle del registro",
+        //   content: `
+        //     <div><b>Id Parcela:</b> ${attributes?.['IDE_ACTIV_'] ?? ''}</div>
+        //     <div><b>Nro Documento:</b> ${attributes?.['TXT_NRODOC'] ?? ''}</div>
+        //     <div><b>Apellidos:</b> ${attributes?.['APELLIDOPA'] ?? ''}</div>
+        //     <div><b>Nombres:</b> ${attributes?.['NOMBRES'] ?? ''}</div>
+        //     <div><b>Género:</b> ${attributes?.['GENERO'] ?? ''}</div>
+        //     <div><b>Edad:</b> ${attributes?.['EDAD'] ?? ''}</div>
+        //     <div><b>Estado Civil:</b> ${attributes?.['ECIVIL'] ?? ''}</div>
+        //     <div><b>Cultivo 1:</b> ${attributes?.['TXGENERICO_CULT1'] ?? ''}</div>
+        //     <div><b>Cultivo 2:</b> ${attributes?.['TXGENERICO_CULT2'] ?? ''}</div>
+        //     <div><b>Cultivo 3:</b> ${attributes?.['TXGENERICO_CULT3'] ?? ''}</div>
+
+        //   `
+        // }
+      }) : null;
+
+  
+
+      this.highlightLayer.removeAll();
+
+      if (pinGraphic && point) {
+        this.highlightLayer.add(pinGraphic);
+
+        await view.goTo({ target: point, zoom: 16 }, { duration: 700 });
+
+        view.popup?.open({
+          features: [pinGraphic],
+          location: point
+        });
+      } else {
+        await view.goTo({ target: geometry, zoom: 16 }, { duration: 700 });
+        console.warn('No se pudo calcular el punto del pin para la geometría.');
+      }
+    });
+
 
     // this.comm.parcelasPadronFiltro$
     // .pipe(takeUntil(this.destroyed$))
@@ -497,6 +556,77 @@ export class Mapa {
   }
 
 
+  private buildPopupTemplate(
+    serviceKey: 'principal' | 'alterno',
+    attributes: Record<string, any> = {}
+  ): __esri.PopupTemplateProperties {
+
+    if (serviceKey === 'alterno') {
+      return {
+        title: "Detalle del registro",
+        content: `
+          <div><b>ID Actividad:</b> ${attributes?.['IDE_ACTIV_'] ?? ''}</div>
+          <div><b>Nro Documento:</b> ${attributes?.['TXT_NRODOC'] ?? ''}</div>
+          <div><b>Apellidos:</b> ${attributes?.['APELLIDOPA'] ?? ''}</div>
+          <div><b>Nombres:</b> ${attributes?.['NOMBRES'] ?? ''}</div>
+          <div><b>Género:</b> ${attributes?.['GENERO'] ?? ''}</div>
+          <div><b>Edad:</b> ${attributes?.['EDAD'] ?? ''}</div>
+          <div><b>Estado Civil:</b> ${attributes?.['ECIVIL'] ?? ''}</div>
+        `
+      };
+    }
+
+    return {
+      title: "Detalle del registro",
+      content: `
+        <div><b>Nro Documento:</b> ${attributes?.['TXT_NRODOC'] ?? ''}</div>
+        <div><b>Apellidos:</b> ${attributes?.['APELLIDOPA'] ?? ''}</div>
+        <div><b>Nombres:</b> ${attributes?.['NOMBRES'] ?? ''}</div>
+        <div><b>Género:</b> ${attributes?.['GENERO'] ?? ''}</div>
+        <div><b>Edad:</b> ${attributes?.['EDAD'] ?? ''}</div>
+        <div><b>Estado Civil:</b> ${attributes?.['ECIVIL'] ?? ''}</div>
+        <div><b>Cultivo 1:</b> ${attributes?.['TXGENERICO_CULT1'] ?? ''}</div>
+        <div><b>Cultivo 2:</b> ${attributes?.['TXGENERICO_CULT2'] ?? ''}</div>
+        <div><b>Cultivo 3:</b> ${attributes?.['TXGENERICO_CULT3'] ?? ''}</div>
+      `
+    };
+  }
+
+
+  private obtenerPuntoParaPin(geometry: any): Point | null {
+    if (!geometry) return null;
+
+    // Si ya es punto
+    if (typeof geometry.x !== 'undefined' && typeof geometry.y !== 'undefined') {
+      return new Point({
+        x: geometry.x,
+        y: geometry.y,
+        spatialReference: geometry.spatialReference
+      });
+    }
+
+    // Si viene como polígono REST JSON
+    if (geometry.rings) {
+      const polygon = Polygon.fromJSON(geometry);
+      return polygon.extent?.center ?? null;
+    }
+
+    // Si más adelante viene polyline
+    if (geometry.paths) {
+      const extent = new Extent({
+        xmin: Math.min(...geometry.paths.flat().map((p: number[]) => p[0])),
+        ymin: Math.min(...geometry.paths.flat().map((p: number[]) => p[1])),
+        xmax: Math.max(...geometry.paths.flat().map((p: number[]) => p[0])),
+        ymax: Math.max(...geometry.paths.flat().map((p: number[]) => p[1])),
+        spatialReference: geometry.spatialReference
+      });
+      return extent.center;
+    }
+
+    return null;
+  }
+
+
   private async filtrarClusterCentEmpPorDepartamento(ubigeo: string): Promise<void> {
     if (!this.capaClusterCentEmp) return;
 
@@ -533,7 +663,7 @@ export class Mapa {
       case 'FLG_AGRICO':
         return '#4CAF50'; // verde
       case 'FLG_PECUAR':
-        return '#8D6E63'; // marrón
+        return '#8E24AA'; // marrón
       case 'FLG_FOREST':
         return '#2E7D32'; // verde oscuro
       case 'FLG_APICUL':
@@ -1255,7 +1385,7 @@ export class Mapa {
       "1": "#4CAF50",
       "2": "#FFC107",
       "3": "#2E7D32",
-      "4": "#8D6E63"
+      "4": "#8E24AA"
     };
 
 
@@ -3139,7 +3269,7 @@ export class Mapa {
     this.multiQyBtn.className = "esri-widget esri-widget--button esri-interactive  btn-tooltip";
     this.multiQyBtn.innerHTML =
       '<span class="esri-icon-filter"></span>' +
-      '<div class="gp-tooltip">GeoAnalítica</div>';
+      '<div class="gp-tooltip">GeoAnalítica: <br>Brinda información especifica de un ámbito en base a una segmentación de variables de interes.</div>';
 
     //  BOTÓN MIDAGRI – Más grande y más visible sobre azul
     this.multiQyBtn.style.background = "#155f31";
@@ -3191,7 +3321,7 @@ export class Mapa {
     // Botón GeoAnalítica (estilo unificado)
     this.btnAnalisis = document.createElement("div");
       this.btnAnalisis.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
-      this.btnAnalisis.innerHTML = '<span class="esri-icon-configure-popup"></span><div class="gp-tooltip">GeoPerfil</div>';
+      this.btnAnalisis.innerHTML = '<span class="esri-icon-configure-popup"></span><div class="gp-tooltip">GeoPerfil: <br>Brinda información básica productiva del área de interés.</div>';
       //this.btnAnalisis.title = "GeoPerfil";
 
     // Estilo institucional (igual que el anterior)
@@ -3308,7 +3438,7 @@ export class Mapa {
       //view.ui.add(this.toc_3D, "top-right");
       view.ui.add(this.basemapContainer, "top-right");
       view.ui.add(this.printBtn, "top-right");
-      view.ui.add(this.kmlBtn, "top-right");
+      //view.ui.add(this.kmlBtn, "top-right");
 
       view.ui.add(this.btnAnalisis, "top-left");
       view.ui.add(this.multiQyBtn, "top-left");

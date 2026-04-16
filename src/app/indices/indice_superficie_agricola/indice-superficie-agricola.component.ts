@@ -49,6 +49,20 @@ export class IndiceSuperfiAgriComponent implements OnInit {
 
   }
 
+  get totalHectareaTotal(): number {
+    return this.tablaDatos.reduce(
+      (acc, fila) => acc + Number(fila.hectareaTotal || 0),
+      0
+    );
+  }
+
+  get totalHectareaBajoRiego(): number {
+    return this.tablaDatos.reduce(
+      (acc, fila) => acc + Number(fila.hectariaBajoRiego || 0),
+      0
+    );
+  }
+
   private crearGrafico() {
     this.chart = Highcharts.chart('container-supagri', {
       chart: {

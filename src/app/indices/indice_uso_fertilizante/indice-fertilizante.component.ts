@@ -77,6 +77,13 @@ export class IndiceFertilizanteComponent implements OnInit {
     //this.aplicarColoresTematico();
   }
 
+  get totalParcelas(): number {
+    return this.tablaFiltrada.reduce(
+      (acc, fila) => acc + Number(fila.parcelas || 0),
+      0
+    );
+  }
+
 
   aplicarColoresGenero() {
     this.mapComm.emitRenderTematico("FERTILIZA");

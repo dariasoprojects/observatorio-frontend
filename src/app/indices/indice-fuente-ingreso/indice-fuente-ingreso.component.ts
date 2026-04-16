@@ -56,6 +56,18 @@ export class IndiceFuenteIngresoComponent implements OnInit, AfterViewInit {
     this.crearGrafico();
     //this.aplicarColoresTematico();
   }
+  
+  get totalProductores(): number {
+    return this.tablaDatos.reduce((acc, fila) => acc + Number(fila.productores || 0), 0);
+  }
+
+  get totalHectarea(): number {
+    return this.tablaDatos.reduce((acc, fila) => acc + Number(fila.hectarea || 0), 0);
+  }
+
+  get totalParcelas(): number {
+    return this.tablaDatos.reduce((acc, fila) => acc + Number(fila.parcelas || 0), 0);
+  }
 
   aplicarColoresTematico() {
     if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {

@@ -1,5 +1,4 @@
 <div class="indice-fuente">
-  <!-- Contenedor del gráfico -->
   <div id="container-fuente"></div>
 
   <div class="acciones">
@@ -8,7 +7,6 @@
     </button>
   </div>
 
-  <!-- Tabla con los datos -->
   <div class="tabla-wrapper">
     <table class="tabla-fuente">
       <thead>
@@ -19,11 +17,10 @@
           <th>Parcelas</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let fila of tablaDatos">
-          <td>
-            {{ fila.ddescr }}
-          </td>
+          <td>{{ fila.ddescr }}</td>
           <td class="num-col">
             {{ FormatUtil.formatInteger(fila.productores) }}
           </td>
@@ -35,6 +32,21 @@
           </td>
         </tr>
       </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectarea) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalParcelas) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>
