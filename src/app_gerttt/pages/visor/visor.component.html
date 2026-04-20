@@ -1,0 +1,382 @@
+
+<div class="app-container">
+
+ <app-layout-vertical></app-layout-vertical>
+
+        <!-- Header -->
+        <header class="header ">
+            <div class="header-content">
+                <div class="header-left">
+                    <!-- Logo del gobierno peruano -->
+                    <img src="assets/log_midagri.png" alt="Logo" width="300" height="auto">
+
+                    <div class="title-section">
+                        <h1 class="main-title">OBSERVATORIO</h1>
+                        <p class="subtitle">Sistema de Información Geoespacial Agrícola</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+
+
+
+        <!-- Main content -->
+        <div class="main-content">
+
+
+
+
+
+          <app-consulta-multiple ></app-consulta-multiple>
+
+
+
+            <!-- Sidebar -->
+          <app-sidebar
+            (sectionSelected)="mostrarSeccion($event)"
+            [activeSection]="seccionActiva"
+          ></app-sidebar>
+
+            <!-- Content area -->
+            <div class="content-area">
+
+
+                <!-- Ini Right panel - Map -->
+                <div class="right-panel">
+                    <div id="mapaDiv" class="map-container">
+
+
+                        <!-- DNI Search floating -->
+                        <div class="dni-search">
+                            <div class="dni-search-header">
+                                <p class="dni-search-title">Búsqueda por DNI</p>
+                                <p class="dni-search-subtitle">Encuentra tu productor</p>
+                            </div>
+                            <div class="dni-search-form">
+                                <input type="text" placeholder="Ingrese N° de DNI" id="txtdni" class="dni-input">
+                                <button   (click)="ejecutarConsultadni()" class="dni-button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.35-4.35"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div style="display:none;" class="map-legend">
+                            <h4 class="legend-title">Leyenda</h4>
+                            <div class="legend-item">
+                                <div class="legend-color"></div>
+                                <span class="legend-text">Zonas agrícolas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Left panel - Controls -->
+                <div class="left-panel">
+                    <!-- Geographic Selection -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="icon-container blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3" fill="red"></circle>
+                                    <path d="M12 1v6m0 6v6m6-6H7"></path>
+                                </svg>
+                            </div>
+                            <h3 class="card-title geographic-title">Selección geográfica</h3>
+                        </div>
+                       <!--
+                        <p class="card-description">
+                            Consulta las estadísticas más recientes del sector agrario
+                        </p>
+                         -->
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label class="form-label">Departamento *</label>
+                                <select (change)="ejecutarConsulta($event)"  id="cbodptos" class="form-select">
+                                    <option value="00">Dpto</option>
+                                    <!-- <option value="LAMBAYEQUE">Lambayeque</option>
+                                    <option value="LIMA">Lima</option> -->
+                                      <option value="01">AMAZONAS</option>
+                                      <option value="02">ANCASH</option>
+                                      <option value="03">APURIMAC</option>
+                                      <option value="04">AREQUIPA</option>
+                                      <option value="05">AYACUCHO</option>
+                                      <option value="06">CAJAMARCA</option>
+                                      <option value="07">CALLAO</option>
+                                      <option value="08">CUSCO</option>
+                                      <option value="09">HUANCAVELICA</option>
+                                      <option value="10">HUANUCO</option>
+                                      <option value="11">ICA</option>
+                                      <option value="12">JUNIN</option>
+                                      <option value="13">LA LIBERTAD</option>
+                                      <option value="14">LAMBAYEQUE</option>
+                                      <option value="15">LIMA</option>
+                                      <option value="16">LORETO</option>
+                                      <option value="17">MADRE DE DIOS</option>
+                                      <option value="18">MOQUEGUA</option>
+                                      <option value="19">PASCO</option>
+                                      <option value="20">PIURA</option>
+                                      <option value="21">PUNO</option>
+                                      <option value="22">SAN MARTIN</option>
+                                      <option value="23">TACNA</option>
+                                      <option value="24">TUMBES</option>
+                                      <option value="25">UCAYALI</option>
+                                </select>
+                            <!-- </div>
+
+                            <div class="form-group"> -->
+                                <label class="form-label">Provincia </label>
+                                <select  (change)="ejecutarConsultaProv($event)"  id="cboProvs" class="form-select">
+
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div  *ngIf="esVisible('sec_padron_pa')"  id="sec_padron_pa" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-padronp  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-padronp>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_19')"  id="sec_indi_19" class="card">
+                        <div class="data-cards">
+                            <div style="display: none !important;"><app-grafico></app-grafico></div>
+
+                        </div>
+
+                        <div class="data-cards">
+
+                            <app-indice-fertilizante></app-indice-fertilizante>
+                        </div>
+
+
+                    </div>
+
+
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_01')"  id="sec_indi_01" class="card">
+                        <div class="data-cards">
+                            <div style="display: none !important;"><app-grafico></app-grafico></div>
+
+                        </div>
+
+                        <div class="data-cards">
+
+                            <app-indice-centros-empadronamiento [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-centros-empadronamiento>
+                        </div>
+
+
+                    </div>
+
+
+                    <div  *ngIf="esVisible('sec_indi_02')"  id="sec_indi_02" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-fuente-ingreso    [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-fuente-ingreso>
+                        </div>
+                    </div>
+
+
+                    <div  *ngIf="esVisible('sec_indi_03')"  id="sec_indi_03" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-segun-region-natural  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-segun-region-natural>
+                        </div>
+                    </div>
+
+
+                    <div  *ngIf="esVisible('sec_indi_04')"  id="sec_indi_04" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-nivel-estudio    [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-nivel-estudio>
+                        </div>
+                    </div>
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_05')"  id="sec_indi_05" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-genero   [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-genero>
+                        </div>
+                    </div>
+
+
+                    <div  *ngIf="esVisible('sec_indi_06')"  id="sec_indi_06" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-tipoorg  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-tipoorg>
+                        </div>
+                    </div>
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_03a')"  id="sec_indi_03a" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-tipo-activ   [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-tipo-activ>
+                        </div>
+                    </div>
+
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_supagri')"  id="sec_indi_supagri" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-supagri   [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-supagri>
+                        </div>
+                    </div>
+
+
+
+                     <div  *ngIf="esVisible('sec_indi_supsemb')"  id="sec_indi_supsemb" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-supsemb  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-supsemb>
+                        </div>
+                    </div>
+
+
+
+
+                     <div  *ngIf="esVisible('sec_indi_tamparce')"  id="sec_indi_tamparce" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-tamparce  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-tamparce>
+                        </div>
+                    </div>
+
+
+
+                    <div  *ngIf="esVisible('sec_indi_regtene')"  id="sec_indi_regtene" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-regtene  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-regtene>
+                        </div>
+                    </div>
+
+
+
+                    <div  *ngIf="esVisible('sec_pricip_cultiv')"  id="sec_pricip_cultiv" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-princult  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-princult>
+                        </div>
+                    </div>
+
+
+
+                     <div  *ngIf="esVisible('sec_cultiv_transit')"  id="sec_cultiv_transit" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-cultivtran  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-cultivtran>
+                        </div>
+                    </div>
+
+
+
+                     <div  *ngIf="esVisible('sec_cultiv_perma')"  id="sec_cultiv_perma" class="card">
+
+                        <div class="data-cards">
+
+                            <app-indice-cultivperm  [valorSeleccionadoProv]="valorSeleccionadoProv"  [valorSeleccionadoProvText]="valorSeleccionadoProvText"  [valorSeleccionado]="valorSeleccionado"   [valorSeleccionadoText]="valorSeleccionadoText"></app-indice-cultivperm>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <!-- Data Cards -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="icon-container orange">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="20" x2="12" y2="10"></line>
+                                    <line x1="18" y1="20" x2="18" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="16"></line>
+                                </svg>
+                            </div>
+                            <h3 class="card-title data-title">Datos</h3>
+                        </div>
+
+                        <p class="card-description">
+                            Consulta las estadísticas más recientes del sector agrario
+                        </p>
+
+
+
+
+                        <div class="data-cards">
+
+                            <app-sumatorias></app-sumatorias>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                </div>
+
+                <!-- End left pane -->
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+<div class="indice-tamparce">
+  <div id="container-tamparce"></div>
+
+  <button class="btn-tematico" (click)="aplicarColoresTematico()">
+    Ver temático
+  </button>
+
+  <div style="margin-bottom: 15px;">
+    <mat-form-field appearance="fill" style="width: 300px;">
+      <mat-label>Tipo de tamaño</mat-label>
+      <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
+        <mat-option *ngFor="let cat of categorias" [value]="cat">
+          {{ cat }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="tabla-wrapper">
+    <table class="tabla-tamparce">
+      <thead>
+        <tr>
+          <th>Regiones</th>
+          <th>Parcelas</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let fila of tablaFiltrada">
+          <td class="num-col">
+            {{ fila.ubigeo }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcela) }}
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalParcelas) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

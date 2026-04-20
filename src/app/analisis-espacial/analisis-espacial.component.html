@@ -1,0 +1,147 @@
+<div id="divDragAnalisis" class="analisis-panel" style="display:none" appDraggable>
+
+  <!-- <div class="panel-header">
+    <span> Análisis Espacial</span>
+    <button class="close-btn" (click)="cerrar()">x</button>
+  </div>
+ -->
+
+ <!-- cabecera movible -->
+  <div class="drag-handle legend-title2" 
+       style="padding:5px; cursor:move;">
+    Análisis Espacial
+    <button (click)="closeVentana()" class="close-btn">×</button>
+  </div>
+
+  <div class="panel-body">
+
+    <label class="section-title">11111. Definir Cobertura</label>
+
+    <!-- OPCIÓN KML -->
+    <div class="input-group">
+      <label>Cargar KML</label>
+      <input type="file" (change)="onFileSelect($event, 'kml')" accept=".kml">
+    </div>
+
+    <!-- OPCIÓN SHAPE -->
+    <!-- <div class="input-group">
+      <label>Cargar Shapefile (.zip)</label>
+      <input type="file" (change)="onFileSelect($event, 'shape')" accept=".zip">
+    </div>
+ -->
+    <!-- OPCIÓN DIBUJAR -->
+    <button class="btn-primary" (click)="dibujar()"> Dibujar polígono</button>
+
+
+     <!-- OPCIÓN SHAPE -->
+    <div class="input-group">
+      <label>Seleccionar Capa</label>
+      <select [(ngModel)]="capaSeleccionada" (change)="onCapaChange()">
+        <option value="">-- Seleccione capa --</option>
+        <option value="unidadhidro">Unidad Hidrográfica</option>
+        <option value="sectores">Sectores Estadísticos</option>
+        <option value="microcuencas">Microcuencas</option>        
+        <option value="junta">Junta de Usuarios</option>
+        <option value="comite">Comisión de Riego</option>
+      </select>
+    </div>
+
+
+
+
+    <hr>
+
+    <label class="section-title">2. Ejecutar análisis</label>
+    <button class="btn-analyze" (click)="analizar()"> Ejecutar Superposición</button>
+
+    <hr>
+
+    <label class="section-title">3. Resultado</label>
+
+    <!-- TABLA RESULTADO -->
+    <div style="display:block" class="table-container" *ngIf="gridData.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumns">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of gridData">
+            <td *ngFor="let col of displayedColumns">{{ row[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+
+<div style="height: 500px; overflow-y: auto;">
+    <!-- TABLA ESTADÍSTICA -->
+    <div class="table-container" *ngIf="gridEstadistico.length > 0">
+      <h3>Resumen por Género</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumnsEst">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of gridEstadistico">
+            <td *ngFor="let col of displayedColumnsEst">{{ row[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- TABLA ACTIVIDAD PRODUCTIVA -->
+    <div class="table-container" *ngIf="gridProductivo.length > 0">
+      <h3>Actividad Productiva</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumnsProductivo">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of gridProductivo">
+            <td *ngFor="let col of displayedColumnsProductivo">{{ row[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+
+    <!-- TABLA SISTEMAS DE RIEGO -->
+    <div class="table-container" *ngIf="gridRiego.length > 0">
+      <h3>Sistemas de Riego</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of displayedColumnsRiego">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of gridRiego">
+            <td *ngFor="let col of displayedColumnsRiego">{{ row[col] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+  </div>
+
+
+    <div *ngIf="gridData.length === 0" class="empty-msg">
+      No hay resultados aún.
+    </div>
+
+  </div>
+
+</div>

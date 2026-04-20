@@ -1,0 +1,36 @@
+<div class="indice-tipoorg">
+  <div id="container-tipoorg"></div>
+
+  <button class="btn-tematico" (click)="aplicarColoresTematico()">
+    Ver temático
+  </button>
+
+  <div class="tabla-wrapper">
+    <table class="tabla-tipoorg">
+      <thead>
+        <tr>
+          <th>Tipo Organización</th>
+          <th>Productores</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

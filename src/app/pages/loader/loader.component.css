@@ -1,0 +1,96 @@
+/* Cubre toda la pantalla mientras carga */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.35),
+    rgba(0, 0, 0, 0.10)
+  );
+
+
+  backdrop-filter: blur(4px);   /* blur suave */
+  z-index: 9999;
+}
+
+
+/* Contenedor del loader */
+.loader-wrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+/* ========= LOGO CENTRAL ========= */
+
+.loader-logo-frame {
+  position: absolute;
+  inset: 20px; /* deja espacio para las barras arriba */
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-logo {
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  object-fit: cover;  /* para que no se deforme */
+}
+
+/* ========= AROS / BARRAS SUPERIORES ========= */
+
+.loader-orbit {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: orbit-spin 1.2s linear infinite;
+}
+
+/* Cada barra es un arco usando border */
+.orbit-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 4px solid transparent;
+}
+
+/* Barra 1 (más interior) */
+.ring-1 {
+  width: 110px;
+  height: 110px;
+  border-top-color: #00a651;   /* verde */
+  transform: rotate(10deg);
+}
+
+/* Barra 2 */
+.ring-2 {
+  width: 120px;
+  height: 120px;
+  border-top-color: #57c3ff;   /* celeste */
+  border-right-color: #57c3ff;
+  transform: rotate(40deg);
+}
+
+/* Barra 3 (la más exterior) */
+.ring-3 {
+  width: 130px;
+  height: 130px;
+  border-top-color: #cccccc;   /* gris claro */
+  transform: rotate(70deg);
+}
+
+/* Animación general de giro */
+@keyframes orbit-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+

@@ -1,0 +1,168 @@
+.wrap-scroll {
+  max-height: 75vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.descargas-container{
+  padding: 16px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.step-card{
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px #e5e7eb;
+  margin-bottom: 14px;
+}
+
+.step-title{
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.step-body{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fila{
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.lbl{
+  font-weight: 700;
+  color: #374151;
+}
+
+.archivo{
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fafafa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.acciones{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.hint{
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.tabla-resultados .p-datatable-thead > tr > th{
+  background: #fafafa;
+  border: none;
+  padding: 10px 8px;
+  font-weight: 700;
+}
+
+.tabla-resultados .p-datatable-tbody > tr > td{
+  border: none;
+  padding: 10px 8px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.acciones-paginacion{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.pagina-info{
+  font-weight: 700;
+  color: #0a8f4d;
+}
+
+
+.fid{
+  font-weight: 700;
+  color: #111827;
+}
+
+.acciones-cell{
+  text-align: right;
+  white-space: nowrap;
+}
+
+.resumen{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resumen-linea{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag{
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.tag .k{
+  font-weight: 700;
+  color: #374151;
+}
+
+.tag .v{
+  color: #111827;
+}
+
+.resumen-sub{
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.detalle-grid{
+  display: grid;
+  gap: 8px;
+}
+
+.detalle-row{
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.detalle-k{
+  font-weight: 700;
+  color: #374151;
+}
+
+.detalle-v{
+  color: #111827;
+  word-break: break-word;
+}

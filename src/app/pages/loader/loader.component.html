@@ -1,0 +1,19 @@
+<div class="loader-overlay"  *ngIf="loading$ | async">
+  <div class="loader-wrapper">
+    <!-- Aros/barras que giran alrededor -->
+    <div class="loader-orbit">
+      <span class="orbit-ring ring-1"></span>
+      <span class="orbit-ring ring-2"></span>
+      <span class="orbit-ring ring-3"></span>
+    </div>
+
+    <!-- Logo MIDAGRI centrado -->
+    <div class="loader-logo-frame">
+      <img
+        src="assets/logo-circle.png"
+        alt="MIDAGRI"
+        class="loader-logo"
+      />
+    </div>
+  </div>
+</div>

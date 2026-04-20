@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;   /* 🔥 clave: el host debe tener altura real */
+  min-height: 400px;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;    /* 🔥 antes ya estaba, esto sí debe mantenerse */
+  min-height: 400px;
+}
+
+#mapDiv,
+#sceneDiv {
+  position: absolute;
+  inset: 0;         /* reemplaza top/left/width/height mejor */
+  width: 100%;
+  height: 100%;
+}
+
+#sceneDiv {
+  display: none;
+}
+
+#coords {
+  position: absolute;
+  bottom: 12px;                 /* separación desde abajo */
+  left: 50%;
+  transform: translateX(-50%);  /* centra horizontalmente */
+  
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  border-radius: 6px;
+  pointer-events: none;         /* no bloquea el mapa */
+  z-index: 10;                  /* por encima del mapa */
+}
+

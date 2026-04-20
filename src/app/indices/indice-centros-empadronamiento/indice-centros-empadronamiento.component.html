@@ -1,0 +1,57 @@
+<div class="indice-centros">
+  <div id="container-centros"></div>
+
+  <div class="tabla-wrapper">
+    <table class="tabla-centros">
+      <thead>
+        <tr>
+          <th>Centro de Empadronamiento</th>
+          <th>Cantidad</th>
+          <th>Datos</th>
+          <th>Ver en Mapa</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let c of categorias; let i = index">
+          <td>{{ c }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(valores[i]) }}
+          </td>
+
+          <td>
+            <button
+              mat-icon-button
+              color="primary"
+              class="mini-icon"
+              matTooltip="Exportar a Excel"
+              (click)="abrirDialogoExportar(c)"
+            >
+              <mat-icon>file_download</mat-icon>
+            </button>
+          </td>
+
+          <td>
+            <mat-slide-toggle
+              color="primary"
+              [checked]="activeReg === c"
+              (change)="toggleCluster($event, c)"
+              class="small-toggle"
+            ></mat-slide-toggle>
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalCantidad) }}</strong>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

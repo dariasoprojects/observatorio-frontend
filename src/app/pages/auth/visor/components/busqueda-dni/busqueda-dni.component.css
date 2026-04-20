@@ -1,0 +1,215 @@
+/* ===== BUSCADOR ===== */
+.search {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 34px;
+  margin: 6px 0 0 10px;
+
+  background-color: #ffffff;
+  border-radius: 8px;
+
+  border: 1px solid #cbd5e1;
+}
+
+
+/* INPUT */
+.search input {
+  flex: 1;
+  height: 34px;
+  padding: 0 12px;
+
+  border: none;
+  outline: none;
+  box-shadow: none;
+
+  background: transparent;
+  border-radius: 8px 0 0 8px;
+  box-sizing: border-box;
+}
+
+.icon-btn {
+  height: 34px;
+  width: 40px;
+
+  border: none;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.icon-btn .pi {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+
+/* BOTÓN BUSCAR */
+.search-btn {
+  background-color: #009c5a;
+  border-radius: 0;
+}
+
+.search-btn:hover {
+  background-color: #00824c;
+}
+
+.clear-btn {
+  background-color: #9ca3af;
+  border-radius: 0 8px 8px 0;
+}
+
+.clear-btn:hover {
+  background-color: #6b7280;
+}
+
+:host ::ng-deep .search .p-inputtext {
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  border-radius: 8px 0 0 8px !important;
+}
+
+
+
+/* ===== PANEL DATOS DEL PRODUCTOR ===== */
+
+.producer-panel .p-panel-header {
+  display: none !important;
+}
+
+/* Panel general */
+.producer-panel {
+  width: 100%;
+  border-radius: 10px;
+
+  /* 🔥 p-panel ya trae padding y shadow, así que los quitamos */
+  padding: 0;
+  box-shadow: none;
+
+  background: #ffffff;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cabecera */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+/* 🔥 Eliminado el estilo directo a .pi aquí
+   porque el ícono va dentro de .header-icon */
+
+
+
+/* Icono de cabecera (cuadradito verde) */
+.header-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-icon .pi {
+  font-size: 0.9rem;
+  color: #009c5a; /* verde */
+}
+
+/* Cuerpo */
+.panel-body {
+  font-size: 12px;
+  color: #333333;
+
+  /* 🔥 p-panel ya trae padding, ajustamos solo si hace falta */
+  padding-top: 4px;
+}
+
+.field-row {
+  margin-bottom: 4px;
+}
+
+.field-label {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+
+
+/* Títulos internos */
+.section-title {
+  font-size: 1rem; /* igual que p-panel header */
+  font-weight: 600; /* igual que p-panel header */
+  margin: 0; /* elimina separación extra */
+  line-height: 1.2;
+  color: #212121;
+}
+
+/* Footer */
+.panel-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+
+/* Botón “Cerrar” borde verde */
+.close-btn {
+  width: 100%;
+  font-size: 12px;
+  border-radius: 6px;
+  border-color: #009c5a !important;
+  color: #009c5a !important;
+}
+
+.msg-error {
+  color: #e63946;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 4px;
+}
+
+.tabla-region {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabla-region th,
+.tabla-region td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: left;
+}
+
+.tabla-region th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.tabla-region tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.tabla-region th.num-col,
+.tabla-region td.num-col {
+  text-align: right;
+  padding-right: 12px;
+}
+.tabla-region td.cell-center {
+  text-align: center;
+}
+
+:host ::ng-deep .p-panel.producer-panel {
+  margin-top: 10px;
+}
