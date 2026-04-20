@@ -6,32 +6,13 @@
     #sidebar
     [(isCollapsed)]="isCollapsed"
     [activeSection]="activeSection"
-    (sectionSelected)="onSelectSection($event)">
+    (sectionSelected)="onSelectSection($event)"
+    (buscarDniRequested)="dialogVisibleBusquedaDni = true" >
+
   </app-sidebar>
 
   <!-- TOP-WIDE -->
-  <section class="top-wide">
-    <div class="topbar">
-      <div class="topbar-right">
-        <div class="usr-info">
-          <i class="pi pi-search"
-             role="button"
-             aria-label="Buscar dni"
-             title="Buscar dni"
-             (click)="dialogVisibleBusquedaDni=true"
-             >
-          </i>
-        </div>
-        <p-avatar [label]="inicialUsuario" shape="circle" styleClass="usr-avatar" (click)="menu.toggle($event)"></p-avatar>
-        <p-menu #menu [model]="items" [popup]="true" />
-        <div class="usr-info">
-          <div class="usr-name">{{ usuarioLogueado }}</div>
-          <div class="usr-role">{{ tipoUsuario }} - {{ entidadUsuario }}</div>
-        </div>
 
-      </div>
-    </div>
-  </section>
 
   <!-- CENTRO: MAPA -->
   <main class="center-map">

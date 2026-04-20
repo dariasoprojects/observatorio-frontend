@@ -1,11 +1,10 @@
 <aside class="side-right">
   <div class="right-sticky">
-    <div  class="right-scroll">
-
+    <div class="right-scroll">
 
       <div [ngSwitch]="activeSection">
-
-        <p-panel *ngSwitchCase="'sec_padron_pa'" styleClass="panel-tight">
+        
+          <p-panel *ngSwitchCase="'sec_padron_pa'" styleClass="panel-tight">
           <app-indice-padronp
             [valorSeleccionadoProv]="valorSeleccionadoProv"
             [valorSeleccionadoProvText]="valorSeleccionadoProvText"
@@ -168,9 +167,8 @@
             [valorSeleccionadoText]="valorSeleccionadoText">
           </app-indice-servicios-recibidos>
         </p-panel>
+
       </div>
-
-
 
       <p-panel header="Datos" styleClass="panel-tight kpi-panel">
         <small class="kpi-hint">Consulta las estadísticas más recientes del sector agrario</small>
@@ -191,6 +189,8 @@
         </div>
       </p-panel>
 
+      <div class="right-spacer"></div>
+
       <p-panel header="Cobertura" styleClass="panel-tight">
         <div class="coverage">
           <div><b>Departamentos:</b> 25/25</div>
@@ -198,7 +198,7 @@
           <div><b>Fecha:</b> 28/06</div>
         </div>
       </p-panel>
-    </div>
 
+    </div>
   </div>
 </aside>

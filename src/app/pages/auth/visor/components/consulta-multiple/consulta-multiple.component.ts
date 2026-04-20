@@ -126,6 +126,8 @@ export class ConsultaMultipleComponent {
 
   
   
+  puedeVerDatosNominales = false;
+  
 
   // --- REPORTE ---
   reporteVisible = false;

@@ -404,20 +404,24 @@ export class AnalisisEspacialComponent {
         ]
       });
 
-    const [respOrga, respQuim, respAmbos] = await Promise.all([
+    const [respOrga, respQuim, respAmbos, respNoUtiliza] = await Promise.all([
       query.executeQueryJSON(serviceLayerUrl, crearQueryCount(`${campoOrga} = 1`)),
       query.executeQueryJSON(serviceLayerUrl, crearQueryCount(`${campoQuim} = 1`)),
-      query.executeQueryJSON(serviceLayerUrl, crearQueryCount(`${campoOrga} = 1 AND ${campoQuim} = 1`))
+      query.executeQueryJSON(serviceLayerUrl, crearQueryCount(`${campoOrga} = 1 AND ${campoQuim} = 1`)),
+      query.executeQueryJSON(serviceLayerUrl, crearQueryCount(`(${campoOrga} = 0 OR ${campoOrga} IS NULL) AND (${campoQuim} = 0 OR ${campoQuim} IS NULL)`)
+      )
     ]);
 
     const totalOrga = Number(respOrga.features?.[0]?.attributes?.TOTAL ?? 0);
     const totalQuim = Number(respQuim.features?.[0]?.attributes?.TOTAL ?? 0);
     const totalAmbos = Number(respAmbos.features?.[0]?.attributes?.TOTAL ?? 0);
+    const totalNoUtiliza = Number(respNoUtiliza.features?.[0]?.attributes?.TOTAL ?? 0);
 
     return [
       { DESCRIPCION: 'Orgánico', TOTAL: totalOrga },
       { DESCRIPCION: 'Químico', TOTAL: totalQuim },
-      { DESCRIPCION: 'Ambos', TOTAL: totalAmbos }
+      { DESCRIPCION: 'Ambos', TOTAL: totalAmbos },
+      { DESCRIPCION: 'No utiliza', TOTAL: totalNoUtiliza }
     ];
   }
 
@@ -1209,20 +1213,40 @@ export class AnalisisEspacialComponent {
         }]
       });
 
-      const [respGraved, respAspers, respGoteo] = await Promise.all([
+      const qSinRiego = new Query({
+        geometry: this.coberturaPolygon,
+        spatialRelationship: "intersects",
+        returnGeometry: false,
+        where: `
+          (FLG_GRAVED = 0 OR FLG_GRAVED IS NULL)
+          AND (FLG_ASPERS = 0 OR FLG_ASPERS IS NULL)
+          AND (FLG_GOTEO = 0 OR FLG_GOTEO IS NULL)
+        `,
+        outFields: [],
+        outStatistics: [{
+          statisticType: "count",
+          onStatisticField: "OBJECTID",
+          outStatisticFieldName: "TOTAL_SIN_RIEGO"
+        }]
+      });
+
+      const [respGraved, respAspers, respGoteo, respSinRiego] = await Promise.all([
         query.executeQueryJSON(serviceLayerUrl, qGraved),
         query.executeQueryJSON(serviceLayerUrl, qAspers),
-        query.executeQueryJSON(serviceLayerUrl, qGoteo)
+        query.executeQueryJSON(serviceLayerUrl, qGoteo),
+        query.executeQueryJSON(serviceLayerUrl, qSinRiego)
       ]);
 
       const totalGraved = respGraved.features?.[0]?.attributes?.TOTAL_GRAVED ?? 0;
       const totalAspers = respAspers.features?.[0]?.attributes?.TOTAL_ASPERS ?? 0;
       const totalGoteo = respGoteo.features?.[0]?.attributes?.TOTAL_GOTEO ?? 0;
+      const totalSinRiego = respSinRiego.features?.[0]?.attributes?.TOTAL_SIN_RIEGO ?? 0;
 
       this.gridRiego = [
         { DESCRIPCION: "Gravedad", TOTAL: totalGraved },
         { DESCRIPCION: "Aspersión", TOTAL: totalAspers },
-        { DESCRIPCION: "Goteo", TOTAL: totalGoteo }
+        { DESCRIPCION: "Goteo", TOTAL: totalGoteo },
+        { DESCRIPCION: "Riego especial", TOTAL: totalSinRiego }
       ];
 
       this.displayedColumnsRiego = ["DESCRIPCION", "TOTAL"];

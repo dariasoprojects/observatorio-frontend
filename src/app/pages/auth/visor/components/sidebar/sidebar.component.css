@@ -1,37 +1,43 @@
-:host{
-  display:block;
+::host{
+  display:flex;
+  width:100%;
   height:100%;
   min-height:0;
 }
 
-/* ===== CONTENEDOR LATERAL ===== */
 .side-left{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  flex:1 1 auto;
+  width:100%;
+  height:100%;
+  min-height:0;
+  gap:6px;
   background:#fff;
   border:1px solid #e5e7eb;
   border-radius:10px;
-  padding:10px;
-  height:100%;
-  min-height:0;
+  padding:8px;
+  box-sizing:border-box;
   overflow:hidden;
 }
 
-/* ===== CABECERA (marca + toggle) ===== */
-.side-left__head {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  background: #fff;
-  margin-top: 10px;
+.side-left__head,
+.sidebar-user,
+.sidebar-action,
+app-busqueda-ubigeo {
+  flex: 0 0 auto;
 }
 
+.side-left__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 4px;
+}
 
 /* Botón de colapso del sidebar */
 .side-left__toggle {
@@ -50,59 +56,164 @@
   box-shadow: none;
   transition: color 0.2s ease;
 }
-.side-left__toggle:hover { color: #000; }
-.side-left__toggle i { font-size: 14px; }
+
+.side-left__toggle:hover {
+  color: #000;
+}
+
+.side-left__toggle i {
+  font-size: 14px;
+}
 
 /* ===== MARCA (logo + textos) ===== */
-.brand-small{ display:flex; align-items:center; gap:8px; font:800 14px "Raleway",sans-serif; }
-.brand-small.centered{
-  display:flex; flex-direction:column; align-items:center;
-  gap:10px; padding:6px 0 8px; text-align:center;
+.brand-small{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font:800 14px "Raleway",sans-serif;
 }
-.logo-midagri{ height:44px; width:auto; object-fit:contain; }
+
+.brand-small.centered{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  padding:2px 0 2px;
+  text-align:center;
+}
+
+.logo-midagri{
+  height:44px;
+  width:auto;
+  object-fit:contain;
+}
 
 .brand-row{
   display:flex;
   align-items:center;
   justify-content:flex-start;
-  gap:12px;
+  gap:10px;
   width:100%;
   flex-wrap:nowrap;
-  margin-top: 15px;
+  margin-top:4px;
 }
-.brand-row svg, .logo-siea{
-  height:40px; width:auto; display:block; flex:0 0 72px; margin-top:1px;
+
+.brand-row svg,
+.logo-siea{
+  height:40px;
+  width:auto;
+  display:block;
+  flex:0 0 72px;
+  margin-top:1px;
 }
+
 .brand-text{
-  flex:1 1 0; max-width:240px; display:flex; flex-direction:column;
-  align-items:flex-start; white-space:normal; word-break:keep-all;
+  flex:1 1 0;
+  max-width:240px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  white-space:normal;
+  word-break:keep-all;
+  line-height:1.1;
 }
+
 .brand-small.centered .brand-title{
-  font-family:"Raleway",sans-serif; font-weight:400; font-size:14px;
-  line-height:1.45; letter-spacing:.2px; color:#9ca3af; text-align:left; padding-bottom:3px;
+  font-family:"Raleway",sans-serif;
+  font-weight:400;
+  font-size:14px;
+  line-height:1.25;
+  letter-spacing:.2px;
+  color:#9ca3af;
+  text-align:left;
+  padding-bottom:1px;
 }
-.brand-line{ width:100%; height:1.5px; background:#d1d5db; margin-top:4px; border-radius:1px; }
 
+.brand-line{
+  width:100%;
+  height:1.5px;
+  background:#d1d5db;
+  margin-top:2px;
+  border-radius:1px;
+}
 
+/* ===== BLOQUE USUARIO ===== */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 8px 6px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: #f7f7f7;
+}
 
+.sidebar-user__avatar {
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.sidebar-user__info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.usr-name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.usr-role {
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.1;
+  margin-top: 1px;
+  word-break: break-word;
+}
 
 /* ===== LISTAS / LINKS ===== */
-.list{ list-style:none; padding:0; margin:6px 0; display:flex; flex-direction:column; gap:6px; }
-.link{ width:100%; text-align:left; padding:8px 10px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; }
-.link:hover{ background:#f3f4f6; }
+.list{
+  list-style:none;
+  padding:0;
+  margin:6px 0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.link{
+  width:100%;
+  text-align:left;
+  padding:8px 10px;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  background:#fff;
+  cursor:pointer;
+}
+
+.link:hover{
+  background:#f3f4f6;
+}
 
 /* ===== ENCABEZADOS DE PANEL (PrimeNG) ===== */
-.hdr{ display:flex; align-items:center; gap:8px; color:#111827;  }
-.hdr .pi{ font-size:14px; color:#374151; }
-.panel-tight .p-panel-content{ padding:8px 10px !important; }
+.hdr{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#111827;
+}
 
-/* ===== RESPONSIVE FINO PARA LA MARCA (opcional) ===== */
-@media (max-width: 520px){
-  .brand-row{ flex-direction:column; align-items:flex-start; gap:6px; }
-  .logo-midagri{ height:52px; }
-  .brand-row svg, .logo-siea{ height:44px; flex:0 0 auto; margin-top:0; }
-  .brand-text{ min-width:0; max-width:none; }
-  .brand-small.centered .brand-title{ font-size:16px; }
+.hdr .pi{
+  font-size:14px;
+  color:#374151;
+}
+
+.panel-tight .p-panel-content{
+  padding:8px 10px !important;
 }
 
 .list .link {
@@ -121,9 +232,8 @@
 }
 
 .list .link i {
-  display: block; /* ocupa su espacio completo */
+  display: block;
 }
-
 
 .list .link:hover{
   background: #f3f4f6;
@@ -131,9 +241,9 @@
 }
 
 .list .link.active{
-  background: #e6f4ea;          /* verde suave */
-  border-color: #22c55e;        /* borde verde */
-  color: #166534;               /* texto verde oscuro */
+  background: #e6f4ea;
+  border-color: #22c55e;
+  color: #166534;
   font-weight: 600;
 }
 
@@ -145,16 +255,15 @@
 
 /* ===== SOLO PARA PANTALLAS GRANDES (>=700px) ===== */
 @media (min-width: 700px) {
-
   :host {
     height: 100%;
     min-height: 0;
   }
 
   .side-left {
-    height: 100%;   /* ocupa todo el track del grid */
+    height: 100%;
     min-height: 0;
-    overflow: hidden; /* el scroll es interno en side-left__scroll */
+    overflow: hidden;
   }
 
   .side-left__head {
@@ -163,31 +272,56 @@
     z-index: 2;
   }
 
-  /* 🔥 AQUÍ VIVE EL SCROLL INTERNO */
-  .side-left__scroll {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
 
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-bottom: 4px; /* pequeño colchón al final */
+}
+
+/* ===== RESPONSIVE FINO PARA LA MARCA ===== */
+@media (max-width: 520px){
+  .brand-row{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:6px;
+  }
+
+  .logo-midagri{
+    height:52px;
+  }
+
+  .brand-row svg,
+  .logo-siea{
+    height:44px;
+    flex:0 0 auto;
+    margin-top:0;
+  }
+
+  .brand-text{
+    min-width:0;
+    max-width:none;
+  }
+
+  .brand-small.centered .brand-title{
+    font-size:16px;
   }
 }
 
+.panel-tight :global(.p-panel-header){
+  padding: 8px 12px;
+}
 
+.panel-tight :global(.p-panel-content){
+  padding: 8px 12px;
+}
 
-
-.panel-tight :global(.p-panel-header){ padding: 8px 12px; }
-.panel-tight :global(.p-panel-content){ padding: 8px 12px; }
-.muted{ color:#6b7280; display:block; margin-bottom:6px; }
+.muted{
+  color:#6b7280;
+  display:block;
+  margin-bottom:6px;
+}
 
 :host ::ng-deep .ppa-chip {
-  background: #f3f4f6 !important;        /* gris suave como los hover de lista */
-  border: 1px solid #e5e7eb !important;   /* borde estándar de tu UI */
-  color: #374151 !important;              /* gris de texto */
+  background: #f3f4f6 !important;
+  border: 1px solid #e5e7eb !important;
+  color: #374151 !important;
 
   font-size: 12px !important;
   font-weight: 500 !important;
@@ -200,26 +334,24 @@
   margin-bottom: 4px !important;
 }
 
-/* Ícono de remover (si decides usarlo luego) */
 :host ::ng-deep .ppa-chip .p-chip-remove-icon {
   font-size: 14px !important;
-  color: #6b7280 !important;      /* gris intermedio */
+  color: #6b7280 !important;
   transition: color 0.15s ease;
 }
 
 :host ::ng-deep .ppa-chip .p-chip-remove-icon:hover {
-  color: #dc2626 !important;       /* rojo suave al hover */
+  color: #dc2626 !important;
 }
 
 /* ============================
    ESTADOS VACÍOS DE FILTROS
    ============================ */
-
 .filter-empty {
   margin-top: 6px;
   padding: 10px;
-  background: #f8fafc;              /* gris muy suave */
-  border: 1px dashed #d1d5db;       /* igual a tus paneles */
+  background: #f8fafc;
+  border: 1px dashed #d1d5db;
   border-radius: 8px;
 
   display: flex;
@@ -228,19 +360,16 @@
   gap: 6px;
 
   text-align: center;
-  color: #475569;                   /* gris del texto */
+  color: #475569;
   font-size: 13px;
 }
 
 .filter-empty i,
 .filter-empty-mini i {
   font-size: 1.2rem;
-  color: #64748b;                   /* gris del ícono */
+  color: #64748b;
 }
 
-
-
-/* Estado vacío de filtros */
 .filter-empty.clean {
   margin-top: 6px;
   padding: 6px 2px;
@@ -255,7 +384,6 @@
   color: #475569;
 }
 
-/* Línea con icono y texto */
 .filter-empty-line {
   display: flex;
   align-items: center;
@@ -269,7 +397,6 @@
   color: #64748b;
 }
 
-/* Botón minimalista verde */
 .btn-ubigeo {
   padding: 0 !important;
   font-size: 13px !important;
@@ -286,28 +413,25 @@
 .btn-ubigeo:hover {
   color: #007a46 !important;
 }
-.btn-ubigeo.center {
-  margin: 0 auto !important;   /* lo centra horizontalmente */
-}
 
+.btn-ubigeo.center {
+  margin: 0 auto !important;
+}
 
 /* ===========================
    MODO COLAPSADO
 =========================== */
-
-/* BLOQUE COLAPSADO */
 .side-left__head[ng-reflect-ng-if="true"],
 .side-left__head.collapsed {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px 0;
-  gap: 6px;
+  padding: 10px 0 6px;
+  gap: 4px;
   background: #fff;
 }
 
-/* Logo circular centrado */
 .collapsed-logo img {
   width: 42px;
   height: 42px;
@@ -319,10 +443,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 56px;      /* encaja con tu sidebar colapsado */
-  margin-top: 4px;
+  width: 56px;
+  margin-top: 2px;
 }
-
 
 :host ::ng-deep .panel-tight .p-panel-header-icon {
   width: 15px;
@@ -334,7 +457,54 @@
 }
 
 
+.sidebar-action {
+  margin: 0 8px 6px;
+}
+
+.btn-dni {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-dni:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.btn-dni .pi {
+  font-size: 13px;
+}
 
 
 
 
+.side-left {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.side-left__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.side-left__scroll > ng-container,
+.side-left__scroll > * {
+  flex: 0 0 auto;
+}

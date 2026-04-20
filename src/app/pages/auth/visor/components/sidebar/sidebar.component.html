@@ -56,7 +56,37 @@
       </div>
     </div>
 
+
+    <div class="sidebar-user" *ngIf="!isCollapsed">
+    <div class="sidebar-user__avatar">
+      <p-avatar
+        [label]="inicialUsuario"
+        shape="circle"
+        styleClass="usr-avatar"
+        (click)="menu.toggle($event)">
+      </p-avatar>
+
+      <p-menu #menu [model]="items" [popup]="true"></p-menu>
+    </div>
+
+    <div class="sidebar-user__info">
+      <div class="usr-name">{{ usuarioLogueado }}</div>
+      <div class="usr-role">{{ tipoUsuario }} - {{ entidadUsuario }}</div>
+    </div>
+    </div>
+
+
+
     <app-busqueda-ubigeo></app-busqueda-ubigeo>
+    <div class="sidebar-action" *ngIf="!isCollapsed">
+      <button
+        type="button"
+        class="btn-dni"
+        (click)="onBuscarDni()">
+        <i class="pi pi-search"></i>
+        <span>Buscar por DNI</span>
+      </button>
+    </div>
 
 
     <!-- <p-panel header="Filtros activos" styleClass="panel-tight" *ngIf="!isCollapsed"> -->

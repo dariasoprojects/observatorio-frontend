@@ -375,7 +375,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
       this.activeReg = null;
       this.mapComm.requestFilterTipoActividad(null);
       this.mapComm.requestRenderUbigeo(null);
-      this.mapComm.setParcelasPadronFiltro(null);
+      //this.mapComm.setParcelasPadronFiltro(null);
       return;
     }
 
@@ -386,7 +386,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
       this.activeReg = null;
       this.mapComm.requestFilterTipoActividad(null);
       this.mapComm.requestRenderUbigeo(null);
-      this.mapComm.setParcelasPadronFiltro(null);
+      //this.mapComm.setParcelasPadronFiltro(null);
       return;
     }
 

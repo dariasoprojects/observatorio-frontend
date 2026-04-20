@@ -65,11 +65,30 @@
 /* paneles laterales */
 app-sidebar,
 app-side-right {
-  display: block;
-  height: 100%;
+  display: flex;
   min-height: 0;
+  height: 100%;
   align-self: stretch;
+  overflow: hidden;
 }
+
+
+.content-grid {
+  align-items: stretch;
+}
+
+.content-grid > app-sidebar {
+  grid-area: left;
+  min-height: 0;
+  height: 100%;
+}
+
+.content-grid > app-side-right {
+  grid-area: right;
+  min-height: 0;
+  height: 100%;
+}
+
 
 /* ===== Angular: asegurar que el MAPA LLENE el área ===== */
 .center-map app-mapa {
@@ -185,11 +204,10 @@ app-side-right {
 
   app-sidebar {
     grid-area: left;
-    display: block;
+    display: flex;
     height: 100%;
     min-height: 0;
     max-height: 100%;
-
     overflow: hidden;
   }
 

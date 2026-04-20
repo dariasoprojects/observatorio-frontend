@@ -1057,6 +1057,10 @@ export class Mapa {
   async aplicarRendererTematico(campo: string) {
 
     console.log(" Aplicando renderer temático... Campo:", campo);
+
+    //await this.limpiarTematicoParcelas();
+
+
     switch (campo) {
       case "GEN":
         await this.aplicarRendererGenero();
@@ -1068,7 +1072,8 @@ export class Mapa {
         await this.aplicarRendererTipoOrganizacion();
         break;
       case "FUING":
-        await this.aplicarRendererTipoOrganizacion();
+        await this.aplicarRendererFuenteIngreso();
+        //await this.aplicarRendererTipoOrganizacion();
         break;
       case "TIPACT":
         await this.aplicarRendererTipoActiv();
@@ -1178,6 +1183,7 @@ export class Mapa {
     } as any;
 
     console.log(" Renderer GÉNERO aplicado correctamente");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1243,6 +1249,7 @@ export class Mapa {
     } as any;
 
     console.log(" Renderer aplicarRendererBienRecibido aplicado correctamente");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1301,6 +1308,7 @@ export class Mapa {
     } as any;
 
     console.log(" Renderer TORG aplicado correctamente");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1360,6 +1368,7 @@ export class Mapa {
     } as any;
 
     console.log(" Renderer aplicarRendererUsoFertilizante aplicado correctamente");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1420,6 +1429,7 @@ export class Mapa {
     } as any;
 
     console.log(" Renderer TIPACT aplicado correctamente");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1479,6 +1489,7 @@ export class Mapa {
     } as any;
 
     console.log(" Renderer TMPR aplicado correctamente");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1599,7 +1610,7 @@ export class Mapa {
     } as any; // ← evita error TS también
 
     console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
-
+    this.capaParcelasPadron.refresh();
   }
 
 
@@ -1660,6 +1671,7 @@ export class Mapa {
     } as any; // ← evita error TS también
 
     console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1722,6 +1734,7 @@ export class Mapa {
     } as any; // ← evita error TS también
 
     console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1783,6 +1796,7 @@ export class Mapa {
     } as any; // ← evita error TS también
 
     console.log(" Renderer aplicado aplicarRendererServRecibido ");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1845,6 +1859,7 @@ export class Mapa {
     } as any; // ← evita error TS también
 
     console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
+    this.capaParcelasPadron.refresh();
 
   }
 
@@ -1906,6 +1921,7 @@ export class Mapa {
     } as any; // ← evita error TS también
 
     console.log("✔ Renderer aplicado (Highcharts style + bordes gruesos)");
+    this.capaParcelasPadron.refresh();
 
   }
 

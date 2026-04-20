@@ -1,89 +1,163 @@
-/* === Panel derecho (estilo propio del componente) === */
 :host {
-  /* Apariencia del contenedor (NO el layout del grid) */
-  display: block;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-  padding: 10px;
-  overflow: hidden;   /* el scroll interno lo maneja .right-sticky */
-  min-height: 0;      /* útil cuando el padre usa grid/flex */
-  height: 100%;
+  padding: 10px 10px 6px 10px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-/* Contenido pegajoso y scroll interno */
-.right-sticky{
-  position: sticky;
-  top: var(--pad); /* hereda del padre; OK */
+.side-right {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
   min-height: 0;
+  overflow: hidden;
+}
+
+.right-sticky {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .right-scroll {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-
-  height: 100%;
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  gap: 0;
 }
 
-/* Textos y labels locales del panel */
-.muted{ color:#6b7280; display:block; margin-bottom:6px; }
+.right-spacer {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.right-scroll > div[ngswitch] {
+  margin-bottom: 10px;
+}
+
+.right-scroll > p-panel {
+  margin-bottom: 10px;
+}
+
+.right-scroll > .right-spacer + p-panel {
+  margin-bottom: 0;
+}
+
+/* Textos y labels */
+.muted {
+  color: #6b7280;
+  display: block;
+  margin-bottom: 6px;
+}
+
 :host ::ng-deep .p-dropdown,
-:host label{
+:host label {
   font-size: 12px;
 }
-:host label{
-  display:block; color:#6b7280; margin:8px 0 4px;
+
+:host label {
+  display: block;
+  color: #6b7280;
+  margin: 8px 0 4px;
 }
 
-/* Ajustes compactos para p-panel usando tu styleClass="panel-tight" */
-.panel-tight :global(.p-panel-header){ padding: 8px 12px; }
-.panel-tight :global(.p-panel-content){ padding: 8px 12px; }
-
-/* Variante para el panel de KPIs */
-.kpi-hint{ display:block; margin:8px 0 16px; color:#6b7280; font-size:13px; line-height:1.45; }
-
-.kpi-panel :global(.p-panel-content){
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  padding:8px 16px 16px; /* más aire para KPIs */
+/* Panels */
+.panel-tight :global(.p-panel-header) {
+  padding: 8px 12px;
 }
 
-/* KPIs */
-.kpi{
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; color:#fff; border-radius:14px;
-  padding:18px 12px; min-height:80px;
-  box-shadow:0 2px 4px rgba(0,0,0,.08);
+.panel-tight :global(.p-panel-content) {
+  padding: 8px 12px;
+  overflow-x: hidden;
+}
+
+.kpi-hint {
+  display: block;
+  margin: 8px 0 16px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.kpi-panel :global(.p-panel-content) {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 8px 16px 16px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  border-radius: 14px;
+  padding: 18px 12px;
+  min-height: 110px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.08);
   transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
 }
-.kpi + .kpi{ margin-top:12px; }
-.kpi:hover{ transform:translateY(-2px); box-shadow:0 4px 8px rgba(0,0,0,.12); filter:brightness(1.05); }
 
-.kpi__value{ font-weight:800; font-size:30px; line-height:1.1; letter-spacing:.3px; }
-.kpi__label{ margin-top:6px; font-weight:600; font-size:13px; line-height:1.1; opacity:.95; }
+.kpi + .kpi {
+  margin-top: 12px;
+}
 
-/* Colores de KPI */
-.kpi--green{ background:#0d6638; }
-.kpi--blue { background:#087ca7; }
-.kpi--brown{ background:#8b4c10; }
+.kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+  filter: brightness(1.05);
+}
 
-/* Cobertura (bloque simple) */
-.coverage { display:grid; gap:6px; font-size:13px; }
-.coverage b { color:#374151; }
+.kpi__value {
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: .3px;
+}
 
+.kpi__label {
+  margin-top: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.1;
+  opacity: .95;
+}
 
-/* Dropdown: ocupa todo el ancho y se ve compacto */
+.kpi--green { background: #0d6638; }
+.kpi--blue  { background: #087ca7; }
+.kpi--brown { background: #8b4c10; }
+
+.coverage {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.coverage b {
+  color: #374151;
+}
+
+/* Dropdown */
 :host ::ng-deep .p-dropdown {
   width: 100%;
   border-radius: 8px;
 }
 
-/* Texto seleccionado, sin desbordes */
 :host ::ng-deep .p-dropdown-label {
   padding: 6px 10px;
   white-space: nowrap;
@@ -91,89 +165,36 @@
   text-overflow: ellipsis;
 }
 
-/* Panel del dropdown */
 :host ::ng-deep .p-dropdown-panel {
-  min-width: 220px;        /* o 100% si prefieres igual al control */
+  min-width: 220px;
   border-radius: 8px;
-  max-height: 280px;       /* scroll interno del panel */
+  max-height: 280px;
 }
 
-/* Header del filtro */
 :host ::ng-deep .p-dropdown-header {
   padding: 8px 10px;
 }
 
-/* Input de filtro (buscador) */
 :host ::ng-deep .p-dropdown-filter {
   border-radius: 6px;
-  padding: 6px 10px 6px 28px; /* espacio para ícono */
-  font-size: 12px;            /* consistente con tu tipografía */
+  padding: 6px 10px 6px 28px;
+  font-size: 12px;
 }
 
-/* Ícono de búsqueda dentro del header */
 :host ::ng-deep .p-dropdown-filter-icon {
   left: 10px;
 }
 
-/* Ítems compactos */
 :host ::ng-deep .p-dropdown-items .p-dropdown-item {
   padding: 8px 12px;
   font-size: 12px;
 }
 
-/* Placeholder de tu control */
 :host ::ng-deep .p-dropdown .p-placeholder {
   color: #6b7280;
 }
 
-/* ===== SOLO PARA PANTALLAS GRANDES (>=700px) ===== */
-@media (min-width: 700px) {
-
-  :host {
-    height: 100%;      /* llena el track derecho */
-    min-height: 0;
-    overflow: hidden;  /* evita scroll fuera del hijo */
-    display: block;
-    background: #fff;
-    border-radius: 10px;
-    padding: 10px;
-  }
-
-  .side-right {
-    height: 100%;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ESTE DIV NO SCROLLEA, SOLO CONTIENE */
-  .right-sticky {
-    flex: 1 1 auto;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* 🔥 EL SCROLL OCURRE SOLO AQUÍ */
-  .right-scroll {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
-/* Afecta solo al contenido interior sin deformar el panel ni tu grid */
 .panel-tight :global(.p-panel-content) > * {
-  transform: scale(0.90);     /* tamaño 90% */
-  transform-origin: top left; /* mantiene alineación */
-}
-
-/* Ajuste opcional para evitar overflow horizontal */
-.panel-tight :global(.p-panel-content) {
-  overflow-x: hidden;
+  transform: scale(0.90);
+  transform-origin: top left;
 }
