@@ -273,5 +273,12 @@ export class MapCommService {
     this.cerrarDescargasDialogSource.next();
   }
 
+   // Servicio para el reset completo
+  private resetCompletosource = new Subject<void>;
+  resetCompleto$ = this.resetCompletosource.asObservable();
 
+  requestResetCompleto(): void {
+    console.log( 'Request completo emitido')
+    this.resetCompletosource.next();
+  }
 }
