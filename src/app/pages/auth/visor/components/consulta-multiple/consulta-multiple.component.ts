@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, ViewChild , Output, EventEmitter} from '@angular/core';
 import {DropdownModule} from 'primeng/dropdown';
 import {TableModule} from 'primeng/table';
 import {ButtonDirective} from 'primeng/button';
@@ -17,6 +17,7 @@ import { MapCommService } from '../../../../../services/map-comm.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil, forkJoin, of, map, catchError , Observable} from 'rxjs';
+import { AuthService } from '../../../../../services/auth.service';
 
 
 type CountRow = { idx: number; n: number | null };
@@ -119,6 +120,8 @@ const REGLAS_RESTRICCION: ReglaRestriccion[] = [
 })
 export class ConsultaMultipleComponent {
 
+  @Output() cerrarModal = new EventEmitter<void>();
+
 
   private readonly CATEGORIA_SERVICIO_ALTERNO = 21;
   private readonly VARIABLE_SERVICIO_ALTERNO = 65;
@@ -213,6 +216,34 @@ export class ConsultaMultipleComponent {
   private destroyed$ = new Subject<void>();
 
 
+  private existeCondicionDuplicada(
+    categoriaId: any,
+    variableId: any,
+    condicionId: any,
+    valorId: any,
+    valorNombre: any,
+    modoIngresar: boolean
+  ): boolean {
+    const valorNormalizado = String(valorNombre ?? '').trim().toLowerCase();
+
+    return this.condicionesAgregadas.some(c => {
+      const mismoCategoria = Number(c.categoriaId) === Number(categoriaId);
+      const mismaVariable = Number(c.idVariable) === Number(variableId);
+      const mismaCondicion = String(c.condicionId) === String(condicionId);
+
+      if (modoIngresar) {
+        const valorActual = String(c.valorNombre ?? '').trim().toLowerCase();
+        return mismoCategoria && mismaVariable && mismaCondicion && valorActual === valorNormalizado;
+      }
+
+      return (
+        mismoCategoria &&
+        mismaVariable &&
+        mismaCondicion &&
+        Number(c.valorId) === Number(valorId)
+      );
+    });
+  }
 
   private getReglasActivas(): ReglaRestriccion[] {
     return REGLAS_RESTRICCION.filter(r =>
@@ -267,6 +298,22 @@ export class ConsultaMultipleComponent {
   }
 
 
+
+  private getAtributosSegurosParaPopup(attributes: Record<string, any>): Record<string, any> {
+    if (this.puedeVerDatosNominales) {
+      return attributes;
+    }
+
+    return {
+      ...attributes,
+      TXT_NRODOC: '****',
+      APELLIDOPA: '****',
+      NOMBRES: '****',
+      GENERO: '****'
+    };
+  }
+
+
   // private getGeomActiva(): Geometry | null {
   //   return this.usarInterseccion ? this.geometryInterseccion : null;
   // }
@@ -276,7 +323,9 @@ export class ConsultaMultipleComponent {
     return geom;
   }
 
-
+  maskIfNoPermission(valor: any): string {
+    return this.puedeVerDatosNominales ? (valor ?? '') : '****';
+  }
   
 
   private formatearValorSQL(registro: any, valor: any): string {
@@ -580,10 +629,13 @@ export class ConsultaMultipleComponent {
 
 
   constructor(
-    private consultaMultipleService: ConsultaMultipleService,private comm: MapCommService
+    private consultaMultipleService: ConsultaMultipleService,private comm: MapCommService,  private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+
+    this.puedeVerDatosNominales = this.authService.puedeVerDatosNominales();
+
     this.getCategoria();
 
     // this.comm.geometry$
@@ -1019,6 +1071,21 @@ export class ConsultaMultipleComponent {
 
     const variableNombre = registrosVariable[0]?.VARIABLE ?? this.selectedVariable;
 
+    const yaExiste = this.existeCondicionDuplicada(
+      this.selectedCategoria,
+      this.selectedVariable,
+      this.selectedCondicion,
+      this.selectedValor,
+      valorNombre,
+      this.modoIngresar
+    );
+
+    if (yaExiste) {
+      console.warn('La condición ya fue agregada.');
+      return;
+    }
+
+
     this.condicionesAgregadas.push({
       categoriaId: this.selectedCategoria,
       categoriaNombre,
@@ -1069,12 +1136,19 @@ export class ConsultaMultipleComponent {
     console.log("SERVICE KEY >>>", this.getServiceKeyActual());
     console.log("=======================");
     // 1) genera reporte (conteos)
-    this.generarReporte();
 
-    // nuevo:
-    //this.generarReporteDinamico();
 
-    // 2) trae la primera página (datos)
+    const sinCondiciones = !this.condicionesAgregadas || this.condicionesAgregadas.length === 0;
+    const sinWhere = !this.whereFinal || this.whereFinal.trim() === '';
+
+    if (sinCondiciones || sinWhere) {
+      console.warn('Debe agregar al menos una condición válida antes de consultar.');
+      return;
+    }
+
+
+
+    this.generarReporte();    
     this.cargarPagina(1);
   }
 
@@ -1096,7 +1170,7 @@ export class ConsultaMultipleComponent {
   }
 
   cerrar() {
-    console.log('Cerrar modal');
+    this.cerrarModal.emit();
   }
 
   onAbrirDetalle(row: any) {
@@ -1128,11 +1202,19 @@ export class ConsultaMultipleComponent {
             return;
           }
 
+          // this.comm.requestZoomPin({
+          //   geometry: feature.geometry,
+          //   attributes: feature.attributes,
+          //   serviceKey
+          // });
+          const atributosSeguros = this.getAtributosSegurosParaPopup(feature.attributes);
+
           this.comm.requestZoomPin({
             geometry: feature.geometry,
-            attributes: feature.attributes,
+            attributes: atributosSeguros,
             serviceKey
           });
+
         },
         error: (err) => console.error("Error trayendo geometría para zoom:", err)
       });

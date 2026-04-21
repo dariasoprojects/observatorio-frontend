@@ -61,6 +61,8 @@ export interface CapaOption {
 export class AnalisisEspacialComponent {
 
 
+  ejecutandoAnalisis = false;
+  private chartsPendientes = 10;
 
   @ViewChild('resultadosCard', { read: ElementRef }) resultadosCard!: ElementRef<HTMLElement>;
 
@@ -224,11 +226,43 @@ export class AnalisisEspacialComponent {
     this.mapComm.selectLayer(this.capaSeleccionada);
   }
 
+
+  private iniciarBloqueoAnalisis(): void {
+    this.ejecutandoAnalisis = true;
+    this.chartsPendientes = 0;
+  }
+
+  private registrarChartPendiente(): void {
+    this.chartsPendientes++;
+  }
+
+  private finalizarChartPendiente(): void {
+    this.chartsPendientes = Math.max(0, this.chartsPendientes - 1);
+
+    if (this.chartsPendientes === 0) {
+      this.ejecutandoAnalisis = false;
+    }
+  }
+
+  private liberarAnalisisSiNoHayCharts(): void {
+    if (this.chartsPendientes === 0) {
+      this.ejecutandoAnalisis = false;
+    }
+  }
+
   getSum(rows: any[], field: string): number {
     return (rows || []).reduce((acc, row) => {
       const value = Number(row?.[field] ?? 0);
       return acc + (isNaN(value) ? 0 : value);
     }, 0);
+  }
+
+  private tieneDataPorCampo(rows: any[], field: string): boolean {
+    return (rows || []).some(r => Number(r?.[field] ?? 0) > 0);
+  }
+
+  private tieneDataPie(data: { name: string; y: number }[]): boolean {
+    return (data || []).some(d => Number(d?.y ?? 0) > 0);
   }
 
   getGridConTotal(
@@ -248,6 +282,85 @@ export class AnalisisEspacialComponent {
 
     return [...(rows || []), filaTotal];
   }
+
+
+  get mostrarPecuarioGeneral(): boolean {
+    return this.loadingPecuario ||
+      this.tieneDataPorCampo(this.gridPecuario, 'SUM_CAN_P29_2');
+  }
+
+  get mostrarPecuarioDetalle(): boolean {
+    return this.loadingPecuarioDetalle ||
+      this.tieneDataPorCampo(this.gridPecuario, 'SUM_CAN_P29_3_RAZA') ||
+      this.tieneDataPorCampo(this.gridPecuario, 'SUM_CAN_P29_3_CRIOLLO') ||
+      this.tieneDataPorCampo(this.gridPecuario, 'SUM_CAN_P29_3_MEJORADO');
+  }
+
+  get mostrarPecuario(): boolean {
+    return this.mostrarPecuarioGeneral || this.mostrarPecuarioDetalle;
+  }
+
+
+  get mostrarGenero(): boolean {
+    return this.loadingGenero || this.tieneDataPorCampo(this.gridGenero, 'SUM_GENERO');
+  }
+
+  get mostrarProductivo(): boolean {
+    return this.loadingProductivo || this.tieneDataPorCampo(this.gridProductivo, 'TOTAL');
+  }
+
+  get mostrarRiego(): boolean {
+    return this.loadingRiego || this.tieneDataPorCampo(this.gridRiego, 'TOTAL');
+  }
+
+  get mostrarCultivos1(): boolean {
+    return this.loadingCultivos1 || this.tieneDataPorCampo(this.gridCultivos1, 'TOTAL');
+  }
+
+  get mostrarCultivos2(): boolean {
+    return this.loadingCultivos2 || this.tieneDataPorCampo(this.gridCultivos2, 'TOTAL');
+  }
+
+  get mostrarCultivos3(): boolean {
+    return this.loadingCultivos3 || this.tieneDataPorCampo(this.gridCultivos3, 'TOTAL');
+  }
+
+  get mostrarFerti1(): boolean {
+    return this.loadingFerti1 || this.tieneDataPorCampo(this.gridFerti1, 'TOTAL');
+  }
+
+  get mostrarFerti2(): boolean {
+    return this.loadingFerti2 || this.tieneDataPorCampo(this.gridFerti2, 'TOTAL');
+  }
+
+  get mostrarFerti3(): boolean {
+    return this.loadingFerti3 || this.tieneDataPorCampo(this.gridFerti3, 'TOTAL');
+  }
+
+
+  get hayResultadosEstadisticos(): boolean {
+    return !!(
+      this.resultados?.length ||
+      this.mostrarGenero ||
+      this.mostrarProductivo ||
+      this.mostrarRiego ||
+      this.mostrarCultivos1 ||
+      this.mostrarCultivos2 ||
+      this.mostrarCultivos3 ||
+      this.mostrarFerti1 ||
+      this.mostrarFerti2 ||
+      this.mostrarFerti3 ||
+      this.mostrarPecuario
+    );
+  }
+
+  // get mostrarPecuario(): boolean {
+  //   return this.loadingPecuario || this.loadingPecuarioDetalle ||
+  //     this.tieneDataPorCampo(this.gridPecuario, 'SUM_CAN_P29_2') ||
+  //     this.tieneDataPorCampo(this.gridPecuario, 'SUM_CAN_P29_3_RAZA') ||
+  //     this.tieneDataPorCampo(this.gridPecuario, 'SUM_CAN_P29_3_CRIOLLO') ||
+  //     this.tieneDataPorCampo(this.gridPecuario, 'SUM_CAN_P29_3_MEJORADO');
+  // }
 
   private coberturaDentroDelLimite(geom: Polygon | null): boolean {
     if (!geom) return false;
@@ -286,24 +399,28 @@ export class AnalisisEspacialComponent {
     setTimeout(() => {
       this.chartFerti1?.destroy();
 
-      this.chartFerti1 = Highcharts.chart('chart-ferti1', {
-        chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
-        title: { text: 'Fertilización cultivo principal' },
-        credits: { enabled: false },
-        xAxis: {
-          categories: this.gridFerti1.map(r => r.DESCRIPCION),
-          title: { text: null }
-        },
-        yAxis: {
-          min: 0,
-          title: { text: 'Cantidad' }
-        },
-        series: [{
-          type: 'column',
-          name: 'Total',
-          data: this.gridFerti1.map(r => Number(r.TOTAL ?? 0))
-        }]
-      });
+      const dataGrafico = this.gridFerti1.filter(r => Number(r.TOTAL ?? 0) > 0);
+
+      if (dataGrafico.length > 0) {
+        this.chartFerti1 = Highcharts.chart('chart-ferti1', {
+          chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
+          title: { text: 'Fertilización cultivo principal' },
+          credits: { enabled: false },
+          xAxis: {
+            categories: this.gridFerti1.map(r => r.DESCRIPCION),
+            title: { text: null }
+          },
+          yAxis: {
+            min: 0,
+            title: { text: 'Cantidad' }
+          },
+          series: [{
+            type: 'column',
+            name: 'Total',
+            data: this.gridFerti1.map(r => Number(r.TOTAL ?? 0))
+          }]
+        });
+      }
 
       this.loadingFerti1 = false;
     }, 0);
@@ -321,24 +438,30 @@ export class AnalisisEspacialComponent {
     setTimeout(() => {
       this.chartFerti2?.destroy();
 
-      this.chartFerti2 = Highcharts.chart('chart-ferti2', {
-        chart: { type: 'column', height: 280, backgroundColor: '#f8fafc' },
-        title: { text: 'Fertilización cultivo transitorio' },
-        credits: { enabled: false },
-        xAxis: {
-          categories: this.gridFerti2.map(r => r.DESCRIPCION),
-          title: { text: null }
-        },
-        yAxis: {
-          min: 0,
-          title: { text: 'Cantidad' }
-        },
-        series: [{
-          type: 'column',
-          name: 'Total',
-          data: this.gridFerti2.map(r => Number(r.TOTAL ?? 0))
-        }]
-      });
+      const dataGrafico = this.gridFerti2.filter(r => Number(r.TOTAL ?? 0) > 0);
+
+      if (dataGrafico.length > 0) {
+          this.chartFerti2 = Highcharts.chart('chart-ferti2', {
+          chart: { type: 'column', height: 280, backgroundColor: '#f8fafc' },
+          title: { text: 'Fertilización cultivo transitorio' },
+          credits: { enabled: false },
+          xAxis: {
+            categories: this.gridFerti2.map(r => r.DESCRIPCION),
+            title: { text: null }
+          },
+          yAxis: {
+            min: 0,
+            title: { text: 'Cantidad' }
+          },
+          series: [{
+            type: 'column',
+            name: 'Total',
+            data: this.gridFerti2.map(r => Number(r.TOTAL ?? 0))
+          }]
+        });
+      }
+
+      
 
       this.loadingFerti2 = false;
     }, 0);
@@ -356,24 +479,32 @@ export class AnalisisEspacialComponent {
     setTimeout(() => {
       this.chartFerti3?.destroy();
 
-      this.chartFerti3 = Highcharts.chart('chart-ferti3', {
-        chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
-        title: { text: 'Fertilización cultivo permanente' },
-        credits: { enabled: false },
-        xAxis: {
-          categories: this.gridFerti3.map(r => r.DESCRIPCION),
-          title: { text: null }
-        },
-        yAxis: {
-          min: 0,
-          title: { text: 'Cantidad' }
-        },
-        series: [{
-          type: 'column',
-          name: 'Total',
-          data: this.gridFerti3.map(r => Number(r.TOTAL ?? 0))
-        }]
-      });
+      const dataGrafico = this.gridFerti3.filter(r => Number(r.TOTAL ?? 0) > 0);
+
+      if (dataGrafico.length > 0) {
+
+        this.chartFerti3 = Highcharts.chart('chart-ferti3', {
+          chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
+          title: { text: 'Fertilización cultivo permanente' },
+          credits: { enabled: false },
+          xAxis: {
+            categories: this.gridFerti3.map(r => r.DESCRIPCION),
+            title: { text: null }
+          },
+          yAxis: {
+            min: 0,
+            title: { text: 'Cantidad' }
+          },
+          series: [{
+            type: 'column',
+            name: 'Total',
+            data: this.gridFerti3.map(r => Number(r.TOTAL ?? 0))
+          }]
+        });
+
+      }
+
+      
 
       this.loadingFerti3 = false;
     }, 0);
@@ -497,7 +628,7 @@ export class AnalisisEspacialComponent {
     .filter(r => Number(r.TOTAL ?? 0) > 0);
 
     setTimeout(() => {
-      this.chartCultivos1?.destroy();
+      //this.chartCultivos1?.destroy();
 
       // const dataGrafico = this.gridCultivos1.filter(r => r.DESCRIPCION !== 'OTROS');
 
@@ -522,31 +653,60 @@ export class AnalisisEspacialComponent {
       //     data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
       //   }]
       // });
+      // const dataGrafico = this.gridCultivos1.filter(r =>
+      //   r.DESCRIPCION !== 'OTROS' && Number(r.TOTAL ?? 0) > 0
+      // );
+
+      // this.chartCultivos1 = Highcharts.chart('chart-cultivos1', {
+      //   chart: { type: 'bar', height: 320, backgroundColor: '#f8fafc' },
+      //   title: { text: 'Productores por cultivo' },
+      //   credits: { enabled: false },
+      //   xAxis: {
+      //     categories: dataGrafico.map(r => r.DESCRIPCION),
+      //     title: { text: null }
+      //   },
+      //   yAxis: {
+      //     min: 0,
+      //     title: { text: '' }
+      //   },
+      //   tooltip: {
+      //     pointFormat: '<b>{point.y}</b>'
+      //   },
+      //   series: [{
+      //     type: 'bar',
+      //     name: 'Número de productores según cultivo',
+      //     data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
+      //   }]
+      // });
       const dataGrafico = this.gridCultivos1.filter(r =>
         r.DESCRIPCION !== 'OTROS' && Number(r.TOTAL ?? 0) > 0
       );
 
-      this.chartCultivos1 = Highcharts.chart('chart-cultivos1', {
-        chart: { type: 'bar', height: 320, backgroundColor: '#f8fafc' },
-        title: { text: 'Productores por cultivo' },
-        credits: { enabled: false },
-        xAxis: {
-          categories: dataGrafico.map(r => r.DESCRIPCION),
-          title: { text: null }
-        },
-        yAxis: {
-          min: 0,
-          title: { text: '' }
-        },
-        tooltip: {
-          pointFormat: '<b>{point.y}</b>'
-        },
-        series: [{
-          type: 'bar',
-          name: 'Número de productores según cultivo',
-          data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
-        }]
-      });
+      this.chartCultivos1?.destroy();
+
+      if (dataGrafico.length > 0) {
+        this.chartCultivos1 = Highcharts.chart('chart-cultivos1', {
+          chart: { type: 'bar', height: 320, backgroundColor: '#f8fafc' },
+          title: { text: 'Productores por cultivo' },
+          credits: { enabled: false },
+          xAxis: {
+            categories: dataGrafico.map(r => r.DESCRIPCION),
+            title: { text: null }
+          },
+          yAxis: {
+            min: 0,
+            title: { text: '' }
+          },
+          tooltip: {
+            pointFormat: '<b>{point.y}</b>'
+          },
+          series: [{
+            type: 'bar',
+            name: 'Número de productores según cultivo',
+            data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
+          }]
+        });
+      }
 
       this.loadingCultivos1 = false;
     }, 0);
@@ -614,7 +774,7 @@ export class AnalisisEspacialComponent {
     .filter(r => Number(r.TOTAL ?? 0) > 0);
 
     setTimeout(() => {
-      this.chartCultivos2?.destroy();
+      //this.chartCultivos2?.destroy();
 
       // const dataGrafico = this.gridCultivos2.filter(r => r.DESCRIPCION !== 'OTROS');
 
@@ -643,27 +803,37 @@ export class AnalisisEspacialComponent {
         r.DESCRIPCION !== 'OTROS' && Number(r.TOTAL ?? 0) > 0
       );
 
-      this.chartCultivos2 = Highcharts.chart('chart-cultivos2', {
-        chart: { type: 'bar', height: 360,backgroundColor: '#f8fafc' },
-        title: { text: 'Productores por cultivo' },
-        credits: { enabled: false },
-        xAxis: {
-          categories: dataGrafico.map(r => r.DESCRIPCION),
-          title: { text: null }
-        },
-        yAxis: {
-          min: 0,
-          title: { text: '' }
-        },
-        tooltip: {
-          pointFormat: '<b>{point.y}</b>'
-        },
-        series: [{
-          type: 'bar',
-          name: 'Número de productores según cultivo',
-          data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
-        }]
-      });
+      
+
+
+
+      this.chartCultivos2?.destroy();
+
+      if (dataGrafico.length > 0) {
+
+          this.chartCultivos2 = Highcharts.chart('chart-cultivos2', {
+          chart: { type: 'bar', height: 360,backgroundColor: '#f8fafc' },
+          title: { text: 'Productores por cultivo' },
+          credits: { enabled: false },
+          xAxis: {
+            categories: dataGrafico.map(r => r.DESCRIPCION),
+            title: { text: null }
+          },
+          yAxis: {
+            min: 0,
+            title: { text: '' }
+          },
+          tooltip: {
+            pointFormat: '<b>{point.y}</b>'
+          },
+          series: [{
+            type: 'bar',
+            name: 'Número de productores según cultivo',
+            data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
+          }]
+        });
+
+      }
 
       this.loadingCultivos2 = false;
     }, 0);
@@ -735,7 +905,7 @@ export class AnalisisEspacialComponent {
     .filter(r => Number(r.TOTAL ?? 0) > 0);
 
     setTimeout(() => {
-      this.chartCultivos3?.destroy();
+      //this.chartCultivos3?.destroy();
 
       // const dataGrafico = this.gridCultivos3.filter(r => r.DESCRIPCION !== 'OTROS');
 
@@ -765,27 +935,36 @@ export class AnalisisEspacialComponent {
         r.DESCRIPCION !== 'OTROS' && Number(r.TOTAL ?? 0) > 0
       );
 
-      this.chartCultivos3 = Highcharts.chart('chart-cultivos3', {
-        chart: { type: 'bar', height: 380 , backgroundColor: '#f8fafc'},
-        title: { text: 'Productores por cultivo' },
-        credits: { enabled: false },
-        xAxis: {
-          categories: dataGrafico.map(r => r.DESCRIPCION),
-          title: { text: null }
-        },
-        yAxis: {
-          min: 0,
-          title: { text: '' }
-        },
-        tooltip: {
-          pointFormat: '<b>{point.y}</b>'
-        },
-        series: [{
-          type: 'bar',
-          name: 'Número de productores según cultivo',
-          data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
-        }]
-      });
+     
+
+
+      this.chartCultivos3?.destroy();
+
+      if (dataGrafico.length > 0) {
+
+         this.chartCultivos3 = Highcharts.chart('chart-cultivos3', {
+          chart: { type: 'bar', height: 380 , backgroundColor: '#f8fafc'},
+          title: { text: 'Productores por cultivo' },
+          credits: { enabled: false },
+          xAxis: {
+            categories: dataGrafico.map(r => r.DESCRIPCION),
+            title: { text: null }
+          },
+          yAxis: {
+            min: 0,
+            title: { text: '' }
+          },
+          tooltip: {
+            pointFormat: '<b>{point.y}</b>'
+          },
+          series: [{
+            type: 'bar',
+            name: 'Número de productores según cultivo',
+            data: dataGrafico.map(r => Number(r.TOTAL ?? 0))
+          }]
+        });
+
+      }
 
       this.loadingCultivos3 = false;
     }, 0);
@@ -974,15 +1153,51 @@ export class AnalisisEspacialComponent {
   }
 
 
-  private crearPie(containerId: string, titulo: string, data: { name: string; y: number }[]) {
+  // private crearPie(containerId: string, titulo: string, data: { name: string; y: number }[]) {
+  //   const el = document.getElementById(containerId);
+  //   if (!el) return;
+
+  //   const total = data.reduce((a, b) => a + (b.y || 0), 0);
+  //   const finalData = total > 0 ? data : [{ name: 'Sin datos', y: 1 }];
+
+  //   return Highcharts.chart(containerId, {
+  //     chart: { type: 'pie', height: 260 , backgroundColor: '#f8fafc'},
+  //     title: { text: titulo, align: 'center' },
+  //     credits: { enabled: false },
+  //     tooltip: { pointFormat: '<b>{point.y}</b> ({point.percentage:.1f}%)' },
+  //     plotOptions: {
+  //       pie: {
+  //         dataLabels: {
+  //           enabled: true,
+  //           format: '{point.name}: {point.percentage:.1f} %',
+  //           style: { fontSize: '11px', textOutline: 'none' }
+  //         }
+  //       }
+  //     },
+  //     series: [{
+  //       type: 'pie',
+  //       name: 'Total',
+  //       data: finalData
+  //     }]
+  //   });
+  // }
+  private crearPie(containerId: string, titulo: string, data: { name: string; y: number }[], onLoad?: () => void) {
     const el = document.getElementById(containerId);
     if (!el) return;
 
     const total = data.reduce((a, b) => a + (b.y || 0), 0);
-    const finalData = total > 0 ? data : [{ name: 'Sin datos', y: 1 }];
+
+    if (total <= 0) {
+      el.innerHTML = '';
+      return undefined;
+    }
 
     return Highcharts.chart(containerId, {
-      chart: { type: 'pie', height: 260 , backgroundColor: '#f8fafc'},
+      chart: { type: 'pie', height: 260, backgroundColor: '#f8fafc' , events: {
+        load: () => {
+          onLoad?.();
+        }
+      }},
       title: { text: titulo, align: 'center' },
       credits: { enabled: false },
       tooltip: { pointFormat: '<b>{point.y}</b> ({point.percentage:.1f}%)' },
@@ -998,7 +1213,7 @@ export class AnalisisEspacialComponent {
       series: [{
         type: 'pie',
         name: 'Total',
-        data: finalData
+        data
       }]
     });
   }
@@ -1036,338 +1251,500 @@ export class AnalisisEspacialComponent {
 
   
   async ejecutarEstadisticas() {
-    const serviceLayerUrl =
-      `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`;
+        
+    if (this.ejecutandoAnalisis) return;
 
-    this.loadingCultivos3 = true;
-    this.gridCultivos3 = [];
+    this.iniciarBloqueoAnalisis();
 
-    this.loadingCultivos2 = true;
-    this.gridCultivos2 = [];
+    try {
 
-    this.loadingCultivos1 = true;
-    this.gridCultivos1 = [];
+        const serviceLayerUrl =
+          `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`;
 
-    this.loadingGenero = true;
-    this.loadingProductivo = true;
-    this.loadingRiego = true;
-    this.loadingPecuario = true;
-    this.loadingPecuarioDetalle = true;
+        this.loadingCultivos3 = true;
+        this.gridCultivos3 = [];
 
-    this.gridGenero = [];
-    this.gridProductivo = [];
-    this.gridRiego = [];
-    this.gridPecuario = [];
+        this.loadingCultivos2 = true;
+        this.gridCultivos2 = [];
 
-    const promGenero = (async () => {
-      const qStats = new Query({
-        geometry: this.coberturaPolygon,
-        spatialRelationship: "intersects",
-        returnGeometry: false,
-        groupByFieldsForStatistics: ["GENERO"],
-        outStatistics: [
-          {
-            statisticType: "count",
-            onStatisticField: "GENERO",
-            outStatisticFieldName: "SUM_GENERO"
-          }
-        ]
-      });
+        this.loadingCultivos1 = true;
+        this.gridCultivos1 = [];
 
-      const respStats = await query.executeQueryJSON(serviceLayerUrl, qStats);
+        this.loadingGenero = true;
+        this.loadingProductivo = true;
+        this.loadingRiego = true;
+        this.loadingPecuario = true;
+        this.loadingPecuarioDetalle = true;
 
-      this.gridGenero = (respStats.features || []).map((f: any) => {
-        const g = Number(String(f.attributes.GENERO).trim());
-        return {
-          GENERO: g,
-          DESCRIPCION: g === 1 ? "MUJER" : g === 2 ? "HOMBRE" : "SIN DATA",
-          SUM_GENERO: f.attributes.SUM_GENERO
-        };
-      });
+        this.gridGenero = [];
+        this.gridProductivo = [];
+        this.gridRiego = [];
+        this.gridPecuario = [];
 
-      this.colsGenero = ["GENERO", "DESCRIPCION", "SUM_GENERO"];
+        const promGenero = (async () => {
+          const qStats = new Query({
+            geometry: this.coberturaPolygon,
+            spatialRelationship: "intersects",
+            returnGeometry: false,
+            groupByFieldsForStatistics: ["GENERO"],
+            outStatistics: [
+              {
+                statisticType: "count",
+                onStatisticField: "GENERO",
+                outStatisticFieldName: "SUM_GENERO"
+              }
+            ]
+          });
 
-      setTimeout(() => {
-        this.chartGenero?.destroy();
-        this.chartGenero = this.crearPie(
-          'chart-genero',
-          'Distribución por Género',
-          this.gridGenero.map(r => ({
-            name: r.DESCRIPCION,
-            y: Number(r.SUM_GENERO ?? 0)
-          }))
-        );
-        this.loadingGenero = false;
-      }, 0);
-    })();
+          const respStats = await query.executeQueryJSON(serviceLayerUrl, qStats);
 
-    const promProductivo = (async () => {
-      const qAgrico = new Query({
-        geometry: this.coberturaPolygon,
-        spatialRelationship: "intersects",
-        returnGeometry: false,
-        where: "FLG_AGRICO = 1",
-        outFields: [],
-        outStatistics: [{
-          statisticType: "count",
-          onStatisticField: "FLG_AGRICO",
-          outStatisticFieldName: "TOTAL_AGRICOLA"
-        }]
-      });
+          this.gridGenero = (respStats.features || []).map((f: any) => {
+            const g = Number(String(f.attributes.GENERO).trim());
+            return {
+              GENERO: g,
+              DESCRIPCION: g === 1 ? "MUJER" : g === 2 ? "HOMBRE" : "SIN DATA",
+              SUM_GENERO: f.attributes.SUM_GENERO
+            };
+          });
 
-      const qPecuar = new Query({
-        geometry: this.coberturaPolygon,
-        spatialRelationship: "intersects",
-        returnGeometry: false,
-        where: "FLG_PECUAR = 1",
-        outFields: [],
-        outStatistics: [{
-          statisticType: "count",
-          onStatisticField: "FLG_PECUAR",
-          outStatisticFieldName: "TOTAL_PECUARIO"
-        }]
-      });
+          this.colsGenero = ["GENERO", "DESCRIPCION", "SUM_GENERO"];
 
-      const qForest = new Query({
-        geometry: this.coberturaPolygon,
-        spatialRelationship: "intersects",
-        returnGeometry: false,
-        where: "FLG_FOREST = 1",
-        outFields: [],
-        outStatistics: [{
-          statisticType: "count",
-          onStatisticField: "FLG_FOREST",
-          outStatisticFieldName: "TOTAL_FORESTAL"
-        }]
-      });
+          // setTimeout(() => {
+          //   this.chartGenero?.destroy();
+          //   this.chartGenero = this.crearPie(
+          //     'chart-genero',
+          //     'Distribución por Género',
+          //     this.gridGenero.map(r => ({
+          //       name: r.DESCRIPCION,
+          //       y: Number(r.SUM_GENERO ?? 0)
+          //     }))
+          //   );
+          //   this.loadingGenero = false;
+          // }, 0);
+          // setTimeout(() => {
+          //   this.chartGenero?.destroy();
 
-      const [respAgrico, respPecuar, respForest] = await Promise.all([
-        query.executeQueryJSON(serviceLayerUrl, qAgrico),
-        query.executeQueryJSON(serviceLayerUrl, qPecuar),
-        query.executeQueryJSON(serviceLayerUrl, qForest)
-      ]);
+          //   const dataGenero = this.gridGenero.map(r => ({
+          //     name: r.DESCRIPCION,
+          //     y: Number(r.SUM_GENERO ?? 0)
+          //   }));
 
-      const totalAgricola = respAgrico.features?.[0]?.attributes?.TOTAL_AGRICOLA ?? 0;
-      const totalPecuario = respPecuar.features?.[0]?.attributes?.TOTAL_PECUARIO ?? 0;
-      const totalForestal = respForest.features?.[0]?.attributes?.TOTAL_FORESTAL ?? 0;
+          //   if (this.tieneDataPie(dataGenero)) {
+          //     this.registrarChartPendiente();
+          //     this.chartGenero = this.crearPie(
+          //       'chart-genero',
+          //       'Distribución por Género',
+          //       dataGenero,
+          //       () => this.finalizarChartPendiente()
+          //     );
+          //   }
 
-      this.gridProductivo = [
-        { DESCRIPCION: "Agrícola", TOTAL: totalAgricola },
-        { DESCRIPCION: "Pecuario", TOTAL: totalPecuario },
-        { DESCRIPCION: "Forestal", TOTAL: totalForestal }
-      ];
+          //   this.loadingGenero = false;
+          // }, 0);
+          setTimeout(() => {
+              this.chartGenero?.destroy();
 
-      this.displayedColumnsProductivo = ["DESCRIPCION", "TOTAL"];
+              const dataGenero = this.gridGenero.map(r => ({
+                name: r.DESCRIPCION,
+                y: Number(r.SUM_GENERO ?? 0)
+              }));
 
-      setTimeout(() => {
-        this.chartProductivo?.destroy();
-        this.chartProductivo = this.crearPie(
-          'chart-productivo',
-          'Actividad Productiva',
-          this.gridProductivo.map(r => ({
-            name: r.DESCRIPCION,
-            y: Number(r.TOTAL ?? 0)
-          }))
-        );
-        this.loadingProductivo = false;
-      }, 0);
-    })();
+              if (this.tieneDataPie(dataGenero)) {
+                this.registrarChartPendiente();
 
-    const promRiego = (async () => {
-      const qGraved = new Query({
-        geometry: this.coberturaPolygon,
-        spatialRelationship: "intersects",
-        returnGeometry: false,
-        where: "FLG_GRAVED = 1",
-        outFields: [],
-        outStatistics: [{
-          statisticType: "count",
-          onStatisticField: "FLG_GRAVED",
-          outStatisticFieldName: "TOTAL_GRAVED"
-        }]
-      });
+                const chartCreado = this.crearPie(
+                  'chart-genero',
+                  'Distribución por Género',
+                  dataGenero,
+                  () => this.finalizarChartPendiente()
+                );
 
-      const qAspers = new Query({
-        geometry: this.coberturaPolygon,
-        spatialRelationship: "intersects",
-        returnGeometry: false,
-        where: "FLG_ASPERS = 1",
-        outFields: [],
-        outStatistics: [{
-          statisticType: "count",
-          onStatisticField: "FLG_ASPERS",
-          outStatisticFieldName: "TOTAL_ASPERS"
-        }]
-      });
+                if (chartCreado) {
+                  this.chartGenero = chartCreado;
+                } else {
+                  this.finalizarChartPendiente();
+                }
+              }
 
-      const qGoteo = new Query({
-        geometry: this.coberturaPolygon,
-        spatialRelationship: "intersects",
-        returnGeometry: false,
-        where: "FLG_GOTEO = 1",
-        outFields: [],
-        outStatistics: [{
-          statisticType: "count",
-          onStatisticField: "FLG_GOTEO",
-          outStatisticFieldName: "TOTAL_GOTEO"
-        }]
-      });
+              this.loadingGenero = false;
+            }, 0);
 
-      const qSinRiego = new Query({
-        geometry: this.coberturaPolygon,
-        spatialRelationship: "intersects",
-        returnGeometry: false,
-        where: `
-          (FLG_GRAVED = 0 OR FLG_GRAVED IS NULL)
-          AND (FLG_ASPERS = 0 OR FLG_ASPERS IS NULL)
-          AND (FLG_GOTEO = 0 OR FLG_GOTEO IS NULL)
-        `,
-        outFields: [],
-        outStatistics: [{
-          statisticType: "count",
-          onStatisticField: "OBJECTID",
-          outStatisticFieldName: "TOTAL_SIN_RIEGO"
-        }]
-      });
+        })();
 
-      const [respGraved, respAspers, respGoteo, respSinRiego] = await Promise.all([
-        query.executeQueryJSON(serviceLayerUrl, qGraved),
-        query.executeQueryJSON(serviceLayerUrl, qAspers),
-        query.executeQueryJSON(serviceLayerUrl, qGoteo),
-        query.executeQueryJSON(serviceLayerUrl, qSinRiego)
-      ]);
+        const promProductivo = (async () => {
+          const qAgrico = new Query({
+            geometry: this.coberturaPolygon,
+            spatialRelationship: "intersects",
+            returnGeometry: false,
+            where: "FLG_AGRICO = 1",
+            outFields: [],
+            outStatistics: [{
+              statisticType: "count",
+              onStatisticField: "FLG_AGRICO",
+              outStatisticFieldName: "TOTAL_AGRICOLA"
+            }]
+          });
 
-      const totalGraved = respGraved.features?.[0]?.attributes?.TOTAL_GRAVED ?? 0;
-      const totalAspers = respAspers.features?.[0]?.attributes?.TOTAL_ASPERS ?? 0;
-      const totalGoteo = respGoteo.features?.[0]?.attributes?.TOTAL_GOTEO ?? 0;
-      const totalSinRiego = respSinRiego.features?.[0]?.attributes?.TOTAL_SIN_RIEGO ?? 0;
+          const qPecuar = new Query({
+            geometry: this.coberturaPolygon,
+            spatialRelationship: "intersects",
+            returnGeometry: false,
+            where: "FLG_PECUAR = 1",
+            outFields: [],
+            outStatistics: [{
+              statisticType: "count",
+              onStatisticField: "FLG_PECUAR",
+              outStatisticFieldName: "TOTAL_PECUARIO"
+            }]
+          });
 
-      this.gridRiego = [
-        { DESCRIPCION: "Gravedad", TOTAL: totalGraved },
-        { DESCRIPCION: "Aspersión", TOTAL: totalAspers },
-        { DESCRIPCION: "Goteo", TOTAL: totalGoteo },
-        { DESCRIPCION: "Riego especial", TOTAL: totalSinRiego }
-      ];
+          const qForest = new Query({
+            geometry: this.coberturaPolygon,
+            spatialRelationship: "intersects",
+            returnGeometry: false,
+            where: "FLG_FOREST = 1",
+            outFields: [],
+            outStatistics: [{
+              statisticType: "count",
+              onStatisticField: "FLG_FOREST",
+              outStatisticFieldName: "TOTAL_FORESTAL"
+            }]
+          });
 
-      this.displayedColumnsRiego = ["DESCRIPCION", "TOTAL"];
+          const [respAgrico, respPecuar, respForest] = await Promise.all([
+            query.executeQueryJSON(serviceLayerUrl, qAgrico),
+            query.executeQueryJSON(serviceLayerUrl, qPecuar),
+            query.executeQueryJSON(serviceLayerUrl, qForest)
+          ]);
 
-      setTimeout(() => {
-        this.chartRiego?.destroy();
-        this.chartRiego = this.crearPie(
-          'chart-riego',
-          'Método de Riego',
-          this.gridRiego.map(r => ({
-            name: r.DESCRIPCION,
-            y: Number(r.TOTAL ?? 0)
-          }))
-        );
-        this.loadingRiego = false;
-      }, 0);
-    })();
+          const totalAgricola = respAgrico.features?.[0]?.attributes?.TOTAL_AGRICOLA ?? 0;
+          const totalPecuario = respPecuar.features?.[0]?.attributes?.TOTAL_PECUARIO ?? 0;
+          const totalForestal = respForest.features?.[0]?.attributes?.TOTAL_FORESTAL ?? 0;
 
-    const promPecuario = (async () => {
-      await this.ejecutarEstadisticasPecuarias();
+          this.gridProductivo = [
+            { DESCRIPCION: "Agrícola", TOTAL: totalAgricola },
+            { DESCRIPCION: "Pecuario", TOTAL: totalPecuario },
+            { DESCRIPCION: "Forestal", TOTAL: totalForestal }
+          ];
 
-      setTimeout(() => {
-        this.chartPecuario?.destroy();
-        this.chartPecuarioDetalle?.destroy();
+          this.displayedColumnsProductivo = ["DESCRIPCION", "TOTAL"];
 
-        const dataPecuarioChart = this.gridPecuario.filter(r =>
-          Number(r.SUM_CAN_P29_2 ?? 0) > 0
-        );
+          // setTimeout(() => {
+          //   this.chartProductivo?.destroy();
+          //   this.chartProductivo = this.crearPie(
+          //     'chart-productivo',
+          //     'Actividad Productiva',
+          //     this.gridProductivo.map(r => ({
+          //       name: r.DESCRIPCION,
+          //       y: Number(r.TOTAL ?? 0)
+          //     }))
+          //   );
+          //   this.loadingProductivo = false;
+          // }, 0);
+          // setTimeout(() => {
+          //   this.chartProductivo?.destroy();
 
-        const dataPecuarioDetalleChart = this.gridPecuario.filter(r =>
-          Number(r.SUM_CAN_P29_3_RAZA ?? 0) > 0 ||
-          Number(r.SUM_CAN_P29_3_CRIOLLO ?? 0) > 0 ||
-          Number(r.SUM_CAN_P29_3_MEJORADO ?? 0) > 0
-        );
+          //   const dataProductivo = this.gridProductivo.map(r => ({
+          //     name: r.DESCRIPCION,
+          //     y: Number(r.TOTAL ?? 0)
+          //   }));
 
-        this.chartPecuario = Highcharts.chart('chart-pecuario', {
-          chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
-          title: { text: 'Cantidad de animales por tipo' },
-          credits: { enabled: false },
-          xAxis: {
-            categories: dataPecuarioChart.map(r => r.TXT_P29_1),
-            title: { text: null }
-          },
-          yAxis: {
-            min: 0,
-            title: { text: 'Cantidad' }
-          },
-          tooltip: { pointFormat: '<b>{point.y}</b>' },
-          series: [{
-            type: 'column',
-            name: 'Total',
-            data: dataPecuarioChart.map(r => Number(r.SUM_CAN_P29_2 ?? 0))
-          }]
-        });
+          //   if (this.tieneDataPie(dataProductivo)) {
+          //     this.registrarChartPendiente();
+          //     this.chartProductivo = this.crearPie(
+          //       'chart-productivo',
+          //       'Actividad Productiva',
+          //       dataProductivo,
+          //       () => this.finalizarChartPendiente()
+          //     );
+          //   }
 
-        this.loadingPecuario = false;
+          //   this.loadingProductivo = false;
+          // }, 0);
+          setTimeout(() => {
+              this.chartProductivo?.destroy();
 
-        this.chartPecuarioDetalle = Highcharts.chart('chart-pecuario-detalle', {
-          chart: { type: 'column', height: 320, backgroundColor: '#f8fafc' },
-          title: { text: 'Composición pecuaria por tipo' },
-          credits: { enabled: false },
-          xAxis: {
-            categories: dataPecuarioDetalleChart.map(r => r.TXT_P29_1),
-            title: { text: null }
-          },
-          yAxis: {
-            min: 0,
-            title: { text: 'Cantidad' }
-          },
-          tooltip: { shared: true },
-          plotOptions: { column: { grouping: true } },
-          series: [
-            {
-              type: 'column',
-              name: 'Raza',
-              data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_RAZA ?? 0))
-            },
-            {
-              type: 'column',
-              name: 'Criollo',
-              data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_CRIOLLO ?? 0))
-            },
-            {
-              type: 'column',
-              name: 'Mejorado',
-              data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_MEJORADO ?? 0))
+              const dataProductivo = this.gridProductivo.map(r => ({
+                name: r.DESCRIPCION,
+                y: Number(r.TOTAL ?? 0)
+              }));
+
+              if (this.tieneDataPie(dataProductivo)) {
+                this.registrarChartPendiente();
+
+                const chartCreado = this.crearPie(
+                  'chart-productivo',
+                  'Actividad Productiva',
+                  dataProductivo,
+                  () => this.finalizarChartPendiente()
+                );
+
+                if (chartCreado) {
+                  this.chartProductivo = chartCreado;
+                } else {
+                  this.finalizarChartPendiente();
+                }
+              }
+
+              this.loadingProductivo = false;
+            }, 0);
+
+
+        })();
+
+        const promRiego = (async () => {
+          const qGraved = new Query({
+            geometry: this.coberturaPolygon,
+            spatialRelationship: "intersects",
+            returnGeometry: false,
+            where: "FLG_GRAVED = 1",
+            outFields: [],
+            outStatistics: [{
+              statisticType: "count",
+              onStatisticField: "FLG_GRAVED",
+              outStatisticFieldName: "TOTAL_GRAVED"
+            }]
+          });
+
+          const qAspers = new Query({
+            geometry: this.coberturaPolygon,
+            spatialRelationship: "intersects",
+            returnGeometry: false,
+            where: "FLG_ASPERS = 1",
+            outFields: [],
+            outStatistics: [{
+              statisticType: "count",
+              onStatisticField: "FLG_ASPERS",
+              outStatisticFieldName: "TOTAL_ASPERS"
+            }]
+          });
+
+          const qGoteo = new Query({
+            geometry: this.coberturaPolygon,
+            spatialRelationship: "intersects",
+            returnGeometry: false,
+            where: "FLG_GOTEO = 1",
+            outFields: [],
+            outStatistics: [{
+              statisticType: "count",
+              onStatisticField: "FLG_GOTEO",
+              outStatisticFieldName: "TOTAL_GOTEO"
+            }]
+          });
+
+          const qSinRiego = new Query({
+            geometry: this.coberturaPolygon,
+            spatialRelationship: "intersects",
+            returnGeometry: false,
+            where: `
+              (FLG_GRAVED = 0 OR FLG_GRAVED IS NULL)
+              AND (FLG_ASPERS = 0 OR FLG_ASPERS IS NULL)
+              AND (FLG_GOTEO = 0 OR FLG_GOTEO IS NULL)
+            `,
+            outFields: [],
+            outStatistics: [{
+              statisticType: "count",
+              onStatisticField: "OBJECTID",
+              outStatisticFieldName: "TOTAL_SIN_RIEGO"
+            }]
+          });
+
+          const [respGraved, respAspers, respGoteo, respSinRiego] = await Promise.all([
+            query.executeQueryJSON(serviceLayerUrl, qGraved),
+            query.executeQueryJSON(serviceLayerUrl, qAspers),
+            query.executeQueryJSON(serviceLayerUrl, qGoteo),
+            query.executeQueryJSON(serviceLayerUrl, qSinRiego)
+          ]);
+
+          const totalGraved = respGraved.features?.[0]?.attributes?.TOTAL_GRAVED ?? 0;
+          const totalAspers = respAspers.features?.[0]?.attributes?.TOTAL_ASPERS ?? 0;
+          const totalGoteo = respGoteo.features?.[0]?.attributes?.TOTAL_GOTEO ?? 0;
+          const totalSinRiego = respSinRiego.features?.[0]?.attributes?.TOTAL_SIN_RIEGO ?? 0;
+
+          this.gridRiego = [
+            { DESCRIPCION: "Gravedad", TOTAL: totalGraved },
+            { DESCRIPCION: "Aspersión", TOTAL: totalAspers },
+            { DESCRIPCION: "Goteo", TOTAL: totalGoteo },
+            { DESCRIPCION: "Riego especial", TOTAL: totalSinRiego }
+          ];
+
+          this.displayedColumnsRiego = ["DESCRIPCION", "TOTAL"];
+
+          // setTimeout(() => {
+          //   this.chartRiego?.destroy();
+          //   this.chartRiego = this.crearPie(
+          //     'chart-riego',
+          //     'Método de Riego',
+          //     this.gridRiego.map(r => ({
+          //       name: r.DESCRIPCION,
+          //       y: Number(r.TOTAL ?? 0)
+          //     }))
+          //   );
+          //   this.loadingRiego = false;
+          // }, 0);
+          // setTimeout(() => {
+          //   this.chartRiego?.destroy();
+
+          //   const dataRiego = this.gridRiego.map(r => ({
+          //     name: r.DESCRIPCION,
+          //     y: Number(r.TOTAL ?? 0)
+          //   }));
+
+          //   if (this.tieneDataPie(dataRiego)) {
+          //     this.registrarChartPendiente();
+          //     this.chartRiego = this.crearPie(
+          //       'chart-riego',
+          //       'Método de Riego',
+          //       dataRiego,
+          //       () => this.finalizarChartPendiente()
+          //     );
+          //   }
+
+          //   this.loadingRiego = false;
+          // }, 0);
+          setTimeout(() => {
+            this.chartRiego?.destroy();
+
+            const dataRiego = this.gridRiego.map(r => ({
+              name: r.DESCRIPCION,
+              y: Number(r.TOTAL ?? 0)
+            }));
+
+            if (this.tieneDataPie(dataRiego)) {
+              this.registrarChartPendiente();
+
+              const chartCreado = this.crearPie(
+                'chart-riego',
+                'Método de Riego',
+                dataRiego,
+                () => this.finalizarChartPendiente()
+              );
+
+              if (chartCreado) {
+                this.chartRiego = chartCreado;
+              } else {
+                this.finalizarChartPendiente();
+              }
             }
-          ]
-        });
 
-        this.loadingPecuarioDetalle = false;
-      }, 0);
-    })();
+            this.loadingRiego = false;
+          }, 0);
+        })();
+
+        const promPecuario = (async () => {
+          await this.ejecutarEstadisticasPecuarias();
+
+          setTimeout(() => {
+            this.chartPecuario?.destroy();
+            this.chartPecuarioDetalle?.destroy();
+
+            const dataPecuarioChart = this.gridPecuario.filter(r =>
+              Number(r.SUM_CAN_P29_2 ?? 0) > 0
+            );
+
+            const dataPecuarioDetalleChart = this.gridPecuario.filter(r =>
+              Number(r.SUM_CAN_P29_3_RAZA ?? 0) > 0 ||
+              Number(r.SUM_CAN_P29_3_CRIOLLO ?? 0) > 0 ||
+              Number(r.SUM_CAN_P29_3_MEJORADO ?? 0) > 0
+            );
+
+            if (dataPecuarioChart.length > 0) {
+              this.chartPecuario = Highcharts.chart('chart-pecuario', {
+                chart: { type: 'column', height: 280 , backgroundColor: '#f8fafc'},
+                title: { text: 'Cantidad de animales por tipo' },
+                credits: { enabled: false },
+                xAxis: {
+                  categories: dataPecuarioChart.map(r => r.TXT_P29_1),
+                  title: { text: null }
+                },
+                yAxis: {
+                  min: 0,
+                  title: { text: 'Cantidad' }
+                },
+                tooltip: { pointFormat: '<b>{point.y}</b>' },
+                series: [{
+                  type: 'column',
+                  name: 'Total',
+                  data: dataPecuarioChart.map(r => Number(r.SUM_CAN_P29_2 ?? 0))
+                }]
+              });
+            }
+
+            this.loadingPecuario = false;
+
+            if (dataPecuarioDetalleChart.length > 0) {
+              this.chartPecuarioDetalle = Highcharts.chart('chart-pecuario-detalle', {
+                chart: { type: 'column', height: 320, backgroundColor: '#f8fafc' },
+                title: { text: 'Composición pecuaria por tipo' },
+                credits: { enabled: false },
+                xAxis: {
+                  categories: dataPecuarioDetalleChart.map(r => r.TXT_P29_1),
+                  title: { text: null }
+                },
+                yAxis: {
+                  min: 0,
+                  title: { text: 'Cantidad' }
+                },
+                tooltip: { shared: true },
+                plotOptions: { column: { grouping: true } },
+                series: [
+                  {
+                    type: 'column',
+                    name: 'Raza',
+                    data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_RAZA ?? 0))
+                  },
+                  {
+                    type: 'column',
+                    name: 'Criollo',
+                    data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_CRIOLLO ?? 0))
+                  },
+                  {
+                    type: 'column',
+                    name: 'Mejorado',
+                    data: dataPecuarioDetalleChart.map(r => Number(r.SUM_CAN_P29_3_MEJORADO ?? 0))
+                  }
+                ]
+              });
+            }
+
+            this.loadingPecuarioDetalle = false;
+          }, 0);
+        })();
 
 
 
 
-    const promCultivos1 = this.ejecutarEstadisticasCultivos1();
+        const promCultivos1 = this.ejecutarEstadisticasCultivos1();
 
-    const promCultivos2 = this.ejecutarEstadisticasCultivos2();
+        const promCultivos2 = this.ejecutarEstadisticasCultivos2();
 
-    const promCultivos3 = this.ejecutarEstadisticasCultivos3();
-
-
-    const promFerti1 = this.ejecutarEstadisticasFerti1();
-    const promFerti2 = this.ejecutarEstadisticasFerti2();
-    const promFerti3 = this.ejecutarEstadisticasFerti3();
+        const promCultivos3 = this.ejecutarEstadisticasCultivos3();
 
 
-    await Promise.all([
-      promGenero,
-      promProductivo,
-      promRiego,
-      promPecuario,
-      promCultivos1,
-      promCultivos2,
-      promCultivos3,
-      promFerti1,
-      promFerti2,
-      promFerti3
-    ]);
+        const promFerti1 = this.ejecutarEstadisticasFerti1();
+        const promFerti2 = this.ejecutarEstadisticasFerti2();
+        const promFerti3 = this.ejecutarEstadisticasFerti3();
+
+
+        await Promise.all([
+          promGenero,
+          promProductivo,
+          promRiego,
+          promPecuario,
+          promCultivos1,
+          promCultivos2,
+          promCultivos3,
+          promFerti1,
+          promFerti2,
+          promFerti3
+        ]);
+
+
+    } catch (error) {
+        console.error('Error en ejecutarEstadisticas:', error);
+    } finally {
+        this.ejecutandoAnalisis = false;
+    }
   }
 
 

@@ -73,6 +73,10 @@ export class AuthService {
     }
   }
 
+  puedeVerDatosNominales(): boolean {
+    return this.estaAutenticado();
+  }
+
   cerrarSesion(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');

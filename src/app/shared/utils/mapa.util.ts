@@ -1995,6 +1995,80 @@ export class Mapa {
   //     await this.mapView.goTo(cober);
   //   }
   // }
+  // async zoomToObjectId2(payload: { geometry: Polygon | null; source?: 'draw' | 'kml' | 'select' }) {
+  //   const cober = payload?.geometry ?? null;
+  //   const source = payload?.source;
+
+  //   this.limpiarCoberturaAnalisis();
+
+  //   if (!cober) {
+  //     console.warn("No llegó geometría (cober es null)");
+  //     return;
+  //   }
+
+  //   const graphic = new Graphic({
+  //     geometry: cober,
+  //     symbol: new SimpleFillSymbol({
+  //       color: [0, 0, 0, 0],
+  //       outline: {
+  //         color: [255, 0, 255],
+  //         width: 3
+  //       }
+  //     })
+  //   });
+
+  //   this.resultsLayer.add(graphic);
+
+  //   if (!this.mapView) return;
+
+  //   // Dibujo manual: NO hacer zoom
+  //   if (source === 'draw') {
+  //     return;
+  //   }
+
+  //   // KML o selección: zoom más suave
+  //   const extent = cober.extent;
+  //   if (extent) {
+  //     await this.mapView.goTo(extent.expand(1.8), { duration: 700 });
+  //   }
+  // }
+  // async zoomToObjectId2(payload: { geometry: Polygon | null; source?: 'draw' | 'kml' | 'select' }) {
+  //   const cober = payload?.geometry ?? null;
+  //   const source = payload?.source;
+
+  //   this.limpiarCoberturaAnalisis();
+
+  //   if (!cober) {
+  //     console.warn("No llegó geometría (cober es null)");
+  //     return;
+  //   }
+
+  //   const graphic = new Graphic({
+  //     geometry: cober,
+  //     symbol: new SimpleFillSymbol({
+  //       color: [0, 0, 0, 0],
+  //       outline: {
+  //         color: [255, 0, 255],
+  //         width: 3
+  //       }
+  //     }
+  //   });
+
+  //   this.drawLayer.add(graphic);
+
+  //   if (!this.mapView) return;
+
+  //   if (source === 'draw') {
+  //     return;
+  //   }
+
+  //   const extent = cober.extent;
+  //   if (extent) {
+  //     await this.mapView.goTo(extent.expand(1.8), { duration: 700 });
+  //   }
+  // }
+
+
   async zoomToObjectId2(payload: { geometry: Polygon | null; source?: 'draw' | 'kml' | 'select' }) {
     const cober = payload?.geometry ?? null;
     const source = payload?.source;
@@ -2017,16 +2091,14 @@ export class Mapa {
       })
     });
 
-    this.resultsLayer.add(graphic);
+    this.drawLayer.add(graphic);
 
     if (!this.mapView) return;
 
-    // Dibujo manual: NO hacer zoom
     if (source === 'draw') {
       return;
     }
 
-    // KML o selección: zoom más suave
     const extent = cober.extent;
     if (extent) {
       await this.mapView.goTo(extent.expand(1.8), { duration: 700 });
@@ -3094,7 +3166,9 @@ export class Mapa {
     this.sketsch.on("create", (event) => {
       if (event.state === "start") {
         // cuando comienza un nuevo dibujo → limpia todos los anteriores
-        this.resultsLayer.removeAll();
+        //this.resultsLayer.removeAll();
+        //this.drawLayer.removeAll();
+        this.limpiarCoberturaAnalisis();
       }
     });
 
@@ -4189,7 +4263,8 @@ export class Mapa {
 
 
   private limpiarCoberturaAnalisis(): void {
-    this.resultsLayer?.removeAll();
+    // this.resultsLayer?.removeAll();
+    // this.drawLayer?.removeAll();
     this.drawLayer?.removeAll();
   }
 

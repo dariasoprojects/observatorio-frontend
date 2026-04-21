@@ -85,7 +85,7 @@
             pTooltip="Ejecutar superposición"
             tooltipPosition="left"
             (click)="onAnalizar()"
-            [disabled]="!coberturaPolygon"
+            [disabled]="!coberturaPolygon || ejecutandoAnalisis"
           ></button>
 
         </div>
@@ -108,7 +108,8 @@
         </ng-template>
 
         <!-- <div  *ngIf="resultados?.length || gridGenero?.length || gridProductivo?.length || gridRiego?.length"> -->
-        <div class="result-actions" *ngIf="resultados?.length || loadingGenero || loadingProductivo || loadingRiego || loadingPecuario || loadingPecuarioDetalle || gridGenero?.length || gridProductivo?.length || gridRiego?.length || gridPecuario?.length">
+        <!-- <div class="result-actions" *ngIf="resultados?.length || loadingGenero || loadingProductivo || loadingRiego || loadingPecuario || loadingPecuarioDetalle || gridGenero?.length || gridProductivo?.length || gridRiego?.length || gridPecuario?.length"> -->
+        <div class="result-actions" *ngIf="hayResultadosEstadisticos">
           <button
             pButton
             type="button"
@@ -131,11 +132,11 @@
         <!-- Mantienes tus cards internas pero con clases compactas -->
         <div class="grid-compact">
 
-          <p-card class="card-mini" *ngIf="loadingGenero || gridGenero?.length">
+          <p-card class="card-mini" *ngIf="mostrarGenero">
             <!-- <ng-template pTemplate="title">
               <span class="mini-title">Género</span>
             </ng-template> -->
-            <div class="chart-wrap" *ngIf="loadingGenero || gridGenero?.length">
+            <div class="chart-wrap" *ngIf="mostrarGenero">
               <div *ngIf="loadingGenero" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -170,11 +171,11 @@
             </p-table>
           </p-card>
 
-          <p-card class="card-mini" *ngIf="loadingProductivo || gridProductivo?.length">
+          <p-card class="card-mini" *ngIf="mostrarProductivo">
             <!-- <ng-template pTemplate="title">
               <span class="mini-title">Actividad</span>
             </ng-template> -->
-            <div class="chart-wrap" *ngIf="loadingProductivo || gridProductivo?.length">
+            <div class="chart-wrap" *ngIf="mostrarProductivo">
               <div *ngIf="loadingProductivo" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -208,12 +209,12 @@
 
 
 
-          <p-card class="card-mini" *ngIf="loadingCultivos1 || gridCultivos1?.length">
+          <p-card class="card-mini" *ngIf="mostrarCultivos1">
             <ng-template pTemplate="title">
               <span class="mini-title">Cultivos principales</span>
             </ng-template>
 
-            <div class="chart-wrap" *ngIf="loadingCultivos1 || gridCultivos1?.length">
+            <div class="chart-wrap" *ngIf="mostrarCultivos1">
               <div *ngIf="loadingCultivos1" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -247,12 +248,12 @@
 
 
 
-          <p-card class="card-mini" *ngIf="loadingCultivos2 || gridCultivos2?.length">
+          <p-card class="card-mini" *ngIf="mostrarCultivos2">
             <ng-template pTemplate="title">
               <span class="mini-title">Cultivos transitorios</span>
             </ng-template>
 
-            <div class="chart-wrap" *ngIf="loadingCultivos2 || gridCultivos2?.length">
+            <div class="chart-wrap" *ngIf="mostrarCultivos2">
               <div *ngIf="loadingCultivos2" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -284,12 +285,12 @@
 
 
 
-          <p-card class="card-mini" *ngIf="loadingCultivos3 || gridCultivos3?.length">
+          <p-card class="card-mini" *ngIf="mostrarCultivos3">
             <ng-template pTemplate="title">
               <span class="mini-title">Cultivos permanentes</span>
             </ng-template>
 
-            <div class="chart-wrap" *ngIf="loadingCultivos3 || gridCultivos3?.length">
+            <div class="chart-wrap" *ngIf="mostrarCultivos3">
               <div *ngIf="loadingCultivos3" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -322,12 +323,12 @@
 
 
 
-          <p-card class="card-mini" *ngIf="loadingPecuario || loadingPecuarioDetalle || gridPecuario?.length">
+          <!-- <p-card class="card-mini" *ngIf="mostrarPecuario">
             <ng-template pTemplate="title">
               <span class="mini-title">Estructura Productiva Pecuaria</span>
             </ng-template>
 
-            <div class="chart-wrap" *ngIf="loadingPecuario || gridPecuario?.length">
+            <div class="chart-wrap" *ngIf="mostrarPecuario">
               <div *ngIf="loadingPecuario" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -364,15 +365,7 @@
                 </tr>
               </ng-template>
 
-              <!-- <ng-template pTemplate="footer">
-                  <tr>
-                    <td><strong>Total</strong></td>
-                    <td><strong>{{ getSum(gridPecuario, 'SUM_CAN_P29_2') }}</strong></td>
-                    <td><strong>{{ getSum(gridPecuario, 'SUM_CAN_P29_3_RAZA') }}</strong></td>
-                    <td><strong>{{ getSum(gridPecuario, 'SUM_CAN_P29_3_CRIOLLO') }}</strong></td>
-                    <td><strong>{{ getSum(gridPecuario, 'SUM_CAN_P29_3_MEJORADO') }}</strong></td>
-                  </tr>
-                </ng-template> -->
+             
 
 
             </p-table>
@@ -380,13 +373,57 @@
             
 
           </p-card>
+ -->
 
+          <p-card class="card-mini" *ngIf="mostrarPecuario">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Estructura Productiva Pecuaria</span>
+            </ng-template>
 
-          <p-card class="card-mini" *ngIf="loadingRiego || gridRiego?.length">
+            <div class="chart-wrap" *ngIf="mostrarPecuarioGeneral">
+              <div *ngIf="loadingPecuario" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-pecuario" [style.display]="loadingPecuario ? 'none' : 'block'"></div>
+            </div>
+
+            <div class="chart-wrap" *ngIf="mostrarPecuarioDetalle">
+              <div *ngIf="loadingPecuarioDetalle" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-pecuario-detalle" [style.display]="loadingPecuarioDetalle ? 'none' : 'block'"></div>
+            </div>
+
+            <p-table [value]="gridPecuario" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>ESPECIE</th>
+                  <th>TOTAL</th>
+                  <th>RAZA</th>
+                  <th>CRIOLLO</th>
+                  <th>MEJORADO</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.TXT_P29_1 }}</td>
+                  <td>{{ row.SUM_CAN_P29_2 }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_RAZA }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_CRIOLLO }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_MEJORADO }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-card>
+
+          <p-card class="card-mini" *ngIf="mostrarRiego">
             <ng-template pTemplate="title">
               <span class="mini-title">Riego</span>
             </ng-template>
-            <div class="chart-wrap" *ngIf="loadingRiego || gridRiego?.length">
+            <div class="chart-wrap" *ngIf="mostrarRiego">
               <div *ngIf="loadingRiego" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -420,12 +457,12 @@
 
 
 
-          <p-card class="card-mini" *ngIf="loadingFerti1 || gridFerti1?.length">
+          <p-card class="card-mini" *ngIf="mostrarFerti1">
             <ng-template pTemplate="title">
               <span class="mini-title">Fertilización </span>
             </ng-template>
 
-            <div class="chart-wrap" *ngIf="loadingFerti1 || gridFerti1?.length">
+            <div class="chart-wrap" *ngIf="mostrarFerti1">
               <div *ngIf="loadingFerti1" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -462,7 +499,7 @@
               <span class="mini-title">Fertilización cultivo transitorio</span>
             </ng-template> --><br><br>
 
-            <div class="chart-wrap" *ngIf="loadingFerti2 || gridFerti2?.length">
+            <div class="chart-wrap" *ngIf="mostrarFerti2">
               <div *ngIf="loadingFerti2" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -498,7 +535,7 @@
               <span class="mini-title">Fertilización cultivo permanente</span>
             </ng-template> --><br><br>
 
-            <div class="chart-wrap" *ngIf="loadingFerti3 || gridFerti3?.length">
+            <div class="chart-wrap" *ngIf="mostrarFerti3">
               <div *ngIf="loadingFerti3" class="chart-loading">
                 <i class="pi pi-spin pi-spinner"></i>
                 <span>Cargando gráfico...</span>
@@ -532,7 +569,7 @@
 
         </div>
 
-        <div class="text-center mb-3" *ngIf="resultados?.length">
+       <!--  <div class="text-center mb-3" *ngIf="resultados?.length">
           <button
             pButton
             type="button"
@@ -541,7 +578,7 @@
             class="p-button-sm p-button-outlined"
             (click)="toggleTablaResultados()"
           ></button>
-        </div>
+        </div> -->
 
         <!-- Tabla principal -->
         <p-table

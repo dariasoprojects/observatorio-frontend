@@ -11,6 +11,7 @@ export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'visor-2', component: VisorComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'auth/visor', component: AuthVisorComponent, canActivate: [authGuard] },
+  //{ path: 'auth/visor', component: AuthVisorComponent, canActivate: [authGuard] },
+  { path: 'auth/visor', component: AuthVisorComponent },
   { path: 'visor', component: PublicVisorComponent },
 ];
