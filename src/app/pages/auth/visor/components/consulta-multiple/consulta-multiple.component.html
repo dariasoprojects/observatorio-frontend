@@ -206,7 +206,14 @@
 
     <!-- Botones de acción -->
     <div class="acciones">
-      <button pButton label="Consultar datos" class="p-button-success" (click)="consultar()"></button>
+      <!-- <button pButton label="Consultar datos" class="p-button-success" (click)="consultar()"></button> -->
+      <button
+        pButton
+        label="Consultar datos"
+        class="p-button-success"
+        [disabled]="!condicionesAgregadas || condicionesAgregadas.length === 0"
+        (click)="consultar()">
+      </button>
       <button pButton label="Limpiar" class="p-button-outlined" (click)="limpiar()"></button>
     </div>
 
@@ -298,10 +305,10 @@
   <ng-template pTemplate="header">
     <tr>
       <th>Zoom</th>
-      <th>Nro Documento Identidad</th>
-      <th>Apellidos</th>
-      <th>Nombres </th>
-      <th>Género</th>
+      <th >Nro Documento Identidad</th>
+      <th >Apellidos</th>
+      <th >Nombres </th>
+      <th >Género</th>
       <!-- <th>Edad</th>
       <th>Estado Civil</th> -->
       <!-- <th style="width: 3rem;"></th> -->
@@ -319,10 +326,15 @@
           (click)="onVerZoom(row)"
         ></button>
       </td>
-      <td>{{ row.attributes.TXT_NRODOC }}</td>
+      <!-- <td>{{ row.attributes.TXT_NRODOC }}</td>
       <td>{{ row.attributes.APELLIDOPA }}</td>
       <td>{{ row.attributes.NOMBRES }}</td>
-      <td>{{ row.attributes.GENERO }}</td>
+      <td>{{ row.attributes.GENERO }}</td> -->
+      <td>{{ puedeVerDatosNominales ? row.attributes.TXT_NRODOC : '****' }}</td>
+      <td>{{ puedeVerDatosNominales ? row.attributes.APELLIDOPA : '****' }}</td>
+      <td>{{ puedeVerDatosNominales ? row.attributes.NOMBRES : '****' }}</td>
+      <td>{{ puedeVerDatosNominales ? row.attributes.GENERO : '****' }}</td>
+
       <!-- <td>{{ row.attributes.EDAD }}</td>
       <td>{{ row.attributes.ECIVIL }}</td> -->
       <!-- <td class="text-center">

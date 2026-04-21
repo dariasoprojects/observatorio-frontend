@@ -69,7 +69,8 @@ export class LandingComponent {
   }
 
   onVisor(){
-    this.router.navigate(['/visor']);
+    //this.router.navigate(['/visor']);
+    this.router.navigate(['/auth/visor']);
   }
 
   private esUrlValida(url: string | null): boolean {

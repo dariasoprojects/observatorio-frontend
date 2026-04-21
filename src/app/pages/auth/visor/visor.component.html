@@ -51,7 +51,10 @@
     [draggable]="true"
     [resizable]="false"
   >
-    <app-consulta-multiple></app-consulta-multiple>
+    <!-- <app-consulta-multiple (cerrarModal)="mostrarGeoanalitica = false"></app-consulta-multiple> -->
+    <app-consulta-multiple
+      (cerrarModal)="dialogVisibleConsultaMultiple = false">
+    </app-consulta-multiple>
   </p-dialog>
 
 
