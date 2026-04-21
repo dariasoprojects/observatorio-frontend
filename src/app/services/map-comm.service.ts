@@ -32,7 +32,7 @@ export class MapCommService {
 
   emitRenderTematico(campo: string) {
     this.renderTematicoSource.next(campo);
-    
+
   }
 
   setRenderTematicoLoading(estado: boolean) {
@@ -50,8 +50,8 @@ export class MapCommService {
   clearAnalysisGeometry(): void {
     this.clearAnalysisGeometrySource.next();
   }
-  
-  
+
+
   private filterRequestCentEmpSource = new Subject<{
     nivel: 'dep' | 'prov' | 'dist';
     reg?: string;
@@ -71,7 +71,7 @@ export class MapCommService {
   }
 
 
-  
+
   private parcelasPadronFiltroSource = new Subject<{
     ubigeo: string;
     nivel: 'dep' | 'prov' | 'dist';
@@ -90,7 +90,7 @@ export class MapCommService {
 
 
   private renderUbigeoSource = new Subject<{ ubigeo: string; nivel: 'dep' | 'prov' | 'dist' } | null>();
-  
+
   renderUbigeo$ = this.renderUbigeoSource.asObservable();
 
   requestRenderUbigeo(payload: { ubigeo: string; nivel: 'dep' | 'prov' | 'dist' } | null) {
@@ -100,7 +100,7 @@ export class MapCommService {
 
 
   private selectLayerSource = new Subject<string | null>();
-  
+
   selectLayer$ = this.selectLayerSource.asObservable();
 
   selectLayer(layer: string | null) {
@@ -113,7 +113,7 @@ export class MapCommService {
   private featureSelectedSource = new Subject<__esri.Graphic | null>();
   featureSelected$ = this.featureSelectedSource.asObservable();
 
-  
+
 
   sendFeatureSelected(feature: __esri.Graphic | null) {
     this.featureSelectedSource.next(feature);
@@ -154,7 +154,7 @@ export class MapCommService {
   //  NUEVO: canal para la geometría de cobertura
   // private geometrySource = new Subject<Polygon | null>();
   // geometry$ = this.geometrySource.asObservable();
-  
+
 
   private geometrySource = new Subject<GeometryPayload>();
   geometry$ = this.geometrySource.asObservable();
@@ -195,7 +195,7 @@ export class MapCommService {
   zoomGeom$ = this.zoomGeomSubject.asObservable();
 
 
-  
+
 
   requestZoomGeom(geom: __esri.Geometry) {
     this.zoomGeomSubject.next(geom);
@@ -204,7 +204,7 @@ export class MapCommService {
 
 
 
-  
+
 
   sendKmlFile(file: File): void {
     this.kmlFileSubject.next(file);
