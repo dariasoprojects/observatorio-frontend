@@ -10,7 +10,7 @@ import {FormatUtil} from '../../../../../shared/utils/format.util';
 import {DropdownModule} from 'primeng/dropdown';
 import {BusquedaUbigeoComponent} from '../busqueda-ubigeo/busqueda-ubigeo.component';
 import {ChipModule} from 'primeng/chip';
-import {Subject} from 'rxjs';
+import {Subject, takeUntil} from 'rxjs';
 import {FiltrosUbigeo, FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
 import {Dialog} from 'primeng/dialog';
 import { Router } from '@angular/router';
@@ -169,6 +169,15 @@ export class SidebarComponent  implements OnInit, OnDestroy{
     ];
 
     this.filtroUbigeoService.filtrosUbigeo$.subscribe(s => this.filtrosUbigeo = s);
+
+    //viene del mapa para limpiar el sidebar
+    this.comm.resetView$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.activeSection = null;
+        this.panels.forEach(p => p.collapsed = false);
+        this.busquedaUbigeo?.resetFiltros();
+      });
   }
 
   ngOnDestroy(): void {
@@ -192,6 +201,10 @@ export class SidebarComponent  implements OnInit, OnDestroy{
 
   selectSection(id: string) {
     this.sectionSelected.emit(id);
+
+    const newSection = this.activeSection === id ? null : id;
+    this.activeSection = newSection;
+    this.sectionSelected.emit(newSection as string);
   }
 
 
@@ -199,7 +212,7 @@ export class SidebarComponent  implements OnInit, OnDestroy{
 
 
   onClearDepartamento(): void {
-    this.busquedaUbigeo.resetFiltros()
+    this.busquedaUbigeo.resetFiltros();
   }
 
   onClearProvincia() {

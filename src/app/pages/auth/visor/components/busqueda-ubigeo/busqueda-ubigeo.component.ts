@@ -7,6 +7,7 @@ import {UbigeoService} from '../../../../../services/ubigeo.service';
 import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
 import {LoaderService} from '../../../../../services/state/loader.service';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MapCommService} from '../../../../../services/map-comm.service';
 
 interface Departamento {
   code: string;
@@ -70,6 +71,7 @@ export class BusquedaUbigeoComponent {
     private filtroUbigeoService: FiltroUbigeoService,
     private loader: LoaderService,
     private fb: FormBuilder,
+    private comm: MapCommService   // para el  manejo de los servicos del mapa desde este control
   ){
     this.form = this.fb.group({
       departamento: [null],
@@ -118,6 +120,11 @@ export class BusquedaUbigeoComponent {
       });
 
 
+    if (!event.value || selectedValue === '00') {
+      console.log('departamento limpiado, disparando resetCompleto');
+      this.comm.requestResetCompleto();
+    }
+
   }
 
   onProvinciaChange(event: any) {
@@ -160,6 +167,7 @@ export class BusquedaUbigeoComponent {
       provincia: null,
       nombreProvincia: null
     });
+
   }
 
 }
