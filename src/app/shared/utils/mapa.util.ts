@@ -44,13 +44,13 @@ export class Mapa {
   private capaAntenasCelular: MapImageLayer | null = null;
   private mapView: MapView | null = null;
   private legendContainer!: HTMLDivElement;
-  private tocContainer!: HTMLDivElement;    
+  private tocContainer!: HTMLDivElement;
   private currentView: __esri.MapView | __esri.SceneView | null = null;
   private identifyActive = false;
   private sketsch: Sketch | null = null;
   private drawActive = false;
   private medirWidget: DistanceMeasurement2D | null = null;
-  private medirAreaWidget: AreaMeasurement2D | null = null;  
+  private medirAreaWidget: AreaMeasurement2D | null = null;
   private printWidget: Print | null = null;
   private isReady = false;
   private sceneView: SceneView | null = null;
@@ -192,7 +192,7 @@ export class Mapa {
     if (this.loadingOverlay) {
       this.loadingOverlay.style.display = 'none';
     }
-  }  
+  }
 
 
   private async getCoberturasLegend(): Promise<any | null> {
@@ -216,7 +216,7 @@ export class Mapa {
   }
 
 
-  
+
 
    private async filtrarClusterCentEmp(payload: {
       nivel: 'dep' | 'prov' | 'dist';
@@ -296,7 +296,7 @@ export class Mapa {
     this.resultsLayer   = new GraphicsLayer({ id: 'Elemento Seleccionado' });
     this.highlightLayer = new GraphicsLayer({ id: 'highlight' });
     this.drawLayer = new GraphicsLayer({ id: 'draw-layer' });
-    
+
 
     // this.comm.filterRequestCentEmp$
     // .pipe(takeUntil(this.destroyed$))
@@ -382,7 +382,7 @@ export class Mapa {
         // }
       }) : null;
 
-  
+
 
       this.highlightLayer.removeAll();
 
@@ -462,7 +462,7 @@ export class Mapa {
       .subscribe(() => this.aplicarEstadoInicial());
 
 
-    
+
     this.comm.renderTematico$
       .pipe(takeUntil(this.destroyed$))
       .subscribe(async campo => {
@@ -499,7 +499,7 @@ export class Mapa {
         }
       });
 
-    
+
     this.comm.selectLayer$
     .pipe(takeUntil(this.destroyed$))
     .subscribe(sel => {
@@ -564,6 +564,20 @@ export class Mapa {
       }
 
     });
+
+    // evento para la limpieza desde  el departamento
+    this.comm.resetCompleto$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(()=> {
+        this.resetCompleto()
+      });
+
+    // evento para la limpieza desde  el departamento
+    this.comm.resetCompleto$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(()=> {
+        this.resetCompleto()
+      });
 
   }
 
@@ -667,7 +681,7 @@ export class Mapa {
   }
 
 
- 
+
 
 
   private obtenerColorHexTipoActividad(campoFlag: string): string {
@@ -771,8 +785,8 @@ export class Mapa {
     console.log('Filtro de ParcelasPadron limpiado');
   }
 
-  
-  private async renderizarUbigeo(ubigeo: string, nivel: 'dep' | 'prov' | 'dist'  ): Promise<void> {    
+
+  private async renderizarUbigeo(ubigeo: string, nivel: 'dep' | 'prov' | 'dist'  ): Promise<void> {
 
     try {
       let url = '';
@@ -1076,7 +1090,7 @@ export class Mapa {
     switch (campo) {
       case "GEN":
         await this.aplicarRendererGenero();
-        break;      
+        break;
       case "NIVEST":
         await this.aplicarRendererNivelEstudio();
         break;
@@ -1089,31 +1103,31 @@ export class Mapa {
         break;
       case "TIPACT":
         await this.aplicarRendererTipoActiv();
-        break;  
+        break;
       case "TAMPARC":
         await this.aplicarRendererTamanioParcela();
-        break; 
+        break;
       case "REGTENE":
         await this.aplicarRendererRegimenTenencia();
-        break;  
+        break;
       case "CULTIPRIN":
         await this.aplicarRendererCultivoPricipal();
-        break;  
+        break;
       case "CULTITRANS":
         await this.aplicarRendererCultivoTransitorio();
-        break;  
+        break;
       case "CULTIPERMA":
         await this.aplicarRendererCultivoPermanente();
-        break;  
+        break;
       case "FERTILIZA":
         await this.aplicarRendererUsoFertilizante();
-        break;  
+        break;
       case "BIEREC":
         await this.aplicarRendererBienRecibido();
-        break;  
+        break;
       case "SRVREC":
         await this.aplicarRendererServRecibido();
-        break;  
+        break;
       case "RESET":
         await this.limpiarTematicoParcelas();
         break;
@@ -2161,7 +2175,7 @@ export class Mapa {
 
   async  filtrarClusterPorReg(reg: string | null) {
 
-   
+
     // console.log('Filtro aplicado:', expr);
     if (!this.capaCluster) return;
 
@@ -2444,7 +2458,7 @@ export class Mapa {
             {
               type: "fields",
               fieldInfos: [
-                { fieldName: "OBJECTID", label: "OBJECTID" },                                
+                { fieldName: "OBJECTID", label: "OBJECTID" },
                 { fieldName: "INST", label: "Institución" },
                 { fieldName: "CENTRO", label: "Centro" },
                 { fieldName: "LONG_", label: "Longitud" },
@@ -2525,7 +2539,7 @@ export class Mapa {
       });
 
 
-      
+
       this.capaCluster = new FeatureLayer({
         url: `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`,
         visible: false,
@@ -2605,7 +2619,7 @@ export class Mapa {
 
       // --- Crear el mapa SOLO 2D ---
       const capas2D: any[] = [
-        this.capaParcelasPadron,                
+        this.capaParcelasPadron,
         this.capaCoberturas,
         this.capaAntenasCelular,
         this.capaCluster,
@@ -2764,16 +2778,16 @@ export class Mapa {
   private obtenerColorTipoActividad(campoFlag: string): [number, number, number, number] {
     switch (campoFlag) {
       case 'FLG_AGRICO':
-        return [76, 175, 80, 1];   // 
+        return [76, 175, 80, 1];   //
       case 'FLG_PECUAR':
         return [141, 110, 99, 1];
       case 'FLG_FOREST':
-        return [46, 125, 50, 1];   // 
+        return [46, 125, 50, 1];   //
       case 'FLG_APICUL':
       case 'TCA':
         return [255, 193, 7, 1];
       default:
-        return [141, 110, 99, 1];  // 
+        return [141, 110, 99, 1];  //
     }
   }
 
@@ -3070,7 +3084,7 @@ export class Mapa {
 
 
   private aplicarEstadoInicial(): void {
-    
+
     this.apagarCoberturas();
     if (this.capaAntenasCelular) this.capaAntenasCelular.visible = false;
     if (this.capaCluster) this.capaCluster.visible = false;
@@ -3109,12 +3123,12 @@ export class Mapa {
 
   agregarBotones() {
 
-    
+
 
     this.legendToggleBtn = document.createElement('div');
     this.legendToggleBtn.className = 'esri-widget esri-widget--button esri-interactive btn-tooltip';
     this.legendToggleBtn.innerHTML = '<span class="esri-icon-collection" ></span><div class="gp-tooltip">Mostrar/Ocultar Leyenda</div>';
-    
+
 
     this.legendToggleBtn.onclick = () => {
       const isVisible = this.legendContainer.style.display !== 'none';
@@ -3124,7 +3138,7 @@ export class Mapa {
     this.toc_ToggleBtn = document.createElement('div');
     this.toc_ToggleBtn.className = 'esri-widget esri-widget--button esri-interactive  btn-tooltip';
     this.toc_ToggleBtn.innerHTML = '<span class="esri-icon-layer-list" ></span><div class="gp-tooltip">Mostrar/Ocultar Leyenda</div>';
-    
+
 
     this.toc_ToggleBtn.onclick = () => {
       const isVisible_toc = this.tocContainer.style.display !== 'none';
@@ -3136,7 +3150,7 @@ export class Mapa {
     this.toc_IndetifiBtn = document.createElement('div');
     this.toc_IndetifiBtn.className = 'esri-widget esri-widget--button esri-interactive  btn-tooltip';
     this.toc_IndetifiBtn.innerHTML = '<span class="esri-icon-notice-round" ></span><div class="gp-tooltip">Identificar elementos</div>';
-    
+
 
     this.toc_IndetifiBtn.onclick = () => {
       // habilita funcion identiffy para click y popup
@@ -3196,7 +3210,7 @@ export class Mapa {
     this.toc_Draw = document.createElement('div');
     this.toc_Draw.className = 'esri-widget esri-widget--button esri-interactive btn-tooltip';
     this.toc_Draw.innerHTML = '<span class="esri-icon-edit" ></span> <div class="gp-tooltip">Dibujar</div>';
-    
+
 
     this.toc_Draw.onclick = () => {
       // habilita funcion identiffy para click y popup
@@ -3216,7 +3230,7 @@ export class Mapa {
     this.toc_MedirRegla = document.createElement('div');
     this.toc_MedirRegla.className = 'esri-widget esri-widget--button esri-interactive btn-tooltip';
     this.toc_MedirRegla.innerHTML = '<span class="esri-icon-measure" ></span><div class="gp-tooltip">Medir distancias</div>';
-    
+
 
     this.toc_MedirRegla.onclick = () => {
       // chat gpt por favr colocar el codigo para iniciar el proceso de medir
@@ -3239,7 +3253,7 @@ export class Mapa {
     this.toc_MedirArea = document.createElement('div');
     this.toc_MedirArea.className = 'esri-widget esri-widget--button esri-interactive btn-tooltip';
     this.toc_MedirArea.innerHTML = '<span class="esri-icon-polygon" ></span><div class="gp-tooltip">Medir áreas</div>';
-   
+
 
     this.toc_MedirArea.onclick = () => {
       if (!this.mapView) return;
@@ -3261,7 +3275,7 @@ export class Mapa {
     this.toc_3D = document.createElement('div');
     this.toc_3D.className = 'esri-widget esri-widget--button esri-interactive';
     this.toc_3D.innerHTML = '<span class="esri-icon-globe" title="Cambiar vista 2D/3D"></span>';
-    
+
 
     // al inicio usas tu mapView normal
     if (this.mapView){
@@ -3274,7 +3288,7 @@ export class Mapa {
     this.basemapBtn = document.createElement("div");
     this.basemapBtn.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
     this.basemapBtn.innerHTML = '<span class="esri-icon-basemap" ></span><div class="gp-tooltip">Cambiar mapa base</div>';
-    
+
 
     // Contenedor del menú (inicialmente oculto)
     this.basemapMenu = document.createElement("div");
@@ -3329,7 +3343,7 @@ export class Mapa {
     this.printBtn = document.createElement("div");
     this.printBtn.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
     this.printBtn.innerHTML = '<span class="esri-icon-printer" ></span><div class="gp-tooltip">Imprimir Mapa</div>';
-    
+
 
     if (!this.mapView) return;
 
@@ -3380,7 +3394,7 @@ export class Mapa {
     this.multiQyBtn.style.border = "4px solid #ffffff";   //
     this.multiQyBtn.style.borderRadius = "12px";          //
 
-   
+
     //  Mejor presencia visual
     this.multiQyBtn.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
 
@@ -3433,7 +3447,7 @@ export class Mapa {
       this.btnAnalisis.style.border = "4px solid #ffffff";
       this.btnAnalisis.style.borderRadius = "12px";
 
-    
+
 
     // Mayor presencia visual en el mapa
     this.btnAnalisis.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
@@ -3557,9 +3571,9 @@ export class Mapa {
       <span class="esri-icon-upload"></span>
       <div class="gp-tooltip">Cargar KML</div>
     `;
-    
 
-    
+
+
 
     // Mostrar/ocultar panel
     this.kmlBtn.onclick = () => {
@@ -3593,7 +3607,7 @@ export class Mapa {
   }
 
 
-  
+
 
   private async cargarKmlLocal(file: File): Promise<void> {
     try {
@@ -3672,7 +3686,7 @@ export class Mapa {
 
     console.log(" RESET COMPLETO DEL MAPA");
 
-    this.apagarCoberturas(); 
+    this.apagarCoberturas();
 
     // 1) Estado y selección
     this.modoConsulta = false;
@@ -3727,7 +3741,7 @@ export class Mapa {
       });
     }
 
-
+    this.comm.resetView();  // para limpiar el sidebar
     console.log(" Mapa restablecido correctamente.");
 
   }
@@ -3752,7 +3766,7 @@ export class Mapa {
   }
 
 
-  
+
   async generarTOC(panel: HTMLElement) {
 
     // helper: obtener sublayer activo (solo para MapImageLayer)
@@ -3865,7 +3879,7 @@ export class Mapa {
         if (!cob) continue;
 
         await cob.when();
-        
+
         let expanded = true;
 
         const arrow = document.createElement("span");
@@ -3882,7 +3896,7 @@ export class Mapa {
         subsWrap.style.display = expanded ? "block" : "none";
         subsWrap.style.borderLeft = "2px solid #e0e0e0";
         subsWrap.style.paddingLeft = "10px";
-        
+
 
         arrow.onclick = () => {
           expanded = !expanded;
@@ -3916,7 +3930,7 @@ export class Mapa {
               ss.visible = false;
               ss.definitionExpression = "1=0";
             });
-          } 
+          }
           // OJO: si lo prendes, NO actives nada automático.
           // Solo se verá algo cuando el usuario elija un sublayer.
 
@@ -3945,7 +3959,7 @@ export class Mapa {
           row.style.transition = "background 0.2s";
 
           row.onmouseover = () => row.style.background = "#f4f6f8";
-          row.onmouseleave = () => row.style.background = "transparent"; 
+          row.onmouseleave = () => row.style.background = "transparent";
 
           if (s.visible && cob.visible) {
             row.style.background = "#e8f5e9";
