@@ -26,13 +26,16 @@ type CountRow = { idx: number; n: number | null };
 //   id: string;
 //   nombre: string;
 // }
+
 interface CondicionItem {
+
   id: string;
   nombre: string;
   disabled?: boolean;
 }
 
 interface CondicionCatalogo {
+
   id: string;
   nombre: string;
 }
@@ -127,7 +130,11 @@ export class ConsultaMultipleComponent {
   private readonly VARIABLE_SERVICIO_ALTERNO = 65;
   private readonly VALOR_SERVICIO_ALTERNO = 3;
 
-  
+  private readonly CATEGORIA_SERVICIO_ALTERNO22 = 21;
+  private readonly VARIABLE_SERVICIO_ALTERNO22 = 65;
+  private readonly VALOR_SERVICIO_ALTERNO22 = 3;
+
+  drtMarx=1;
   
   puedeVerDatosNominales = false;
   
