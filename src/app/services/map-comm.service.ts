@@ -180,6 +180,9 @@ export class MapCommService {
   private abrirDescargasDialogSource = new Subject<void>();
   abrirDescargasDialog$ = this.abrirDescargasDialogSource.asObservable();
 
+  private abrirBusquedaDniDialogSource = new Subject<void>();
+  abrirBusquedaDniDialog$ = this.abrirBusquedaDniDialogSource.asObservable();
+
   private cerrarDescargasDialogSource = new Subject<void>();
   cerrarDescargas$ = this.cerrarDescargasDialogSource.asObservable();
 
@@ -267,6 +270,10 @@ export class MapCommService {
 
   abrirDialogDescargas() {
     this.abrirDescargasDialogSource.next();
+  }
+
+  abrirDialogBusquedaDni() {
+    this.abrirBusquedaDniDialogSource.next();
   }
 
   cerrarDescargas() {
