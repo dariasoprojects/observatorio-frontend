@@ -11,8 +11,6 @@ import {SidebarComponent} from './components/sidebar/sidebar.component';
 import {SideRightComponent} from './components/side-right/side-right.component';
 import {MapaComponent} from './components/mapa/mapa.component';
 import {DialogModule} from 'primeng/dialog';
-import {MenuItem} from 'primeng/api';
-import {Menu} from 'primeng/menu';
 import {MapCommService} from '../../../services/map-comm.service';
 import {LoaderComponent} from '../../loader/loader.component';
 import {AnalisisEspacialComponent} from './components/analisis-espacial/analisis-espacial.component';
@@ -42,7 +40,6 @@ import { AuthService } from '../../../services/auth.service';
     ConsultaMultipleComponent,
     BusquedaDniComponent,
     DescargasComponent,
-    Menu,
 
   ],
   templateUrl: './visor.component.html',
@@ -50,9 +47,17 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class VisorComponent {
 
+  usuarioLogueado = 'Usuario';
+  tipoUsuario = 'Acceso';
+  entidadUsuario = '';
+  inicialUsuario = 'U';
+  esVisitante = true;
+
   constructor(
               private elRef: ElementRef,
-              private comm: MapCommService              
+              private comm: MapCommService,
+              private authService: AuthService,
+              private router: Router
               ) {}
 
   // Aplica la clase al contenedor raíz para estrechar la 1ª columna
@@ -80,31 +85,24 @@ export class VisorComponent {
   
 
   ngOnInit(): void {
+    this.esVisitante = !this.authService.estaAutenticado();
 
-    // this.usuarioLogueado = this.authService.obtenerUsuario();
-    // this.tipoUsuario = this.authService.obtenerTipoUser();
-    // this.entidadUsuario = this.authService.obtenerEntidad();
-    // this.inicialUsuario = this.usuarioLogueado
-    //   ? this.usuarioLogueado.charAt(0).toUpperCase()
-    //   : 'U';
+    if (this.esVisitante) {
+      this.usuarioLogueado = 'Visitante';
+      this.tipoUsuario = 'Acceso público';
+      this.entidadUsuario = '';
+      this.inicialUsuario = 'V';
+    } else {
+    const nombres = this.authService.obtenerNombres().trim();
+    const apellidos = this.authService.obtenerApellidos().trim();
+    const nombreCompleto = `${nombres} ${apellidos}`.trim();
 
-    // this.items = [
-    //   {
-    //     label: 'Opciones',
-    //     items: [
-    //       {
-    //         label: 'Limpiar',
-    //         icon: 'pi pi-refresh',
-    //         command: () => this.onClear()
-    //       },
-    //       {
-    //         label: 'Salir',
-    //         icon: 'pi pi-sign-out',
-    //         command: () => this.onLogout()
-    //       }
-    //     ]
-    //   }
-    // ];
+    this.usuarioLogueado = nombreCompleto || this.authService.obtenerUsuario() || 'Usuario';
+    this.tipoUsuario = this.authService.obtenerTipoUser() || 'Acceso';
+    this.entidadUsuario = this.authService.obtenerEntidad();
+    this.inicialUsuario = this.usuarioLogueado.charAt(0).toUpperCase();
+    }
+
     this.comm.abrirAnalisisDialog$
       .subscribe(() => {
         this.dialogVisible = true;
@@ -121,6 +119,11 @@ export class VisorComponent {
         this.dialogVisibleDescarga = true;
       });
 
+    this.comm.abrirBusquedaDniDialog$
+      .subscribe(() => {
+        this.dialogVisibleBusquedaDni = true;
+      });
+
   }
   onSelectSection(section: string) {
      this.activeSection = section;
@@ -132,11 +135,10 @@ export class VisorComponent {
     }
   }
 
-  // onLogout(): void {
-  //   // this.router.navigate(['/visor']);
-  //   this.authService.cerrarSesion();
-  //   this.router.navigate(['/login']);
-  // }
+  onLogout(): void {
+    this.authService.cerrarSesion();
+    this.router.navigate(['/']);
+  }
 
   onClear(): void {
     this.activeSection ="";

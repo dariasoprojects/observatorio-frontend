@@ -8,11 +8,6 @@
   display:block; color:#6b7280; margin:8px 0 4px;
 }
 
-/* Ajustes compactos para p-panel usando tu styleClass="panel-tight" */
-.panel-tight :global(.p-panel-header){ padding: 8px 12px; }
-.panel-tight :global(.p-panel-content){ padding: 8px 12px; }
-
-
 /* Dropdown: ocupa todo el ancho y se ve compacto */
 :host ::ng-deep .p-dropdown {
   width: 100%;
