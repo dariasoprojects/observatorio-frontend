@@ -11,6 +11,7 @@ import {ChipModule} from 'primeng/chip';
 import {Subject, takeUntil} from 'rxjs';
 import {FiltrosUbigeo, FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
 import {Dialog} from 'primeng/dialog';
+import {MapCommService} from '../../../../../services/map-comm.service';
 
 interface Item { title: string; section: string; icon: string; }
 interface PanelGroup { title: string; icon: string; collapsed: boolean; items: Item[]; }
@@ -115,7 +116,8 @@ export class SidebarComponent  implements OnInit, OnDestroy{
   ubicacionGeograficaVisible: boolean = false;
 
   constructor(
-    private filtroUbigeoService: FiltroUbigeoService
+    private filtroUbigeoService: FiltroUbigeoService,
+    private comm: MapCommService
   ) {
   }
 
