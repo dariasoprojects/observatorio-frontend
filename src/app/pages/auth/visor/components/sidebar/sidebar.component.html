@@ -78,7 +78,17 @@
 
 
     <app-busqueda-ubigeo></app-busqueda-ubigeo>
-    <div class="sidebar-action" *ngIf="!isCollapsed">
+    <!-- <div class="sidebar-action" *ngIf="!isCollapsed">
+      <button
+        type="button"
+        class="btn-dni"
+        (click)="onBuscarDni()">
+        <i class="pi pi-search"></i>
+        <span>Buscar por DNI</span>
+      </button>
+    </div>
+     -->
+     <div class="sidebar-action" *ngIf="!isCollapsed && mostrarBusquedaDni">
       <button
         type="button"
         class="btn-dni"

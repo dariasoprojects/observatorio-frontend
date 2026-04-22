@@ -126,6 +126,7 @@ export class SidebarComponent  implements OnInit, OnDestroy{
     },
   ];
 
+  mostrarBusquedaDni = false;
 
   @ViewChild(BusquedaUbigeoComponent)  busquedaUbigeo!: BusquedaUbigeoComponent;
 
@@ -150,6 +151,8 @@ export class SidebarComponent  implements OnInit, OnDestroy{
       ? this.usuarioLogueado.charAt(0).toUpperCase()
       : 'U';
 
+    this.mostrarBusquedaDni = !!this.usuarioLogueado;
+    
     this.items = [
       {
         label: 'Opciones',
