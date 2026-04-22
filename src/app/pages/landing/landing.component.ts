@@ -8,6 +8,7 @@ import {ParametrosService} from '../../services/parametros.service';
 import {ParametroResponse} from '../../models/parametro/parametro.model';
 import {SafeUrlPipe} from '../../shared/pipes/safe-url.pipe';
 import {LoaderComponent} from '../loader/loader.component';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-landing',
@@ -22,9 +23,13 @@ export class LandingComponent {
   nroParcelas: string = '';
   nroHectareas: string = '';
   videoPortada: string | null = null;
+  videoPortadaLocal = 'assets/video.mp4';
+  videoPoster = 'assets/img/fondo.avif';
+
   constructor(
     private sumatoriasService: SumatoriasService,
     private parametrosService: ParametrosService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -68,8 +73,8 @@ export class LandingComponent {
     this.router.navigate(['/login']);
   }
 
-  onVisor(){
-    //this.router.navigate(['/visor']);
+  onVisitor() {
+    this.authService.cerrarSesion();
     this.router.navigate(['/auth/visor']);
   }
 

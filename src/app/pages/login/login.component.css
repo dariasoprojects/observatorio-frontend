@@ -143,16 +143,6 @@
 }
 .toggle-pass:hover{ color: var(--green); }
 
-/* Enlace olvido */
-.forgot{
-  margin: 2px 0 4px;
-  font: 600 12px/1 "Raleway", sans-serif;
-  color: #3AC0E4;
-  text-decoration: none;
-  align-self: flex-start;
-}
-.forgot:hover{ text-decoration: underline; }
-
 /* =========================
    BOTONES
 ========================= */
@@ -176,17 +166,6 @@
   margin-top: 14px;
 }
 .btn-primary-auth:hover{ transform: translateY(-1px); background: var(--green-2); }
-
-.btn-outline-auth{
-  background: transparent;
-  color: var(--green);
-  border: 2px solid var(--green);
-}
-.btn-outline-auth:hover{
-  background: rgba(26,127,60,.08);
-  color: var(--green-2);
-  transform: translateY(-1px);
-}
 
 /* =========================
    BREAKPOINTS

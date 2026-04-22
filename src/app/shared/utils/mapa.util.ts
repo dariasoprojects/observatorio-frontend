@@ -24,6 +24,8 @@ import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
 
 
 export class Mapa {
+  private readonly peruInitialCenter: [number, number] = [-75.015, -9.19];
+  private readonly peruInitialZoom = 6.3;
 
   private coordsDiv!: HTMLDivElement;
   private destroyed$ = new Subject<void>();
@@ -64,6 +66,7 @@ export class Mapa {
   private printBtn: HTMLDivElement | null = null;
   private multiQyBtn!: HTMLDivElement;
   private btnAnalisis!: HTMLDivElement;
+  private btnGeoProductor!: HTMLDivElement;
   private basemapMenu!: HTMLDivElement;
   private printDiv!: HTMLDivElement;
   private basemapBtn!: HTMLDivElement;
@@ -84,6 +87,15 @@ export class Mapa {
   private capaCoberturas: MapImageLayer | null = null;
 
   private loadingOverlay: HTMLDivElement | null = null;
+
+  private applyPeruInitialView(): void {
+    if (!this.mapView) return;
+
+    void this.mapView.goTo({
+      center: this.peruInitialCenter,
+      zoom: this.peruInitialZoom
+    }, { animate: false });
+  }
 
   private readonly COBERTURAS_URL =
   "https://winlmprap09.midagri.gob.pe/winjmprap12/rest/services/OBSRV_INFOBASE/MapServer";
@@ -552,6 +564,13 @@ export class Mapa {
       }
 
     });
+
+    // evento para la limpieza desde  el departamento
+    this.comm.resetCompleto$
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(()=> {
+        this.resetCompleto()
+      });
 
     // evento para la limpieza desde  el departamento
     this.comm.resetCompleto$
@@ -2622,11 +2641,15 @@ export class Mapa {
       this.mapView = new MapView({
         container: this.mapDiv,
         map: this.map,
-        center: [-75.015, -9.19],
-        zoom: 6
+        constraints: {
+          snapToZoom: false
+        },
+        center: this.peruInitialCenter,
+        zoom: this.peruInitialZoom
       });
 
       await this.mapView.when();
+      this.applyPeruInitialView();
       console.log(" MAPA 2D listo");
 
 
@@ -3078,10 +3101,7 @@ export class Mapa {
          this.mapView.popup.visible = false;
       }
 
-      this.mapView.goTo({
-        center: [-75.015, -9.19],
-        zoom: 6
-      });
+      this.applyPeruInitialView();
     }
 
     // Ocultar paneles de leyenda y TOC
@@ -3467,6 +3487,45 @@ export class Mapa {
       icon2.style.fontSize = "25px";
     }
 
+    this.btnGeoProductor = document.createElement("div");
+    this.btnGeoProductor.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
+    this.btnGeoProductor.innerHTML =
+      '<i class="pi pi-user"></i><div class="gp-tooltip">GeoProductor: <br>Brinda información específica del productor mediante DNI.</div>';
+
+    this.btnGeoProductor.style.background = "#155f31";
+    this.btnGeoProductor.style.color = "white";
+    this.btnGeoProductor.style.border = "4px solid #ffffff";
+    this.btnGeoProductor.style.borderRadius = "12px";
+    this.btnGeoProductor.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
+    this.btnGeoProductor.style.display = "flex";
+    this.btnGeoProductor.style.alignItems = "center";
+    this.btnGeoProductor.style.justifyContent = "center";
+    this.btnGeoProductor.style.cursor = "pointer";
+    this.btnGeoProductor.style.transition = "0.25s";
+    this.btnGeoProductor.style.minWidth = "60px";
+    this.btnGeoProductor.style.minHeight = "60px";
+
+    this.btnGeoProductor.onmouseover = () => {
+      this.btnGeoProductor.style.background = "#0f4a25";
+      this.btnGeoProductor.style.transform = "scale(1.18)";
+      this.btnGeoProductor.style.boxShadow = "0 0 16px rgba(0,0,0,0.85)";
+    };
+    this.btnGeoProductor.onmouseleave = () => {
+      this.btnGeoProductor.style.background = "#155f31";
+      this.btnGeoProductor.style.transform = "scale(1)";
+      this.btnGeoProductor.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
+    };
+
+    this.btnGeoProductor.onclick = () => {
+      this.comm.abrirDialogBusquedaDni();
+    };
+
+    const iconGeoProductor = this.btnGeoProductor.querySelector("i");
+    if (iconGeoProductor) {
+      iconGeoProductor.style.fontSize = "25px";
+      iconGeoProductor.style.pointerEvents = "none";
+    }
+
 
     this.btnReset = document.createElement("div");
     this.btnReset.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
@@ -3539,7 +3598,8 @@ export class Mapa {
 
       view.ui.add(this.btnAnalisis, "top-left");
       view.ui.add(this.multiQyBtn, "top-left");
-
+      view.ui.add(this.btnGeoProductor, "top-left");
+      
       this.sketsch.visible = false;
     }
 
@@ -3657,7 +3717,7 @@ export class Mapa {
 
     // 6) Vista inicial
     if (this.mapView) {
-      this.mapView.goTo({ center: [-75.015, -9.19], zoom: 6 });
+      this.applyPeruInitialView();
     }
 
     // 7) Quitar popup
@@ -3701,6 +3761,7 @@ export class Mapa {
     view.ui.add(this.basemapContainer,"top-right");
     view.ui.add(this.multiQyBtn,"top-left");
     view.ui.add(this.btnAnalisis,"top-left");
+    view.ui.add(this.btnGeoProductor,"top-left");
 
   }
 

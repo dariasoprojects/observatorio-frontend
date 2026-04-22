@@ -702,8 +702,9 @@ body {
         width: 100%;
     }
 
-    .right-panel {
-        height: 400px;
+    .left-panel{
+    flex:0 0 540px;
+    width:540px;
     }
 
     .header-content {

@@ -5,19 +5,13 @@ import {ButtonModule } from 'primeng/button';
 import {CardModule } from 'primeng/card';
 import {DividerModule} from 'primeng/divider';
 import {ReactiveFormsModule} from '@angular/forms';
-import {MapCommService} from '../../../../../services/map-comm.service';
-import {FormatUtil} from '../../../../../shared/utils/format.util';
 import {DropdownModule} from 'primeng/dropdown';
 import {BusquedaUbigeoComponent} from '../busqueda-ubigeo/busqueda-ubigeo.component';
 import {ChipModule} from 'primeng/chip';
 import {Subject, takeUntil} from 'rxjs';
 import {FiltrosUbigeo, FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
 import {Dialog} from 'primeng/dialog';
-import { Router } from '@angular/router';
-import { AvatarModule } from 'primeng/avatar';
-import { Menu } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
-import { AuthService } from '../../../../../services/auth.service';
+import {MapCommService} from '../../../../../services/map-comm.service';
 
 interface Item { title: string; section: string; icon: string; }
 interface PanelGroup { title: string; icon: string; collapsed: boolean; items: Item[]; }
@@ -36,24 +30,12 @@ interface PanelGroup { title: string; icon: string; collapsed: boolean; items: I
     DropdownModule,
     ChipModule,
     BusquedaUbigeoComponent,
-    Dialog,
-    AvatarModule,
-    Menu
+    Dialog
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent  implements OnInit, OnDestroy{
-
-  usuarioLogueado = '';
-  tipoUsuario = '';
-  inicialUsuario = '';
-  entidadUsuario = '';
-  items: MenuItem[] = [];
-
-  @Output() buscarDniRequested = new EventEmitter<void>();
-
-
   @Output() isCollapsedChange = new EventEmitter<boolean>();
 
   // Selección de sección
@@ -126,7 +108,6 @@ export class SidebarComponent  implements OnInit, OnDestroy{
     },
   ];
 
-  mostrarBusquedaDni = false;
 
   @ViewChild(BusquedaUbigeoComponent)  busquedaUbigeo!: BusquedaUbigeoComponent;
 
@@ -135,42 +116,12 @@ export class SidebarComponent  implements OnInit, OnDestroy{
   ubicacionGeograficaVisible: boolean = false;
 
   constructor(
-    private comm: MapCommService,
     private filtroUbigeoService: FiltroUbigeoService,
-    private authService: AuthService,
-    private router: Router
+    private comm: MapCommService
   ) {
   }
 
   ngOnInit(): void {
-
-    this.usuarioLogueado = this.authService.obtenerUsuario();
-    this.tipoUsuario = this.authService.obtenerTipoUser();
-    this.entidadUsuario = this.authService.obtenerEntidad();
-    this.inicialUsuario = this.usuarioLogueado
-      ? this.usuarioLogueado.charAt(0).toUpperCase()
-      : 'U';
-
-    this.mostrarBusquedaDni = !!this.usuarioLogueado;
-    
-    this.items = [
-      {
-        label: 'Opciones',
-        items: [
-          // {
-          //   label: 'Limpiar',
-          //   icon: 'pi pi-refresh',
-          //   command: () => this.onClear()
-          // },
-          {
-            label: 'Salir',
-            icon: 'pi pi-sign-out',
-            command: () => this.onLogout()
-          }
-        ]
-      }
-    ];
-
     this.filtroUbigeoService.filtrosUbigeo$.subscribe(s => this.filtrosUbigeo = s);
 
     //viene del mapa para limpiar el sidebar
@@ -186,15 +137,6 @@ export class SidebarComponent  implements OnInit, OnDestroy{
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  onBuscarDni(): void {
-    this.buscarDniRequested.emit();
-  }
-
-  onLogout(): void {
-    this.authService.cerrarSesion();
-    this.router.navigate(['/login']);
   }
 
   toggleLeft(): void {
@@ -238,6 +180,4 @@ export class SidebarComponent  implements OnInit, OnDestroy{
 
   onVerPaneles():void{
   }
-
-  protected readonly FormatUtil = FormatUtil;
 }

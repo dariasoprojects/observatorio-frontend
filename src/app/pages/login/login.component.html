@@ -62,18 +62,9 @@
             {{ mensajeError }}
           </small>
 
-          <a class="forgot" href="#">Olvidé mi contraseña</a>
-
-
-
-
           <!-- Botones -->
           <button type="submit" class="btn-auth btn-primary-auth" [disabled]="formularioLogin.invalid || cargando">
             {{ cargando ? 'Ingresando...' : 'Iniciar sesión' }}
-          </button>
-
-          <button type="button" class="btn-auth btn-outline-auth">
-            Solicitar registro
           </button>
 
         </form>

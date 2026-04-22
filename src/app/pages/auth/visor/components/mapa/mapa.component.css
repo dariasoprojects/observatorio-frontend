@@ -26,16 +26,18 @@
 
 #coords {
   position: absolute;
-  bottom: 12px;                 /* separación desde abajo */
+  bottom: 16px;
   left: 50%;
-  transform: translateX(-50%);  /* centra horizontalmente */
-  
-  padding: 6px 12px;
-  background: rgba(0, 0, 0, 0.6);
+  transform: translateX(-50%);
+  padding: 7px 12px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   color: #fff;
   font-size: 12px;
-  border-radius: 6px;
-  pointer-events: none;         /* no bloquea el mapa */
-  z-index: 10;                  /* por encima del mapa */
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  z-index: 10;
 }
 
