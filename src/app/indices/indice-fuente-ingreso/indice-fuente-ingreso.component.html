@@ -1,20 +1,14 @@
 <div class="indice-fuente">
   <div id="container-fuente"></div>
-
-  <div class="acciones">
-    <button class="btn-tema" (click)="aplicarColoresTematico()">
-      Aplicar tematización
-    </button>
-  </div>
-
+  <button (click)="aplicarColoresTematico()">Aplicar tematización</button>
   <div class="tabla-wrapper">
     <table class="tabla-fuente">
       <thead>
         <tr>
           <th>Descripción</th>
-          <th>Productores</th>
-          <th>Hectárea</th>
-          <th>Parcelas</th>
+          <th class="num-col">Productores</th>
+          <th class="num-col">Hectárea</th>
+          <th class="num-col">Parcelas</th>
         </tr>
       </thead>
 
@@ -40,10 +34,14 @@
             <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
           </td>
           <td class="num-col">
-            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectarea) }}</strong>
+            <strong>{{
+              FormatUtil.formatInteger2Digitos(totalHectarea)
+            }}</strong>
           </td>
           <td class="num-col">
-            <strong>{{ FormatUtil.formatInteger2Digitos(totalParcelas) }}</strong>
+            <strong>{{
+              FormatUtil.formatInteger2Digitos(totalParcelas)
+            }}</strong>
           </td>
         </tr>
       </tfoot>

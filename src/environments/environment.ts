@@ -2,8 +2,8 @@ export const environment = {
   production: false,
   envName: 'DEV',
   api: {
-    //authUrl: 'http://dobservatorio.midagri.gob.pe/api/auth'
-    authUrl: 'http://localhost:8083/api/auth'
+    authUrl: 'http://dobservatorio.midagri.gob.pe/api/auth'
+    //authUrl: 'http://localhost:8083/api/auth'
   },
   arcgis: {
     baseUrl: 'https://winlmprap09.midagri.gob.pe',

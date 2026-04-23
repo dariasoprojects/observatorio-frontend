@@ -18,7 +18,8 @@ import { environment } from 'src/environments/environment';
   standalone: true,
   imports: [CommonModule,
     MatIconModule,
-    MatSlideToggleModule],
+    MatSlideToggleModule,
+  ],
   templateUrl: './indice-centros-empadronamiento.component.html',
   styleUrls: ['./indice-centros-empadronamiento.component.css']
 })
@@ -34,6 +35,7 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   valores: number[] = [];
   chart!: Highcharts.Chart;
   activeReg: string | null = null;
+  showGraficAndTable: boolean = true;
 
   private url = `${environment.arcgis.baseUrl}${environment.arcgis.centroEmpadronamientoUrl}`;
 
@@ -313,6 +315,11 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
   actualizarDatos(nuevasCategorias: string[], nuevosValores: number[]) {
     this.categorias = [...nuevasCategorias];
     this.valores = [...nuevosValores];
+    if(this.categorias.length === 0 && this.valores.length === 0){
+      this.showGraficAndTable = false;
+    }else {
+      this.showGraficAndTable = true;
+    }
 
     if (this.chart) {
       this.chart.xAxis[0].setCategories(nuevasCategorias, false);

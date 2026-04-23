@@ -23,9 +23,9 @@ export class IndicePadronProdComponent implements OnInit {
   @Input() valorSeleccionadoProv!: string | null;
   @Input() valorSeleccionadoProvText!: string | null;
 
-
   categorias: string[] = [];
   chart!: Highcharts.Chart;
+  titleYDinamic: string = '';
 
   tablaDatos: { ddescr: string; productores: number; hectarea: number; parcelas: number }[] = [];
 
@@ -69,10 +69,10 @@ export class IndicePadronProdComponent implements OnInit {
       title: { text: 'Cantidad de Productores Agrarios' },
       xAxis: {
         categories: this.categorias,
-        title: { text: 'Departamentos' }
+        title: { text: this.titleYDinamic }
       },
       yAxis: {
-        title: { text: 'Valores' },
+        title: { text: 'Número de productores' },
         allowDecimals: false
       },
       legend: { enabled: true },
@@ -86,7 +86,7 @@ export class IndicePadronProdComponent implements OnInit {
       },
       series: [
         {
-          name: 'Hectáreas',
+          name: 'Productores',
           type: 'bar',
           data: this.tablaDatos.map(d => d.productores)
         }
@@ -95,6 +95,7 @@ export class IndicePadronProdComponent implements OnInit {
   }
 
   public  cargarDatos() {
+    this.titleYDinamic = 'Departamentos';
     this.padronProductoresService.getDatosIndicadores().subscribe({
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
@@ -125,6 +126,7 @@ export class IndicePadronProdComponent implements OnInit {
   }
 
   public cargarDatosByDpto(ubigeo: string) {
+    this.titleYDinamic = 'Provincias';
     this.padronProductoresService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
@@ -156,6 +158,7 @@ export class IndicePadronProdComponent implements OnInit {
   }
 
   public cargarDatosByProv(ubigeo: string) {
+    this.titleYDinamic = 'Distritos';
     this.padronProductoresService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];

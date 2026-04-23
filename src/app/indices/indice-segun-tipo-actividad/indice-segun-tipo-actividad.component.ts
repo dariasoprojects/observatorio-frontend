@@ -75,7 +75,7 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
   get tituloPrimeraColumna(): string {
     if (this.valorSeleccionadoProv) return 'Distritos';
     if (this.valorSeleccionado) return 'Provincias';
-    return 'Regiones';
+    return 'Departamentos';
   }
 
 
@@ -142,7 +142,11 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
       title: { text: 'Tipo de Actividad', align: 'center' },
       credits: { enabled: false },
       legend: { enabled: false },
-
+      yAxis: {
+        title: {
+          text: 'Productores'
+        }
+      },
       series: [{
         type: 'column',
         data: this.categorias.map((c, i) => ({
