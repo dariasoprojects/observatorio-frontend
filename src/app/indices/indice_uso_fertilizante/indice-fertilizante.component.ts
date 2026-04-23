@@ -320,15 +320,19 @@ export class IndiceFertilizanteComponent implements OnInit {
     console.log('Toggle cambiado:', ubigeo, isChecked);
 
     let codReg = null;
+    let nivel: 'dep' | 'prov' | 'dist' = 'dep';
 
     switch (this.activeNivel) {
       case '1':
+        nivel = 'dep';
         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 2);
         break;
       case '2':
+        nivel = 'prov';
         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 4);
         break;
       case '3':
+        nivel = 'dist';
         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 6);
         break;
     }
@@ -338,6 +342,10 @@ export class IndiceFertilizanteComponent implements OnInit {
       console.log('Activando filtro para:', ubigeo);
       this.activeReg = ubigeo;
       this.mapComm.requestFilterPpa(codReg);
+      this.mapComm.requestRenderUbigeo({
+        ubigeo: ubigeo,
+        nivel: nivel,
+      });
     } else {
       console.log('Desactivando filtro');
       this.activeReg = null;

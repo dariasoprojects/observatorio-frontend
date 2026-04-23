@@ -125,8 +125,7 @@ const REGLAS_RESTRICCION: ReglaRestriccion[] = [
     InputTextModule,
     FormsModule,
     Card,
-    NgIf,
-    LoaderComponent,
+    NgIf
   ],
   templateUrl: './consulta-multiple.component.html',
   styleUrl: './consulta-multiple.component.css',
