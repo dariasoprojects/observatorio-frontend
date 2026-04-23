@@ -211,7 +211,7 @@
         pButton
         label="Consultar datos"
         class="p-button-success"
-        [disabled]="!condicionesAgregadas || condicionesAgregadas.length === 0"
+        [disabled]="puedeConsultar"
         (click)="consultar()">
       </button>
       <button pButton label="Limpiar" class="p-button-outlined" (click)="limpiar()"></button>
@@ -370,7 +370,6 @@
     (click)="cargarPagina(paginaActual + 1)">
   </button>
 </div>
-
 
 
 

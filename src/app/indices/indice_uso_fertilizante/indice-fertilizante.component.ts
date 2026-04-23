@@ -1,4 +1,3 @@
-
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,30 +13,29 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MapCommService } from '../../services/map-comm.service';
 import { DialogExportarComponent } from './dialog-exportar/dialog-exportar.component';
-import {UsoFertilizanteService} from '../../services/indices/uso-fertilizante.service';
-import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
+import { UsoFertilizanteService } from '../../services/indices/uso-fertilizante.service';
+import { IndicadoresSumatoriaResponse } from '../../models/Sumatorias/indicadores-sumatoria.model';
 import { environment } from 'src/environments/environment';
-
 
 @Component({
   selector: 'app-indice-fertilizante',
   standalone: true,
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     FormsModule,
     MatSelectModule,
     MatFormFieldModule,
     MatSlideToggleModule,
-    MatIconModule],
+    MatIconModule,
+  ],
   templateUrl: './indice-fertilizante.component.html',
-  styleUrls: ['./indice-fertilizante.component.css']
+  styleUrls: ['./indice-fertilizante.component.css'],
 })
 export class IndiceFertilizanteComponent implements OnInit {
-
   @Input() valorSeleccionado!: string | null;
   @Input() valorSeleccionadoText!: string | null;
   @Input() valorSeleccionadoProv!: string | null;
   @Input() valorSeleccionadoProvText!: string | null;
-
 
   categorias: string[] = [];
   valores: number[] = [];
@@ -46,67 +44,81 @@ export class IndiceFertilizanteComponent implements OnInit {
   activeNivel: string | null = null;
   categoriasOrdenadas: string[] = [];
 
-  tablaDatos: { ubigeo: string; parcelas: number; ddescr: string; codubi: string  }[] = [];
-  tablaFiltrada: { ubigeo: string; parcelas: number; ddescr: string; codubi: string }[] = [];
+  tablaDatos: {
+    ubigeo: string;
+    parcelas: number;
+    ddescr: string;
+    codubi: string;
+  }[] = [];
+  tablaFiltrada: {
+    ubigeo: string;
+    parcelas: number;
+    ddescr: string;
+    codubi: string;
+  }[] = [];
 
   categoriaSeleccionada: string = '';
 
   private urlParcelas = `${environment.arcgis.baseUrl}${environment.arcgis.productorConsolidadoUrl}`;
 
-
-  constructor(private ubigeoSrv: UbigeoService,
-              private mapComm: MapCommService,
-              private dialog: MatDialog,
-              private usoFertilizanteService: UsoFertilizanteService,
-  ) {}  // <-- solo para inyectar
-
+  constructor(
+    private ubigeoSrv: UbigeoService,
+    private mapComm: MapCommService,
+    private dialog: MatDialog,
+    private usoFertilizanteService: UsoFertilizanteService,
+  ) {} // <-- solo para inyectar
 
   async ngOnInit() {
     await this.ubigeoSrv.cargarTodo();
 
     if (this.valorSeleccionadoProv) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
-      this.activeNivel="3"
+      this.activeNivel = '3';
     } else if (this.valorSeleccionado) {
       this.cargarDatosByDpto(this.valorSeleccionado);
-      this.activeNivel="2"
+      this.activeNivel = '2';
     } else {
-      this.activeNivel="1"
+      this.activeNivel = '1';
       this.cargarDatos();
     }
     //this.aplicarColoresTematico();
   }
 
+  get tituloPrimeraColumna(): string {
+    if (this.valorSeleccionadoProv) return 'Distritos';
+    if (this.valorSeleccionado) return 'Provincias';
+    return 'Departamentos';
+  }
+
   get totalParcelas(): number {
     return this.tablaFiltrada.reduce(
       (acc, fila) => acc + Number(fila.parcelas || 0),
-      0
+      0,
     );
   }
 
-
   aplicarColoresGenero() {
-    this.mapComm.emitRenderTematico("FERTILIZA");
+    this.mapComm.emitRenderTematico('FERTILIZA');
   }
 
-
-  aplicarColoresTematico() {    
-    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
-      this.mapComm.emitRenderTematico("FERTILIZA");
-    }else{
-      alert("Esta opción no está disponible a nivel nacional.");
+  aplicarColoresTematico() {
+    if (
+      this.valorSeleccionadoProv !== null ||
+      this.valorSeleccionado !== null
+    ) {
+      this.mapComm.emitRenderTematico('FERTILIZA');
+    } else {
+      alert('Esta opción no está disponible a nivel nacional.');
     }
   }
 
-
-
-  abrirDialogoExportar(reg: string) {
-
-    this.dialog.open(DialogExportarComponent, {
-      width: '900px',
-      height: '500px',
-      data: { reg, url: this.urlParcelas }
-    });
+  abrirDialogoExportar(fila: any) {
+    // this.dialog.open(DialogExportarComponent, {
+    //   width: '900px',
+    //   height: '800px',
+    //   maxWidth: 'none',
+    //   data: { codUbigeo: fila.codubi, url: this.urlParcelas, ubigeo:  fila.ubigeo, tipo: fila.ddescr},
+    // });
   }
 
   // ---------------------------------------------------
@@ -117,13 +129,13 @@ export class IndiceFertilizanteComponent implements OnInit {
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          const data = features.map(f => ({
+          const data = features.map((f) => ({
             ubigeo: f.attributes.UBIGEO,
             ddescr: f.attributes.DDESCR,
-            parcelas: f.attributes.PARCELAS
+            parcelas: f.attributes.PARCELAS,
           }));
           this.prepararDatos(data);
-        }else {
+        } else {
           this.tablaDatos = [];
           this.tablaFiltrada = [];
         }
@@ -132,7 +144,7 @@ export class IndiceFertilizanteComponent implements OnInit {
         console.error('Error cargando indicadores:', err);
         this.tablaDatos = [];
         this.tablaFiltrada = [];
-      }
+      },
     });
   }
 
@@ -140,56 +152,60 @@ export class IndiceFertilizanteComponent implements OnInit {
   //  CARGA POR DEPARTAMENTO
   // ---------------------------------------------------
   public cargarDatosByDpto(ubigeo: string) {
-    this.usoFertilizanteService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
-      next: (response: IndicadoresSumatoriaResponse) => {
-        const features = response?.features ?? [];
-        if (features.length > 0) {
-          const data = features.map(f => ({
-            ubigeo: f.attributes.UBIGEO,
-            ddescr: f.attributes.DDESCR,
-            parcelas: f.attributes.PARCELAS
-          }));
+    this.usoFertilizanteService
+      .getDatosIndicadoresbyDepartamento(ubigeo)
+      .subscribe({
+        next: (response: IndicadoresSumatoriaResponse) => {
+          const features = response?.features ?? [];
+          if (features.length > 0) {
+            const data = features.map((f) => ({
+              ubigeo: f.attributes.UBIGEO,
+              ddescr: f.attributes.DDESCR,
+              parcelas: f.attributes.PARCELAS,
+            }));
 
-          this.prepararDatos(data);
-        } else {
+            this.prepararDatos(data);
+          } else {
+            this.tablaDatos = [];
+            this.tablaFiltrada = [];
+          }
+        },
+        error: (err) => {
+          console.error('Error cargando indicadores:', err);
           this.tablaDatos = [];
           this.tablaFiltrada = [];
-        }
-      },
-      error: (err) => {
-        console.error('Error cargando indicadores:', err);
-        this.tablaDatos = [];
-        this.tablaFiltrada = [];
-      }
-    });
+        },
+      });
   }
 
   // ---------------------------------------------------
   //  CARGA POR PROVINCIA
   // ---------------------------------------------------
   public cargarDatosByProv(ubigeo: string) {
-    this.usoFertilizanteService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
-      next: (response: IndicadoresSumatoriaResponse) => {
-        const features = response?.features ?? [];
-        if (features.length > 0) {
-          const data = features.map(f => ({
-            ubigeo: f.attributes.UBIGEO,
-            ddescr: f.attributes.DDESCR,
-            parcelas: f.attributes.PARCELAS
-          }));
+    this.usoFertilizanteService
+      .getDatosIndicadoresbyProvincia(ubigeo)
+      .subscribe({
+        next: (response: IndicadoresSumatoriaResponse) => {
+          const features = response?.features ?? [];
+          if (features.length > 0) {
+            const data = features.map((f) => ({
+              ubigeo: f.attributes.UBIGEO,
+              ddescr: f.attributes.DDESCR,
+              parcelas: f.attributes.PARCELAS,
+            }));
 
-          this.prepararDatos(data);
-        } else {
+            this.prepararDatos(data);
+          } else {
+            this.tablaDatos = [];
+            this.tablaFiltrada = [];
+          }
+        },
+        error: (err) => {
+          console.error('Error cargando indicadores:', err);
           this.tablaDatos = [];
           this.tablaFiltrada = [];
-        }
-      },
-      error: (err) => {
-        console.error('Error cargando indicadores:', err);
-        this.tablaDatos = [];
-        this.tablaFiltrada = [];
-      }
-    });
+        },
+      });
   }
 
   // ---------------------------------------------------
@@ -197,8 +213,8 @@ export class IndiceFertilizanteComponent implements OnInit {
   // ---------------------------------------------------
   private prepararDatos(data: any[]) {
     const agrGrafico: Record<string, number> = {};
-    data.forEach(it => {
-      const clave = it.ddescr || "No definido";
+    data.forEach((it) => {
+      const clave = it.ddescr || 'No definido';
       if (!agrGrafico[clave]) agrGrafico[clave] = 0;
       agrGrafico[clave] += it.parcelas;
     });
@@ -207,28 +223,32 @@ export class IndiceFertilizanteComponent implements OnInit {
     const vals = Object.values(agrGrafico);
 
     const tablaOrdenada = data
-      .map(d => ({
+      .map((d) => ({
         ubigeo: this.ubigeoSrv.getNombre(d.ubigeo),
         parcelas: d.parcelas,
-        ddescr: d.ddescr || "No definido",
-        codubi: d.ubigeo
+        ddescr: d.ddescr || 'No definido',
+        codubi: d.ubigeo,
       }))
-      .sort((a, b) => a.ubigeo.localeCompare(b.ubigeo, 'es', { sensitivity: 'base' }));
-
+      .sort((a, b) =>
+        a.ubigeo.localeCompare(b.ubigeo, 'es', { sensitivity: 'base' }),
+      );
 
     this.categoriasOrdenadas = Object.keys(agrGrafico).sort((a, b) =>
-      a.localeCompare(b));
+      a.localeCompare(b),
+    );
 
     // 👉 ahora llamamos al método central de actualización
     this.actualizarDatos(cats, vals, tablaOrdenada);
   }
 
-
-
   // ---------------------------------------------------
   //  ACTUALIZAR DATOS GLOBALES
   // ---------------------------------------------------
-  private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[], tabla: any[]) {
+  private actualizarDatos(
+    nuevasCategorias: string[],
+    nuevosValores: number[],
+    tabla: any[],
+  ) {
     this.categorias = [...nuevasCategorias];
     this.valores = [...nuevosValores];
     this.tablaDatos = [...tabla];
@@ -246,18 +266,17 @@ export class IndiceFertilizanteComponent implements OnInit {
       this.crearGrafico();
     } else {
       const serie = this.chart.series[0];
-      const puntos = this.categorias.map((c, i) => ({ name: c, y: this.valores[i] }));
+      const puntos = this.categorias.map((c, i) => ({
+        name: c,
+        y: this.valores[i],
+      }));
       serie.setData(puntos, true);
     }
   }
 
-
-
   // ---------------------------------------------------
   //  FILTRADO DINÁMICO
   // ---------------------------------------------------
-
-
 
   filtrarPorCategoria() {
     let datosFiltrados = [...this.tablaDatos];
@@ -265,33 +284,36 @@ export class IndiceFertilizanteComponent implements OnInit {
     // Si se elige una categoría específica → filtra por ddescr
     if (this.categoriaSeleccionada) {
       datosFiltrados = datosFiltrados.filter(
-        f => f.ddescr === this.categoriaSeleccionada
+        (f) => f.ddescr === this.categoriaSeleccionada,
       );
     }
 
     // Agrupar por UBIGEO + CODUBI y sumar parcelas
-    const agrUbigeoCodubi: Record<string, { ubigeo: string; codubi: string; parcelas: number }> = {};
+    const agrUbigeoCodubi: Record<
+      string,
+      { ubigeo: string; codubi: string; parcelas: number }
+    > = {};
 
-    datosFiltrados.forEach(it => {
+    datosFiltrados.forEach((it) => {
       const clave = `${it.ubigeo}-${it.codubi}`;
       if (!agrUbigeoCodubi[clave]) {
-        agrUbigeoCodubi[clave] = { ubigeo: it.ubigeo, codubi: it.codubi, parcelas: 0 };
+        agrUbigeoCodubi[clave] = {
+          ubigeo: it.ubigeo,
+          codubi: it.codubi,
+          parcelas: 0,
+        };
       }
       agrUbigeoCodubi[clave].parcelas += it.parcelas;
     });
 
     // Convertir a arreglo final
-    this.tablaFiltrada = Object.values(agrUbigeoCodubi).map(it => ({
+    this.tablaFiltrada = Object.values(agrUbigeoCodubi).map((it) => ({
       ubigeo: it.ubigeo,
       codubi: it.codubi,
       parcelas: it.parcelas,
-      ddescr: this.categoriaSeleccionada || "Todos"
+      ddescr: this.categoriaSeleccionada || 'Todos',
     }));
-
   }
-
-
-
 
   toggleCluster(event: MatSlideToggleChange, ubigeo: string) {
     const isChecked = event.checked;
@@ -301,31 +323,28 @@ export class IndiceFertilizanteComponent implements OnInit {
 
     switch (this.activeNivel) {
       case '1':
-         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 2);
+        codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 2);
         break;
       case '2':
-         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 4);
+        codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 4);
         break;
       case '3':
-         codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 6);
+        codReg = this.ubigeoSrv.getCodigo(ubigeo)?.substring(0, 6);
         break;
     }
 
-    if(isChecked){
+    if (isChecked) {
       // activar el cluster o acción ON
       console.log('Activando filtro para:', ubigeo);
       this.activeReg = ubigeo;
       this.mapComm.requestFilterPpa(codReg);
-    }else{
+    } else {
       console.log('Desactivando filtro');
       this.activeReg = null;
       this.mapComm.requestFilterPpa(null);
       // desactivar el cluster o acción OFF
     }
   }
-
-
-
 
   // ---------------------------------------------------
   //  CREAR GRÁFICO
@@ -346,7 +365,10 @@ export class IndiceFertilizanteComponent implements OnInit {
 
             // Calcular total
             const pts = chart.series[0]?.points || [];
-            const total = pts.reduce((acc: number, p: any) => acc + (p.y || 0), 0);
+            const total = pts.reduce(
+              (acc: number, p: any) => acc + (p.y || 0),
+              0,
+            );
             const totalStr = total.toLocaleString('es-PE');
 
             // Borrar textos previos si existen
@@ -369,13 +391,15 @@ export class IndiceFertilizanteComponent implements OnInit {
               .add();
 
             (chart as any)._centerTexts = { top, bot };
-          }
-        }
+          },
+        },
       },
 
       title: { text: 'Uso de Fertilizante (Parcelas)', align: 'center' },
       credits: { enabled: false },
-      tooltip: { pointFormat: '<b>{point.y:,.0f}</b> parcelas ({point.percentage:.1f}%)' },
+      tooltip: {
+        pointFormat: '<b>{point.y:,.0f}</b> parcelas ({point.percentage:.1f}%)',
+      },
 
       plotOptions: {
         pie: {
@@ -384,24 +408,39 @@ export class IndiceFertilizanteComponent implements OnInit {
             enabled: true,
             format: '{point.percentage:.1f} %',
             distance: -40,
-            style: { fontWeight: 'bold', textOutline: 'none', fontSize: '11px' }
+            style: {
+              fontWeight: 'bold',
+              textOutline: 'none',
+              fontSize: '11px',
+            },
           },
-          showInLegend: true
-        }
+          showInLegend: true,
+        },
       },
 
-      series: [{
-        name: 'Parcelas',
-        type: 'pie',
-        data: this.categorias.map((c, i) => ({ name: c, y: this.valores[i] })),
-        colors: ['#20B5B8', '#229389', '#D2DD45', '#FFE44A', '#FFB022', '#F76C4A', '#F23C3C']
-      }]
+      series: [
+        {
+          name: 'Parcelas',
+          type: 'pie',
+          data: this.categorias.map((c, i) => ({
+            name: c,
+            y: this.valores[i],
+          })),
+          colors: [
+            '#20B5B8',
+            '#229389',
+            '#D2DD45',
+            '#FFE44A',
+            '#FFB022',
+            '#F76C4A',
+            '#F23C3C',
+          ],
+        },
+      ],
     };
 
     this.chart = Highcharts.chart('container-fertilizante', options);
   }
-
-
 
   protected readonly Number = Number;
   protected readonly FormatUtil = FormatUtil;

@@ -496,11 +496,11 @@ export class IndiceTipoActividadComponent implements OnInit, AfterViewInit,OnCha
   }
 
   abrirDialogoExportar(reg: string) {
-    this.dialog.open(DialogExportarComponent, {
-      width: '900px',
-      height: '500px',
-      data: { reg, url: this.url }
-    });
+    // this.dialog.open(DialogExportarComponent, {
+    //   width: '900px',
+    //   height: '500px',
+    //   data: { reg, url: this.url }
+    // });
   }
 
 

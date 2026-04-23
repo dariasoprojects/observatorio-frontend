@@ -61,11 +61,11 @@ export class IndiceCentrosEmpadronamientoComponent implements OnInit, AfterViewI
 
 
   abrirDialogoExportar(reg: string) {
-    this.dialog.open(DialogExportarComponent, {
-      width: '900px',
-      height: '500px',
-      data: { reg, url: this.url }
-    });
+    // this.dialog.open(DialogExportarComponent, {
+    //   width: '900px',
+    //   height: '500px',
+    //   data: { reg, url: this.url }
+    // });
   }
 
 

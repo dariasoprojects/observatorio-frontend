@@ -9,15 +9,13 @@
 
       <div class="visor-banner__divider"></div>
 
-      <img
-        src="assets/logo-siea.jpg"
-        alt="SIEA"
-        class="visor-banner__siea"
-      />
+      <img src="assets/logo-siea.jpg" alt="SIEA" class="visor-banner__siea" />
 
       <div class="visor-banner__copy">
         <span class="visor-banner__eyebrow">Observatorio agrario</span>
-        <h1 class="visor-banner__title">Sistema Integrado de Estadística Agraria</h1>
+        <h1 class="visor-banner__title">
+          Sistema Integrado de Estadística Agraria
+        </h1>
       </div>
     </div>
 
@@ -32,13 +30,29 @@
         <span class="visor-banner__user-name">{{ usuarioLogueado }}</span>
         <span class="visor-banner__user-role">
           {{ tipoUsuario }}
-          <ng-container *ngIf="entidadUsuario"> - {{ entidadUsuario }}</ng-container>
+          <ng-container *ngIf="entidadUsuario">
+            - {{ entidadUsuario }}</ng-container
+          >
         </span>
       </div>
 
-      <button *ngIf="!esVisitante" type="button" class="visor-banner__logout" (click)="onLogout()">
+      <button
+        *ngIf="!esVisitante"
+        type="button"
+        class="visor-banner__logout"
+        (click)="onLogout()"
+      >
         <i class="pi pi-sign-out"></i>
         <span>Salir</span>
+      </button>
+      <button
+        *ngIf="esVisitante"
+        type="button"
+        class="visor-banner__logout"
+        (click)="goBack()"
+      >
+        <i class="pi pi-sign-out"></i>
+        <span>Volver al inicio</span>
       </button>
     </div>
   </header>
@@ -58,9 +72,7 @@
       </div>
     </main>
 
-    <app-side-right
-      #sideright
-      [activeSection]="activeSection">
+    <app-side-right #sideright [activeSection]="activeSection">
     </app-side-right>
   </div>
 
@@ -72,8 +84,7 @@
     [draggable]="true"
     [resizable]="false"
   >
-    <app-analisis-espacial
-      (close)="dialogVisible = false">
+    <app-analisis-espacial (close)="dialogVisible = false">
     </app-analisis-espacial>
   </p-dialog>
 
@@ -87,24 +98,22 @@
   >
     <!-- <app-consulta-multiple (cerrarModal)="mostrarGeoanalitica = false"></app-consulta-multiple> -->
     <app-consulta-multiple
-      (cerrarModal)="dialogVisibleConsultaMultiple = false">
+      (cerrarModal)="dialogVisibleConsultaMultiple = false"
+    >
     </app-consulta-multiple>
   </p-dialog>
 
-
-
- <p-dialog
-  header="Descargas"
-  [(visible)]="dialogVisibleDescarga"
-  [modal]="false"
-  [style]="{ width: '830px' }"
-  [contentStyle]="{ height: '80vh', overflow: 'hidden' }"
-  [draggable]="true"
-  [resizable]="false"
->
-  <app-descargas></app-descargas>
-</p-dialog>
-
+  <p-dialog
+    header="Descargas"
+    [(visible)]="dialogVisibleDescarga"
+    [modal]="false"
+    [style]="{ width: '830px' }"
+    [contentStyle]="{ height: '80vh', overflow: 'hidden' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <app-descargas></app-descargas>
+  </p-dialog>
 
   <p-dialog
     [(visible)]="dialogVisibleBusquedaDni"
@@ -116,15 +125,11 @@
     <ng-template pTemplate="header">
       <div class="p-dialog-title">
         Búsqueda por DNI
-        <div class="dialog-subtitle ">
-          Localización de productores
-        </div>
+        <div class="dialog-subtitle">Localización de productores</div>
       </div>
     </ng-template>
 
-    <app-busqueda-dni
-    >
-    </app-busqueda-dni>
+    <app-busqueda-dni> </app-busqueda-dni>
   </p-dialog>
 </div>
 

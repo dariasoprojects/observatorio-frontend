@@ -21,8 +21,8 @@
     <table class="tabla-fertilizante">
       <thead>
         <tr>
-          <th>Jurisdicción</th>
-          <th>Parcelas</th>
+          <th>{{ tituloPrimeraColumna }}</th>
+          <th class="num-col">Parcelas</th>
           <th>Datos</th>
           <th>Ver en Mapa</th>
         </tr>
@@ -30,7 +30,7 @@
 
       <tbody>
         <tr *ngFor="let fila of tablaFiltrada">
-          <td class="num-col">{{ fila.ubigeo }}</td>
+          <td>{{ fila.ubigeo }}</td>
           <td class="num-col">{{ FormatUtil.formatInteger(fila.parcelas) }}</td>
           <td>
             <button
@@ -38,7 +38,7 @@
               color="primary"
               class="mini-icon"
               matTooltip="Exportar a Excel"
-              (click)="abrirDialogoExportar(fila.codubi)"
+              (click)="abrirDialogoExportar(fila)"
             >
               <mat-icon>file_download</mat-icon>
             </button>

@@ -9,6 +9,7 @@ import Query from '@arcgis/core/rest/support/Query';
 import * as query from '@arcgis/core/rest/query';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { UbigeoService } from 'src/app/services/ubigeo.service';
 
 @Component({
   selector: 'app-dialog-exportar',
@@ -30,13 +31,16 @@ export class DialogExportarComponent implements OnInit {
   columnas = ['OBJECTID', 'NOMBRES', 'APELLIDOPA' ]; // Ajusta los nombres reales
   totalRegistros = 0;
   regSeleccionado!: string;
+  titleSeleccionado: string = '';
+  tipoSelected: string = '';
   url!: string;
   cargando = false;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-    this.regSeleccionado = data.reg;
+    this.regSeleccionado = data.codUbigeo;
+    this.titleSeleccionado = data.ubigeo;
+    this.tipoSelected = data.tipo;
     this.url = data.url;
-    alert(data.reg);
   }
 
   ngOnInit() {
@@ -64,6 +68,7 @@ export class DialogExportarComponent implements OnInit {
       console.log("Cantidad devuelta:", res.features.length);
 
       this.dataSource.data = res.features.map((f: any) => f.attributes);
+      this.dataSource.paginator = this.paginator;
       this.totalRegistros = res.exceededTransferLimit
         ? offset + pageSize + 1
         : offset + res.features.length;
