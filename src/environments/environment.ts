@@ -1,6 +1,9 @@
 export const environment = {
   production: false,
   envName: 'DEV',
+  analytics: {
+    measurementId: 'G-0JX388GCCP'
+  },
   api: {
     //authUrl: 'http://dobservatorio.midagri.gob.pe/api/auth'
     authUrl: 'http://localhost:8083/api/auth'

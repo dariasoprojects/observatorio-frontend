@@ -136,7 +136,9 @@ export class VisorComponent {
   }
 
   onLogout(): void {
-    this.authService.cerrarSesion();
+    if (this.authService.estaAutenticado()) {
+      this.authService.cerrarSesion();
+    }
     this.router.navigate(['/']);
   }
 

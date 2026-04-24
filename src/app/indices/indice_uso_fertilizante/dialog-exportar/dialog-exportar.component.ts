@@ -9,6 +9,7 @@ import Query from '@arcgis/core/rest/support/Query';
 import * as query from '@arcgis/core/rest/query';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { AnalyticsService } from '../../../services/analytics.service';
 
 @Component({
   selector: 'app-dialog-exportar',
@@ -33,7 +34,10 @@ export class DialogExportarComponent implements OnInit {
   url!: string;
   cargando = false;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private analytics: AnalyticsService
+  ) {
     this.regSeleccionado = data.reg;
     this.url = data.url;
     alert(data.reg);
@@ -108,6 +112,11 @@ export class DialogExportarComponent implements OnInit {
     const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, `Export_REG_${this.regSeleccionado}.xlsx`);
+    this.analytics.trackDescargaReporte('dialogo_exportar_uso_fertilizante', {
+      formato: 'xlsx',
+      region: this.regSeleccionado,
+      registros: allFeatures.length
+    });
     this.cargando = false;
   }
 }

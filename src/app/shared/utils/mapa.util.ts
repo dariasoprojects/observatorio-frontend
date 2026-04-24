@@ -21,6 +21,7 @@ import { environment } from 'src/environments/environment';
 import KMLLayer from "@arcgis/core/layers/KMLLayer";
 import * as reactiveUtils from '@arcgis/core/core/reactiveUtils';
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
+import { AnalyticsService } from '../../services/analytics.service';
 
 
 export class Mapa {
@@ -66,7 +67,7 @@ export class Mapa {
   private printBtn: HTMLDivElement | null = null;
   private multiQyBtn!: HTMLDivElement;
   private btnAnalisis!: HTMLDivElement;
-  private btnGeoProductor!: HTMLDivElement;
+  private btnGeoProductor: HTMLDivElement | null = null;
   private basemapMenu!: HTMLDivElement;
   private printDiv!: HTMLDivElement;
   private basemapBtn!: HTMLDivElement;
@@ -87,6 +88,8 @@ export class Mapa {
   private capaCoberturas: MapImageLayer | null = null;
 
   private loadingOverlay: HTMLDivElement | null = null;
+  private analytics?: AnalyticsService;
+  private readonly showGeoProductor: boolean;
 
   private applyPeruInitialView(): void {
     if (!this.mapView) return;
@@ -285,12 +288,16 @@ export class Mapa {
   constructor(
       private mapDiv: HTMLDivElement,
       private comm: MapCommService,
-      private sceneDiv: HTMLDivElement
+      private sceneDiv: HTMLDivElement,
+      analytics?: AnalyticsService,
+      showGeoProductor = false
     ) {
 
     this.mapDiv = mapDiv;
     this.sceneDiv = sceneDiv;
     this.comm = comm;
+    this.analytics = analytics;
+    this.showGeoProductor = showGeoProductor;
 
 
     this.resultsLayer   = new GraphicsLayer({ id: 'Elemento Seleccionado' });
@@ -579,6 +586,10 @@ export class Mapa {
         this.resetCompleto()
       });
 
+  }
+
+  private trackMapAction(accion: string, params: Record<string, unknown> = {}): void {
+    this.analytics?.trackUsoMapa(accion, params);
   }
 
 
@@ -2908,6 +2919,10 @@ export class Mapa {
       // Zoom
       this.mapView?.goTo(feature.geometry);
 
+      this.trackMapAction('identificar_entidad', {
+        capa: this.capaSeleccionada ?? 'sin_capa'
+      });
+
       // Enviar evento para panel u otro componente
       this.comm.sendFeatureSelected(feature);
       //this.comm.sendGeometry(feature.geometry);
@@ -3154,6 +3169,9 @@ export class Mapa {
 
     this.toc_IndetifiBtn.onclick = () => {
       // habilita funcion identiffy para click y popup
+      this.trackMapAction('toggle_identificar', {
+        activo: !this.modoConsulta
+      });
       this.activarIdentify();
     };
 
@@ -3215,6 +3233,9 @@ export class Mapa {
     this.toc_Draw.onclick = () => {
       // habilita funcion identiffy para click y popup
       this.drawActive = !this.drawActive;
+      this.trackMapAction('toggle_dibujo', {
+        activo: this.drawActive
+      });
       if (this.sketsch){
         this.sketsch.visible = this.drawActive;
         if (this.mapView && this.mapView.container) {
@@ -3235,6 +3256,9 @@ export class Mapa {
     this.toc_MedirRegla.onclick = () => {
       // chat gpt por favr colocar el codigo para iniciar el proceso de medir
       if (!this.mapView) return;
+
+      const activo = !this.medirWidget;
+      this.trackMapAction('medir_distancia', { activo });
 
       if (this.medirWidget) {
         //Si ya está activo → lo apago
@@ -3257,6 +3281,9 @@ export class Mapa {
 
     this.toc_MedirArea.onclick = () => {
       if (!this.mapView) return;
+
+      const activo = !this.medirAreaWidget;
+      this.trackMapAction('medir_area', { activo });
 
       if (!this.medirAreaWidget) {
         // Si ya está activo → lo apago
@@ -3282,7 +3309,12 @@ export class Mapa {
       this.currentView = this.mapView;
     }
 
-    this.toc_3D.onclick = () => this.toggle3D();
+    this.toc_3D.onclick = () => {
+      this.trackMapAction('toggle_3d', {
+        destino: this.is3D ? '2d' : '3d'
+      });
+      void this.toggle3D();
+    };
 
     // Botón principal
     this.basemapBtn = document.createElement("div");
@@ -3322,6 +3354,9 @@ export class Mapa {
         if (this.currentView?.map) {
           this.currentView.map.basemap = b.id;
         }
+        this.trackMapAction('cambiar_basemap', {
+          basemap: b.id
+        });
         this.basemapMenu.style.display = "none"; // ocultar después de seleccionar
       };
 
@@ -3330,6 +3365,7 @@ export class Mapa {
 
     // Evento para abrir/cerrar el menú
     this.basemapBtn.onclick = () => {
+      this.trackMapAction('abrir_basemap');
       this.basemapMenu.style.display = this.basemapMenu.style.display === "none" ? "block" : "none";
     };
 
@@ -3378,6 +3414,9 @@ export class Mapa {
     document.body.appendChild(this.printDiv);
 
     this.printBtn.onclick = () => {
+      this.trackMapAction('toggle_impresion', {
+        activo: this.printDiv.style.display === "none"
+      });
       this.printDiv.style.display = this.printDiv.style.display === "none" ? "block" : "none";
     };
 
@@ -3420,6 +3459,7 @@ export class Mapa {
 
     // Acción al presionar (mantengo la que tenías)
     this.multiQyBtn.onclick = () => {
+      this.trackMapAction('abrir_geoanalitica');
       this.comm.abrirDialogConsultaMultiple();
 
     };
@@ -3473,6 +3513,7 @@ export class Mapa {
 
     // Acción original
     this.btnAnalisis.onclick = () => {
+      this.trackMapAction('abrir_geoperfil');
       this.comm.abrirDialogAnalisis();
     };
 
@@ -3487,43 +3528,46 @@ export class Mapa {
       icon2.style.fontSize = "25px";
     }
 
-    this.btnGeoProductor = document.createElement("div");
-    this.btnGeoProductor.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
-    this.btnGeoProductor.innerHTML =
-      '<i class="pi pi-user"></i><div class="gp-tooltip">GeoProductor: <br>Brinda información específica del productor mediante DNI.</div>';
+    if (this.showGeoProductor) {
+      this.btnGeoProductor = document.createElement("div");
+      this.btnGeoProductor.className = "esri-widget esri-widget--button esri-interactive btn-tooltip";
+      this.btnGeoProductor.innerHTML =
+        '<i class="pi pi-user"></i><div class="gp-tooltip">GeoProductor: <br>Brinda información específica del productor mediante DNI.</div>';
 
-    this.btnGeoProductor.style.background = "#155f31";
-    this.btnGeoProductor.style.color = "white";
-    this.btnGeoProductor.style.border = "4px solid #ffffff";
-    this.btnGeoProductor.style.borderRadius = "12px";
-    this.btnGeoProductor.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
-    this.btnGeoProductor.style.display = "flex";
-    this.btnGeoProductor.style.alignItems = "center";
-    this.btnGeoProductor.style.justifyContent = "center";
-    this.btnGeoProductor.style.cursor = "pointer";
-    this.btnGeoProductor.style.transition = "0.25s";
-    this.btnGeoProductor.style.minWidth = "60px";
-    this.btnGeoProductor.style.minHeight = "60px";
-
-    this.btnGeoProductor.onmouseover = () => {
-      this.btnGeoProductor.style.background = "#0f4a25";
-      this.btnGeoProductor.style.transform = "scale(1.18)";
-      this.btnGeoProductor.style.boxShadow = "0 0 16px rgba(0,0,0,0.85)";
-    };
-    this.btnGeoProductor.onmouseleave = () => {
       this.btnGeoProductor.style.background = "#155f31";
-      this.btnGeoProductor.style.transform = "scale(1)";
+      this.btnGeoProductor.style.color = "white";
+      this.btnGeoProductor.style.border = "4px solid #ffffff";
+      this.btnGeoProductor.style.borderRadius = "12px";
       this.btnGeoProductor.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
-    };
+      this.btnGeoProductor.style.display = "flex";
+      this.btnGeoProductor.style.alignItems = "center";
+      this.btnGeoProductor.style.justifyContent = "center";
+      this.btnGeoProductor.style.cursor = "pointer";
+      this.btnGeoProductor.style.transition = "0.25s";
+      this.btnGeoProductor.style.minWidth = "60px";
+      this.btnGeoProductor.style.minHeight = "60px";
 
-    this.btnGeoProductor.onclick = () => {
-      this.comm.abrirDialogBusquedaDni();
-    };
+      this.btnGeoProductor.onmouseover = () => {
+        this.btnGeoProductor!.style.background = "#0f4a25";
+        this.btnGeoProductor!.style.transform = "scale(1.18)";
+        this.btnGeoProductor!.style.boxShadow = "0 0 16px rgba(0,0,0,0.85)";
+      };
+      this.btnGeoProductor.onmouseleave = () => {
+        this.btnGeoProductor!.style.background = "#155f31";
+        this.btnGeoProductor!.style.transform = "scale(1)";
+        this.btnGeoProductor!.style.boxShadow = "0 0 12px rgba(0,0,0,0.7)";
+      };
 
-    const iconGeoProductor = this.btnGeoProductor.querySelector("i");
-    if (iconGeoProductor) {
-      iconGeoProductor.style.fontSize = "25px";
-      iconGeoProductor.style.pointerEvents = "none";
+      this.btnGeoProductor.onclick = () => {
+        this.trackMapAction('abrir_geoproductor');
+        this.comm.abrirDialogBusquedaDni();
+      };
+
+      const iconGeoProductor = this.btnGeoProductor.querySelector("i");
+      if (iconGeoProductor) {
+        iconGeoProductor.style.fontSize = "25px";
+        iconGeoProductor.style.pointerEvents = "none";
+      }
     }
 
 
@@ -3559,7 +3603,10 @@ export class Mapa {
     // };
 
     // Acción
-    this.btnReset.onclick = () => this.resetCompleto();
+    this.btnReset.onclick = () => {
+      this.trackMapAction('reset_mapa');
+      this.resetCompleto();
+    };
 
 
     // =========================
@@ -3578,6 +3625,7 @@ export class Mapa {
     // Mostrar/ocultar panel
     this.kmlBtn.onclick = () => {
       //this.kmlPanel.style.display = (this.kmlPanel.style.display === "none") ? "block" : "none";
+      this.trackMapAction('abrir_descargas');
       this.comm.abrirDialogDescargas();
     };
 
@@ -3598,7 +3646,9 @@ export class Mapa {
 
       view.ui.add(this.btnAnalisis, "top-left");
       view.ui.add(this.multiQyBtn, "top-left");
-      view.ui.add(this.btnGeoProductor, "top-left");
+      if (this.btnGeoProductor) {
+        view.ui.add(this.btnGeoProductor, "top-left");
+      }
       
       this.sketsch.visible = false;
     }
@@ -3761,7 +3811,9 @@ export class Mapa {
     view.ui.add(this.basemapContainer,"top-right");
     view.ui.add(this.multiQyBtn,"top-left");
     view.ui.add(this.btnAnalisis,"top-left");
-    view.ui.add(this.btnGeoProductor,"top-left");
+    if (this.btnGeoProductor) {
+      view.ui.add(this.btnGeoProductor,"top-left");
+    }
 
   }
 

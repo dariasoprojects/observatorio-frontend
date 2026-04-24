@@ -21,6 +21,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
 import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
+import { AnalyticsService } from '../../../../../services/analytics.service';
 
 
 interface ResultadoConsulta {
@@ -69,7 +70,8 @@ export class DescargasComponent implements OnInit, OnDestroy {
 
   constructor(
     private comm: MapCommService,
-    private descargasService: DescargasService
+    private descargasService: DescargasService,
+    private analytics: AnalyticsService
   ) {}
 
 
@@ -124,6 +126,11 @@ export class DescargasComponent implements OnInit, OnDestroy {
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(blob, fileName);
+    this.analytics.trackDescargaReporte('descargas', {
+      formato: 'xlsx',
+      pagina: this.paginaActual,
+      registros: this.resultados.length
+    });
   }
 
 
@@ -210,6 +217,9 @@ export class DescargasComponent implements OnInit, OnDestroy {
 
   // UI: seleccionar archivo
   onPickFileClick(input: HTMLInputElement): void {
+    this.analytics.trackUsoMapa('abrir_selector_kml', {
+      origen: 'descargas'
+    });
     input.click();
   }
 
@@ -221,6 +231,9 @@ export class DescargasComponent implements OnInit, OnDestroy {
     if (!file) return;
 
     this.archivoNombre = file.name;
+    this.analytics.trackUsoMapa('cargar_kml', {
+      origen: 'descargas'
+    });
 
     // reset
     this.poligono = null;
@@ -342,6 +355,9 @@ export class DescargasComponent implements OnInit, OnDestroy {
 
   onDibujar(): void {
     // pide al mapa activar Sketch para dibujar polígono
+    this.analytics.trackUsoMapa('activar_dibujo_descargas', {
+      origen: 'descargas'
+    });
     this.comm.requestDraw(true);
 
     // (opcional) reset de resultados para que el usuario sepa que cambió cobertura
@@ -360,6 +376,9 @@ export class DescargasComponent implements OnInit, OnDestroy {
   }
 
   quitarKml(): void {
+    this.analytics.trackUsoMapa('quitar_kml', {
+      origen: 'descargas'
+    });
     this.archivoNombre = 'Ningún archivo';
     this.poligono = null;
     this.resultados = [];

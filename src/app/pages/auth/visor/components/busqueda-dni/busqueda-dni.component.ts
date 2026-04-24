@@ -11,6 +11,7 @@ import {DividerModule} from 'primeng/divider';
 import {MapCommService} from '../../../../../services/map-comm.service';
 import {ButtonModule} from 'primeng/button';
 import {UbigeoService} from '../../../../../services/ubigeo.service';
+import {AnalyticsService} from '../../../../../services/analytics.service';
 
 @Component({
   selector: 'app-busqueda-dni',
@@ -29,6 +30,7 @@ export class BusquedaDniComponent {
   mostrarProductor:boolean=false;
   existeProductor:boolean=false;
   private destroy$ = new Subject<void>();
+  private pendingSearchDni = false;
 
   productor: ProductorAttributes | null = null;
   parcelas: Feature []=[];
@@ -39,6 +41,7 @@ export class BusquedaDniComponent {
     private fb: FormBuilder,
     private comm: MapCommService,
     protected ubigeoService: UbigeoService,
+    private analytics: AnalyticsService
   ) {
     this.formBusqueda = this.fb.group({
       dni: [
@@ -74,6 +77,14 @@ export class BusquedaDniComponent {
         this.parcelas = parcelas;
         this.existeProductor = !!this.productor;
         this.mostrarProductor = this.existeProductor;
+
+        if (this.pendingSearchDni) {
+          this.analytics.trackBusquedaDni('geo_productor', {
+            estado: this.existeProductor ? 'exitoso' : 'sin_resultados',
+            resultados: this.parcelas.length
+          });
+          this.pendingSearchDni = false;
+        }
       });
   }
 
@@ -89,12 +100,19 @@ export class BusquedaDniComponent {
     }
 
     const dni = dniControl?.value;
+    this.pendingSearchDni = true;
+
+    // Se evita enviar el DNI a Analytics por tratarse de un dato sensible.
+    this.analytics.trackBusquedaDni('geo_productor', {
+      estado: 'busqueda_iniciada'
+    });
 
     this.productorService.getProductor(dni);
 
   }
 
   onClearDni(): void {
+    this.pendingSearchDni = false;
     this.formBusqueda.get('dni')?.setValue('');
     this.productor =null;
     this.parcelas=[];
@@ -107,6 +125,9 @@ export class BusquedaDniComponent {
       return;
     }
     // Si 'fila' ES un __esri.Graphic:
+    this.analytics.trackUsoMapa('zoom_parcela_dni', {
+      origen: 'geo_productor'
+    });
     this.comm.requestZoomGraphic(fila);
   }
 

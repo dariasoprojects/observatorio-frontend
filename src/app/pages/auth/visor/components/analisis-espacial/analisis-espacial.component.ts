@@ -32,6 +32,7 @@ import { saveAs } from 'file-saver';
 import { TabViewModule } from 'primeng/tabview';
 import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
+import { AnalyticsService } from '../../../../../services/analytics.service';
 
 
 export interface CapaOption {
@@ -216,7 +217,8 @@ export class AnalisisEspacialComponent {
 
   constructor(
     private mapComm: MapCommService,
-    private analisisGeometricoService: AnalisisGeometricoService
+    private analisisGeometricoService: AnalisisGeometricoService,
+    private analytics: AnalyticsService
   ) {}
 
   onCapaChange(event: any) {
@@ -1091,6 +1093,14 @@ export class AnalisisEspacialComponent {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
     saveAs(blob, fileName);
+    this.analytics.trackDescargaReporte('analisis_espacial', {
+      formato: 'xlsx',
+      hojas:
+        Number((this.gridGenero?.length ?? 0) > 0) +
+        Number((this.gridProductivo?.length ?? 0) > 0) +
+        Number((this.gridRiego?.length ?? 0) > 0) +
+        Number((this.resultados?.length ?? 0) > 0)
+    });
   }
 
 

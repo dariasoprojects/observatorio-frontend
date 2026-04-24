@@ -6,6 +6,8 @@ import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ub
 import {Subscription} from 'rxjs';
 import {MapaService} from '../../../../../services/mapa.service';
 import {ProductorService} from '../../../../../services/productor.service';
+import {AnalyticsService} from '../../../../../services/analytics.service';
+import {AuthService} from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-mapa',
@@ -29,7 +31,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     private comm: MapCommService,
     private filtroUbigeoService: FiltroUbigeoService,
     private mapaService: MapaService,
-    private productorService: ProductorService
+    private productorService: ProductorService,
+    private analytics: AnalyticsService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -74,7 +78,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     this.mapa = new Mapa(
       this.mapDiv.nativeElement,
       this.comm,
-      this.sceneDiv.nativeElement
+      this.sceneDiv.nativeElement,
+      this.analytics,
+      this.authService.estaAutenticado()
     );
 
     this.mapa.iniciar()

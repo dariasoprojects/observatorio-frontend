@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService, LoginResponse } from '../../services/auth.service';
+import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +28,8 @@ export class LoginComponent {
   constructor(
     private constructorFormulario: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private analytics: AnalyticsService
   ) {
     this.formularioLogin = this.constructorFormulario.group({
       usuario: ['', Validators.required],
@@ -77,6 +79,10 @@ export class LoginComponent {
         }
 
         this.authService.guardarSesion(respuesta);
+        this.analytics.trackLogin('credenciales', {
+          estado: 'exitoso',
+          tipo_usuario: respuesta.tipoUser ?? 'desconocido'
+        });
         this.router.navigate(['/auth/visor']);
       },
       error: (error) => {
