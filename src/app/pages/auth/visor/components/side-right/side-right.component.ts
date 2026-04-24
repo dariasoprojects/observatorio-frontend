@@ -304,13 +304,6 @@ export class SideRightComponent {
     cargar(this.indiceServiciosRecibidosComponent);
   }
 
-
-
-
-
-
-
-
   getDatosIndicadores():void  {
     this.sumatoriasService.getDatosIndicadores().subscribe({
       next: (rows: IndicadoresSumatoriaResponse) => {

@@ -5,9 +5,9 @@
     <table class="tabla-supsemb">
       <thead>
         <tr>
-          <th>Regiones</th>
-          <th>Área Total (ha.)</th>
-          <th>Área Sembrada (ha.)</th>
+          <th>{{ tituloPrimeraColumna }}</th>
+          <th class="num-col">Área Total (ha.)</th>
+          <th class="num-col">Área Sembrada (ha.)</th>
         </tr>
       </thead>
 
@@ -15,7 +15,7 @@
         <tr *ngFor="let fila of tablaDatos">
           <td>{{ fila.ddescr }}</td>
           <td class="num-col">
-            {{ FormatUtil.formatInteger2Digitos(fila.hectareaTotal) }}
+            {{ fila.hectareaTotal }}
           </td>
           <td class="num-col">
             {{ FormatUtil.formatInteger2Digitos(fila.hectariaSembrada) }}
@@ -27,7 +27,7 @@
         <tr class="fila-total">
           <td><strong>Total</strong></td>
           <td class="num-col">
-            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareaTotal) }}</strong>
+            <strong>{{ totalHectareaTotal }}</strong>
           </td>
           <td class="num-col">
             <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareaSembrada) }}</strong>

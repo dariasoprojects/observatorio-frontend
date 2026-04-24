@@ -210,6 +210,10 @@ export class AnalisisEspacialComponent {
   detalleVisible = false;
   filaSeleccionada: any = null;
 
+  /*TITULOS DINAMICOS*/
+  tituloProductivo: string = 'Distribución por Actividad Productiva';
+  tituloPorCultivo: string = 'Productores por cultivo';
+
   //@ViewChild('wrapScroll') wrapScroll!: ElementRef<HTMLDivElement>;
   @ViewChild('wrapScroll', { read: ElementRef }) wrapScroll!: ElementRef<HTMLElement>;
 
@@ -416,7 +420,7 @@ export class AnalisisEspacialComponent {
           },
           series: [{
             type: 'column',
-            name: 'Total',
+            name: 'Número de Productores por cultivo principal según fertilizante',
             data: this.gridFerti1.map(r => Number(r.TOTAL ?? 0))
           }]
         });
@@ -455,7 +459,7 @@ export class AnalisisEspacialComponent {
           },
           series: [{
             type: 'column',
-            name: 'Total',
+            name: 'Número de Productores por cultivo transitorio según fertilizante',
             data: this.gridFerti2.map(r => Number(r.TOTAL ?? 0))
           }]
         });
@@ -497,7 +501,7 @@ export class AnalisisEspacialComponent {
           },
           series: [{
             type: 'column',
-            name: 'Total',
+            name: 'Número de Productores por cultivo permanente según fertilizante',
             data: this.gridFerti3.map(r => Number(r.TOTAL ?? 0))
           }]
         });
@@ -687,7 +691,7 @@ export class AnalisisEspacialComponent {
       if (dataGrafico.length > 0) {
         this.chartCultivos1 = Highcharts.chart('chart-cultivos1', {
           chart: { type: 'bar', height: 320, backgroundColor: '#f8fafc' },
-          title: { text: 'Productores por cultivo' },
+          title: { text: this.tituloPorCultivo },
           credits: { enabled: false },
           xAxis: {
             categories: dataGrafico.map(r => r.DESCRIPCION),
@@ -813,7 +817,7 @@ export class AnalisisEspacialComponent {
 
           this.chartCultivos2 = Highcharts.chart('chart-cultivos2', {
           chart: { type: 'bar', height: 360,backgroundColor: '#f8fafc' },
-          title: { text: 'Productores por cultivo' },
+          title: { text: this.tituloPorCultivo },
           credits: { enabled: false },
           xAxis: {
             categories: dataGrafico.map(r => r.DESCRIPCION),
@@ -944,7 +948,7 @@ export class AnalisisEspacialComponent {
 
          this.chartCultivos3 = Highcharts.chart('chart-cultivos3', {
           chart: { type: 'bar', height: 380 , backgroundColor: '#f8fafc'},
-          title: { text: 'Productores por cultivo' },
+          title: { text: this.tituloPorCultivo },
           credits: { enabled: false },
           xAxis: {
             categories: dataGrafico.map(r => r.DESCRIPCION),
@@ -1498,7 +1502,7 @@ export class AnalisisEspacialComponent {
             const g = Number(String(f.attributes.GENERO).trim());
             return {
               GENERO: g,
-              DESCRIPCION: g === 1 ? "MUJER" : g === 2 ? "HOMBRE" : "SIN DATA",
+              DESCRIPCION: g === 1 ? "MUJER" : g === 2 ? "HOMBRE" : "NO ESPECIFICA",
               SUM_GENERO: f.attributes.SUM_GENERO
             };
           });
@@ -1670,7 +1674,7 @@ export class AnalisisEspacialComponent {
 
                 const chartCreado = this.crearPie(
                   'chart-productivo',
-                  'Actividad Productiva',
+                  this.tituloProductivo,
                   dataProductivo,
                   () => this.finalizarChartPendiente()
                 );
@@ -1860,7 +1864,7 @@ export class AnalisisEspacialComponent {
                 tooltip: { pointFormat: '<b>{point.y}</b>' },
                 series: [{
                   type: 'column',
-                  name: 'Total',
+                  name: 'Cantidad de animales por tipo',
                   data: dataPecuarioChart.map(r => Number(r.SUM_CAN_P29_2 ?? 0))
                 }]
               });

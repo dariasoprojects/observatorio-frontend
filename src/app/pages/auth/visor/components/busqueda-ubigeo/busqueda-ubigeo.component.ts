@@ -1,13 +1,13 @@
-import {Component} from '@angular/core';
-import {DropdownModule} from "primeng/dropdown";
-import {Panel} from "primeng/panel";
-import {finalize} from 'rxjs';
-import {ProvinciasResponse} from '../../../../../models/ubigeos/provincias.model';
-import {UbigeoService} from '../../../../../services/ubigeo.service';
-import {FiltroUbigeoService} from '../../../../../services/state/visor/filtro-ubigeo.service';
-import {LoaderService} from '../../../../../services/state/loader.service';
-import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {MapCommService} from '../../../../../services/map-comm.service';
+import { Component } from '@angular/core';
+import { DropdownModule } from 'primeng/dropdown';
+import { Panel } from 'primeng/panel';
+import { finalize } from 'rxjs';
+import { ProvinciasResponse } from '../../../../../models/ubigeos/provincias.model';
+import { UbigeoService } from '../../../../../services/ubigeo.service';
+import { FiltroUbigeoService } from '../../../../../services/state/visor/filtro-ubigeo.service';
+import { LoaderService } from '../../../../../services/state/loader.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { MapCommService } from '../../../../../services/map-comm.service';
 
 interface Departamento {
   code: string;
@@ -21,16 +21,11 @@ interface Provincia {
 
 @Component({
   selector: 'app-busqueda-ubigeo',
-  imports: [
-    DropdownModule,
-    Panel,
-    ReactiveFormsModule
-  ],
+  imports: [DropdownModule, Panel, ReactiveFormsModule],
   templateUrl: './busqueda-ubigeo.component.html',
-  styleUrl: './busqueda-ubigeo.component.css'
+  styleUrl: './busqueda-ubigeo.component.css',
 })
 export class BusquedaUbigeoComponent {
-
   departamentoCodigo: string = '';
   provinciaCodigo: string = '';
 
@@ -60,8 +55,8 @@ export class BusquedaUbigeoComponent {
     { code: '22', name: 'San Martin' },
     { code: '23', name: 'Tacna' },
     { code: '24', name: 'Tumbes' },
-    { code: '25', name: 'Ucayali' }
-  ]
+    { code: '25', name: 'Ucayali' },
+  ];
   provincias: Provincia[] = [];
 
   form!: FormGroup;
@@ -71,20 +66,20 @@ export class BusquedaUbigeoComponent {
     private filtroUbigeoService: FiltroUbigeoService,
     private loader: LoaderService,
     private fb: FormBuilder,
-    private comm: MapCommService   // para el  manejo de los servicos del mapa desde este control
-  ){
+    private comm: MapCommService, // para el  manejo de los servicos del mapa desde este control
+  ) {
     this.form = this.fb.group({
       departamento: [null],
-      provincia: [null]
+      provincia: [null],
     });
-
   }
 
   onDepartamentoChange(event: any) {
-    const selectedValue = event.value??'00';
-    const opt = this.departamentos.find(d => d.code === selectedValue);
-    const selectedText = selectedValue !== '00' ? opt?.name?.toUpperCase() ?? null : null;
-    this.departamentoCodigo =selectedValue;
+    const selectedValue = event.value ?? '00';
+    const opt = this.departamentos.find((d) => d.code === selectedValue);
+    const selectedText =
+      selectedValue !== '00' ? (opt?.name?.toUpperCase() ?? null) : null;
+    this.departamentoCodigo = selectedValue;
     this.provincias = [];
 
     console.log(this.departamentoCodigo);
@@ -93,68 +88,75 @@ export class BusquedaUbigeoComponent {
     this.filtroUbigeoService.setFiltros({
       departamento: this.departamentoCodigo,
       nombreDepartamento: selectedText,
-      provincia: null  ,
-      nombreProvincia: null
+      provincia: null,
+      nombreProvincia: null,
     });
     this.loader.show();
-    this.ubigeoService.getProvinciabyCodigo(selectedValue)
-      .pipe(
-        finalize(() => this.loader.hide())
-      )
+    this.ubigeoService
+      .getProvinciabyCodigo(selectedValue)
+      .pipe(finalize(() => this.loader.hide()))
       .subscribe({
         next: (rows: ProvinciasResponse) => {
-          const lista = (rows?.features ?? []).map(f => ({
+          const lista = (rows?.features ?? []).map((f) => ({
             code: f.attributes.IDPROV,
-            name: this.toPascalCase(f.attributes.NOMBPROV)
+            name: this.toPascalCase(f.attributes.NOMBPROV),
           }));
 
           this.provincias = [
             { code: '00', name: '-- Todas --' },
-            ...lista.sort((a, b) => a.name.localeCompare(b.name, 'es'))
+            ...lista.sort((a, b) => a.name.localeCompare(b.name, 'es')),
           ];
         },
         error: (err) => {
           console.error('Error cargando provincias', err);
           this.provincias = [{ code: '00', name: '-- Todas --' }];
-        }
+        },
       });
-
 
     if (!event.value || selectedValue === '00') {
       console.log('departamento limpiado, disparando resetCompleto');
       this.comm.requestResetCompleto();
     }
-
   }
 
   onProvinciaChange(event: any) {
-    const selectedValue = event.value??'00';
-    const opt = this.provincias.find(d => d.code === selectedValue);
-    const selectedText = selectedValue !=='00'? opt?.name.toUpperCase() ?? null:null;
+    const selectedValue = event.value ?? '00';
+    const opt = this.provincias.find((d) => d.code === selectedValue);
+    const selectedText =
+      selectedValue !== '00' ? (opt?.name.toUpperCase() ?? null) : null;
     this.provinciaCodigo = selectedValue;
 
     this.filtroUbigeoService.setFiltros({
       provincia: selectedValue ?? '00',
-      nombreProvincia :selectedText ?? '',
+      nombreProvincia: selectedText ?? '',
     });
-
   }
 
   private toPascalCase(text: string): string {
     if (!text) return '';
-    return text
-      .toLowerCase()
-      .replace(/\b\w/g, char => char.toUpperCase());
+
+    const fixed = this.decodeUTF8(text);
+
+    return fixed
+      .toLocaleLowerCase('es-PE')
+      .split(' ')
+      .map((word) => word.charAt(0).toLocaleUpperCase('es-PE') + word.slice(1))
+      .join(' ');
   }
 
+  private decodeUTF8(text: string): string {
+    try {
+      return decodeURIComponent(escape(text));
+    } catch {
+      return text;
+    }
+  }
 
   resetFiltros(): void {
-
     this.form.patchValue({
       departamento: null,
-      provincia: null
+      provincia: null,
     });
-
 
     this.departamentoCodigo = '';
     this.provinciaCodigo = '';
@@ -165,9 +167,7 @@ export class BusquedaUbigeoComponent {
       departamento: '00',
       nombreDepartamento: null,
       provincia: null,
-      nombreProvincia: null
+      nombreProvincia: null,
     });
-
   }
-
 }

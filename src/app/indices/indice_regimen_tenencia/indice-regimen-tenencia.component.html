@@ -2,7 +2,7 @@
   <div id="container-regtene"></div>
 
   <button class="btn-tematico" (click)="aplicarColoresTematico()">
-    Ver temático
+    Aplicar tematización
   </button>
 
   <div style="margin-bottom: 15px;">
@@ -20,14 +20,14 @@
     <table class="tabla-regtene">
       <thead>
         <tr>
-          <th>Jurisdicción</th>
-          <th>Parcelas</th>
+          <th>{{ tituloPrimeraColumna }}</th>
+          <th class="num-col">Parcelas</th>
         </tr>
       </thead>
 
       <tbody>
         <tr *ngFor="let fila of tablaFiltrada">
-          <td class="num-col">
+          <td>
             {{ fila.ubigeo }}
           </td>
           <td class="num-col">

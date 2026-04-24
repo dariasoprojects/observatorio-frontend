@@ -14,7 +14,7 @@
           <!-- TAB 1: CAPA -->
           <p-tabPanel header="Seleccionar capa">
             <div class="tab-body">
-              <label class="field-title">Seleccionar capa</label>
+              <label class="field-title mr-2">Seleccionar capa</label>
               <p-dropdown
                 [options]="capas"
                 optionLabel="label"
@@ -148,8 +148,8 @@
               <ng-template pTemplate="header">
                 <tr>
                   
-                  <th>GÉNERO</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th width="50%">GÉNERO</th>
+                  <th width="50%">PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -164,7 +164,7 @@
               <ng-template pTemplate="footer">
                 <tr>
                  
-                  <td><strong>Suma</strong></td>
+                  <td><strong>TOTAL</strong></td>
                   <td><strong>{{ getSum(gridGenero, 'SUM_GENERO') }}</strong></td>
                 </tr>
               </ng-template>
@@ -186,8 +186,8 @@
             <p-table [value]="gridProductivo" styleClass="p-datatable-sm mini-table">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>DESCRIPCION</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th width="50%">ACTIVIDAD PRODUCTIVA</th>
+                  <th width="50%">PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -197,12 +197,12 @@
                 </tr>
               </ng-template>
 
-              <ng-template pTemplate="footer">
+              <!-- <ng-template pTemplate="footer">
                 <tr>
                   <td><strong>Suma</strong></td>
                   <td><strong>{{ getSum(gridProductivo, 'TOTAL') }}</strong></td>
                 </tr>
-              </ng-template>
+              </ng-template> -->
 
             </p-table>
           </p-card>
@@ -211,7 +211,7 @@
 
           <p-card class="card-mini" *ngIf="mostrarCultivos1">
             <ng-template pTemplate="title">
-              <span class="mini-title">Cultivos principales</span>
+              <span class="mini-title">Distribución por Cultivos principales</span>
             </ng-template>
 
             <div class="chart-wrap" *ngIf="mostrarCultivos1">
@@ -225,8 +225,8 @@
             <p-table [value]="gridCultivos1" styleClass="p-datatable-sm mini-table">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>DESCRIPCIÓN</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th>CULTIVOS PRINCIPALES</th>
+                  <th>PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -250,7 +250,7 @@
 
           <p-card class="card-mini" *ngIf="mostrarCultivos2">
             <ng-template pTemplate="title">
-              <span class="mini-title">Cultivos transitorios</span>
+              <span class="mini-title">Distribución por Cultivos transitorios</span>
             </ng-template>
 
             <div class="chart-wrap" *ngIf="mostrarCultivos2">
@@ -264,8 +264,8 @@
             <p-table [value]="gridCultivos2" styleClass="p-datatable-sm mini-table">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>DESCRIPCIÓN</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th>CULTIVOS TRANSITORIOS</th>
+                  <th>PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -287,7 +287,7 @@
 
           <p-card class="card-mini" *ngIf="mostrarCultivos3">
             <ng-template pTemplate="title">
-              <span class="mini-title">Cultivos permanentes</span>
+              <span class="mini-title">Distribución por Cultivos permanentes</span>
             </ng-template>
 
             <div class="chart-wrap" *ngIf="mostrarCultivos3">
@@ -301,8 +301,8 @@
             <p-table [value]="gridCultivos3" styleClass="p-datatable-sm mini-table">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>DESCRIPCIÓN</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th>CULTIVOS PERMANENTES</th>
+                  <th>PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -377,7 +377,7 @@
 
           <p-card class="card-mini" *ngIf="mostrarPecuario">
             <ng-template pTemplate="title">
-              <span class="mini-title">Estructura Productiva Pecuaria</span>
+              <span class="mini-title">Distribución por Estructura Productiva Pecuaria</span>
             </ng-template>
 
             <div class="chart-wrap" *ngIf="mostrarPecuarioGeneral">
@@ -421,7 +421,7 @@
 
           <p-card class="card-mini" *ngIf="mostrarRiego">
             <ng-template pTemplate="title">
-              <span class="mini-title">Riego</span>
+              <span class="mini-title">Distribución por Riego</span>
             </ng-template>
             <div class="chart-wrap" *ngIf="mostrarRiego">
               <div *ngIf="loadingRiego" class="chart-loading">
@@ -433,8 +433,8 @@
             <p-table [value]="gridRiego" styleClass="p-datatable-sm mini-table">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>DESCRIPCION</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th>METODO DE RIEGO</th>
+                  <th>PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -443,12 +443,12 @@
                   <td>{{ row.TOTAL }}</td>
                 </tr>
               </ng-template>
-               <ng-template pTemplate="footer">
+               <!-- <ng-template pTemplate="footer">
                   <tr>
                     <td><strong>Suma</strong></td>
                     <td><strong>{{ getSum(gridRiego, 'TOTAL') }}</strong></td>
                   </tr>
-                </ng-template>
+                </ng-template> -->
 
 
             </p-table>
@@ -459,7 +459,7 @@
 
           <p-card class="card-mini" *ngIf="mostrarFerti1">
             <ng-template pTemplate="title">
-              <span class="mini-title">Fertilización </span>
+              <span class="mini-title">Distribución por Fertilización </span>
             </ng-template>
 
             <div class="chart-wrap" *ngIf="mostrarFerti1">
@@ -473,8 +473,8 @@
             <p-table [value]="gridFerti1" styleClass="p-datatable-sm mini-table">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>DESCRIPCIÓN</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th>FERTILIZANTES</th>
+                  <th>PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -483,12 +483,12 @@
                   <td>{{ row.TOTAL }}</td>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="footer">
+              <!-- <ng-template pTemplate="footer">
                 <tr>
                   <td><strong>Suma</strong></td>
                   <td><strong>{{ getSum(gridFerti1, 'TOTAL') }}</strong></td>
                 </tr>
-              </ng-template>
+              </ng-template> -->
             </p-table>
           <!-- </p-card>
 
@@ -510,8 +510,8 @@
             <p-table [value]="gridFerti2" styleClass="p-datatable-sm mini-table">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>DESCRIPCIÓN</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th>FERTILIZANTES</th>
+                  <th>PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -520,12 +520,12 @@
                   <td>{{ row.TOTAL }}</td>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="footer">
+              <!-- <ng-template pTemplate="footer">
                 <tr>
                   <td><strong>Suma</strong></td>
                   <td><strong>{{ getSum(gridFerti2, 'TOTAL') }}</strong></td>
                 </tr>
-              </ng-template>
+              </ng-template> -->
             </p-table>
           <!-- </p-card>
 
@@ -546,8 +546,8 @@
             <p-table [value]="gridFerti3" styleClass="p-datatable-sm mini-table">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>DESCRIPCIÓN</th>
-                  <th>TOTAL PRODUCTORES</th>
+                  <th>FERTILIZANTES</th>
+                  <th>PRODUCTORES</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-row>
@@ -556,12 +556,12 @@
                   <td>{{ row.TOTAL }}</td>
                 </tr>
               </ng-template>
-               <ng-template pTemplate="footer">
+               <!-- <ng-template pTemplate="footer">
                   <tr>
                     <td><strong>Suma</strong></td>
                     <td><strong>{{ getSum(gridFerti3, 'TOTAL') }}</strong></td>
                   </tr>
-                </ng-template>
+                </ng-template> -->
             </p-table>
           </p-card>
 
