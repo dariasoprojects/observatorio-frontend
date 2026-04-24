@@ -1,4 +1,5 @@
-<h2 mat-dialog-title>Registros para {{ regSeleccionado }}</h2>
+<h2 mat-dialog-title>Registros para {{ titleSeleccionado }}</h2>
+<h4 class="ml-4 mt-2">Tipo: {{ tipoSelected }}</h4>
 
 <mat-dialog-content>
   <div *ngIf="cargando" class="spinner-container">
@@ -13,13 +14,13 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="INST">
-      <th mat-header-cell *matHeaderCellDef>Institución</th>
+    <ng-container matColumnDef="NOMBRES">
+      <th mat-header-cell *matHeaderCellDef>NOMBRES</th>
       <td mat-cell *matCellDef="let row">{{ row.NOMBRES }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="CENTRO">
-      <th mat-header-cell *matHeaderCellDef>Centro</th>
+    <ng-container matColumnDef="APELLIDOPA">
+      <th mat-header-cell *matHeaderCellDef>APELLIDO PATERNO</th>
       <td mat-cell *matCellDef="let row">{{ row.APELLIDOPA }}</td>
     </ng-container>
 
@@ -31,12 +32,11 @@
     [length]="totalRegistros"
     [pageSize]="20"
     [pageSizeOptions]="[10, 20, 50]"
-    showFirstLastButtons
-    (page)="cambiarPagina($event)">
+    showFirstLastButtons>
   </mat-paginator>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button color="primary" (click)="exportarTodo()">Exportar todo</button>
+  <button mat-button color="primary" (click)="exportarTodo()" [disabled]="cargando">Exportar todo</button>
   <button mat-button mat-dialog-close>Cerrar</button>
 </mat-dialog-actions>

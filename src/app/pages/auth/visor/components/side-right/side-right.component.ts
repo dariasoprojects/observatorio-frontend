@@ -160,7 +160,7 @@ export class SideRightComponent {
     const prov = f.provincia ?? '00';
     const nombreProvincia = f.nombreProvincia ?? '';
 
-    // 🔥 Recuperar variables de estado locales
+    //  Recuperar variables de estado locales
     this.valorSeleccionado = dpto !== '00' ? dpto : null;
     this.valorSeleccionadoText = nombreDepartamento !== '' ? nombreDepartamento : null;
     this.valorSeleccionadoProv = prov !== '00' ? prov : null;
@@ -304,19 +304,14 @@ export class SideRightComponent {
     cargar(this.indiceServiciosRecibidosComponent);
   }
 
-
-
-
-
-
-
-
   getDatosIndicadores():void  {
     this.sumatoriasService.getDatosIndicadores().subscribe({
       next: (rows: IndicadoresSumatoriaResponse) => {
         const feature = rows?.features?.[0];
         this.nroProductores = FormatUtil.formatInteger( feature?.attributes?.PRODUCTORES ?? 0);
         this.nroParcelas = FormatUtil.formatInteger( feature?.attributes?.PARCELAS ?? 0);
+        console.log("nroHectareas :::", feature?.attributes?.HECTAREA);
+        //debugger;
         this.nroHectareas = FormatUtil.formatInteger( feature?.attributes?.HECTAREA ?? 0);
       },
       error: (err) => {

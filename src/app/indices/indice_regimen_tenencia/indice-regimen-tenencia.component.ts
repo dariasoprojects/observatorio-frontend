@@ -1,20 +1,17 @@
-import { Component, OnInit , Input} from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
 import { UbigeoService } from '../../services/ubigeo.service';
-import {FormatUtil} from '../../shared/utils/format.util';
-import {MatSelectModule} from '@angular/material/select';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatIconModule} from '@angular/material/icon';
-import {IndicadoresSumatoriaResponse} from '../../models/Sumatorias/indicadores-sumatoria.model';
-import {TablaIndiceUbigeo} from '../../models/indices/indices.model';
-import {IndicesUtil} from '../../shared/utils/indices.util';
-import {RegimenTeneciaService} from '../../services/indices/regimen-tenecia.service';
-import {MapCommService} from '../../services/map-comm.service';
-
-
-
+import { FormatUtil } from '../../shared/utils/format.util';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { IndicadoresSumatoriaResponse } from '../../models/Sumatorias/indicadores-sumatoria.model';
+import { TablaIndiceUbigeo } from '../../models/indices/indices.model';
+import { IndicesUtil } from '../../shared/utils/indices.util';
+import { RegimenTeneciaService } from '../../services/indices/regimen-tenecia.service';
+import { MapCommService } from '../../services/map-comm.service';
 
 @Component({
   selector: 'app-indice-regtene',
@@ -24,46 +21,43 @@ import {MapCommService} from '../../services/map-comm.service';
     MatSelectModule,
     MatFormFieldModule,
     MatSlideToggleModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './indice-regimen-tenencia.component.html',
-  styleUrls: ['./indice-regimen-tenencia.component.css']
+  styleUrls: ['./indice-regimen-tenencia.component.css'],
 })
 export class IndiceRegimenTenenComponent implements OnInit {
-
   @Input() valorSeleccionado!: string | null;
   @Input() valorSeleccionadoText!: string | null;
   @Input() valorSeleccionadoProv!: string | null;
   @Input() valorSeleccionadoProvText!: string | null;
-
 
   categorias: string[] = [];
   categoriasOrdenadas: string[] = [];
   valores: number[] = [];
   chart!: Highcharts.Chart;
 
-  tablaDatos: TablaIndiceUbigeo [] = [];
+  tablaDatos: TablaIndiceUbigeo[] = [];
   tablaFiltrada: TablaIndiceUbigeo[] = [];
   categoriasUnicas: string[] = [];
   categoriaSeleccionada: string = '';
   categoriaSeleccionadaInit: string = '';
 
-
   constructor(
     private ubigeoService: UbigeoService,
     private regimenTeneciaService: RegimenTeneciaService,
     private mapComm: MapCommService,
-    private indicesUtil: IndicesUtil
+    private indicesUtil: IndicesUtil,
   ) {}
 
   async ngOnInit() {
     await this.ubigeoService.cargarTodo();
     if (this.valorSeleccionadoProv !== null) {
       this.cargarDatosByProv(this.valorSeleccionadoProv);
-    }else{
+    } else {
       if (this.valorSeleccionado !== null) {
         this.cargarDatosByDpto(this.valorSeleccionado);
-      }else{
+      } else {
         this.cargarDatos();
       }
     }
@@ -71,26 +65,31 @@ export class IndiceRegimenTenenComponent implements OnInit {
     //this.aplicarColoresTematico();
   }
 
+  get tituloPrimeraColumna(): string {
+    if (this.valorSeleccionadoProv) return 'Distritos';
+    if (this.valorSeleccionado) return 'Provincias';
+    return 'Departamentos';
+  }
+
   get totalParcelas(): number {
     return this.tablaFiltrada.reduce(
       (acc, fila) => acc + Number(fila.parcela || 0),
-      0
+      0,
     );
   }
 
   aplicarColoresTematico() {
-    
-    if (this.valorSeleccionadoProv !== null || this.valorSeleccionado !== null) {      
-      this.mapComm.emitRenderTematico("REGTENE");
-    }else{
-      alert("Esta opción no está disponible a nivel nacional.");
+    if (
+      this.valorSeleccionadoProv !== null ||
+      this.valorSeleccionado !== null
+    ) {
+      this.mapComm.emitRenderTematico('REGTENE');
+    } else {
+      alert('Esta opción no está disponible a nivel nacional.');
     }
   }
 
-
   private crearGrafico() {
-
-
     const options: Highcharts.Options = {
       chart: {
         type: 'pie',
@@ -102,10 +101,13 @@ export class IndiceRegimenTenenComponent implements OnInit {
             if (!s0 || !s0.center) return;
 
             const cx = chart.plotLeft + s0.center[0];
-            const cy = chart.plotTop  + s0.center[1];
+            const cy = chart.plotTop + s0.center[1];
 
             const pts = chart.series[0]?.points || [];
-            const total = pts.reduce((acc: number, p: any) => acc + (p.y || 0), 0);
+            const total = pts.reduce(
+              (acc: number, p: any) => acc + (p.y || 0),
+              0,
+            );
             const totalStr = total.toLocaleString('es-PE');
 
             // borrar textos previos
@@ -128,68 +130,79 @@ export class IndiceRegimenTenenComponent implements OnInit {
               .add();
 
             (chart as any)._centerTexts = { top, bot };
-          }
-        }
+          },
+        },
       },
 
       title: {
         text: 'Régimen Tenencia de Tierras',
-        align: 'center'
+        align: 'center',
       },
 
       credits: { enabled: false },
 
       tooltip: {
-        pointFormat: '<b>{point.y:,.0f}</b> parcelas ({point.percentage:.1f}%)'
+        pointFormat: '<b>{point.y:,.0f}</b> parcelas ({point.percentage:.1f}%)',
       },
 
       plotOptions: {
         pie: {
-          innerSize: '60%',                 //  Donut
+          innerSize: '60%', //  Donut
           dataLabels: {
             enabled: true,
             format: '{point.percentage:.1f} %',
-            distance: -40,                  //  Etiquetas dentro del arco
+            distance: -40, //  Etiquetas dentro del arco
             style: {
               fontWeight: 'bold',
               textOutline: 'none',
-              fontSize: '11px'
-            }
+              fontSize: '11px',
+            },
           },
-          showInLegend: true
-        }
+          showInLegend: true,
+        },
       },
 
-      series: [{
-        name: 'Parcelas',
-        type: 'pie',
-        data: this.categorias.map((c, i) => ({
-          name: c,
-          y: this.valores[i]
-        })),
-        colors: ['#20B5B8', '#229389', '#D2DD45', '#FFE44A', '#FFB022', '#F76C4A', '#F23C3C']
-      }],
-
+      series: [
+        {
+          name: 'Parcelas',
+          type: 'pie',
+          data: this.categorias.map((c, i) => ({
+            name: c,
+            y: this.valores[i],
+          })),
+          colors: [
+            '#20B5B8',
+            '#229389',
+            '#D2DD45',
+            '#FFE44A',
+            '#FFB022',
+            '#F76C4A',
+            '#F23C3C',
+          ],
+        },
+      ],
     };
     this.chart = Highcharts.chart('container-regtene', options);
   }
-
 
   public cargarDatos() {
     this.regimenTeneciaService.getDatosIndicadores().subscribe({
       next: (response: IndicadoresSumatoriaResponse) => {
         const features = response?.features ?? [];
         if (features.length > 0) {
-          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeoParcela(features);
+          const { tabla, categorias, valores } =
+            this.indicesUtil.procesarDatosUbigeoParcela(features);
           this.tablaDatos = tabla;
-          this.categoriasOrdenadas =categorias.sort((a, b) =>
-            a.localeCompare(b)
+          this.categoriasOrdenadas = categorias.sort((a, b) =>
+            a.localeCompare(b),
           );
           this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
-          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
+          this.categoriasUnicas = [
+            ...new Set(this.tablaDatos.map((x) => x.ddescr)),
+          ];
           this.tablaFiltrada = [...this.tablaDatos];
           this.actualizarDatos(categorias, valores);
-          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
+          this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
           this.filtrarPorCategoria();
         } else {
           this.tablaDatos = [];
@@ -208,76 +221,84 @@ export class IndiceRegimenTenenComponent implements OnInit {
         this.categoriasUnicas = [];
         this.tablaFiltrada = [];
         this.crearGrafico();
-      }
+      },
     });
   }
 
-
-
   public cargarDatosByDpto(ubigeo: string) {
-    this.regimenTeneciaService.getDatosIndicadoresbyDepartamento(ubigeo).subscribe({
-      next: (response: IndicadoresSumatoriaResponse) => {
-        const features = response?.features ?? [];
-        if (features.length > 0) {
-          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeoParcela(features);
-          this.tablaDatos = tabla;
-          this.categoriasOrdenadas =categorias.sort((a, b) =>
-            a.localeCompare(b)
-          );
-          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
-          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
-          this.tablaFiltrada = [...this.tablaDatos];
-          this.actualizarDatos(categorias, valores);
-          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
-          this.filtrarPorCategoria();
-        } else {
+    this.regimenTeneciaService
+      .getDatosIndicadoresbyDepartamento(ubigeo)
+      .subscribe({
+        next: (response: IndicadoresSumatoriaResponse) => {
+          const features = response?.features ?? [];
+          if (features.length > 0) {
+            const { tabla, categorias, valores } =
+              this.indicesUtil.procesarDatosUbigeoParcela(features);
+            this.tablaDatos = tabla;
+            this.categoriasOrdenadas = categorias.sort((a, b) =>
+              a.localeCompare(b),
+            );
+            this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
+            this.categoriasUnicas = [
+              ...new Set(this.tablaDatos.map((x) => x.ddescr)),
+            ];
+            this.tablaFiltrada = [...this.tablaDatos];
+            this.actualizarDatos(categorias, valores);
+            this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
+            this.filtrarPorCategoria();
+          } else {
+            this.tablaDatos = [];
+            this.categoriasUnicas = [];
+            this.tablaFiltrada = [];
+            this.actualizarDatos([], []);
+          }
+        },
+        error: (err) => {
+          console.error('Error cargando indicadores:', err);
           this.tablaDatos = [];
           this.categoriasUnicas = [];
           this.tablaFiltrada = [];
           this.actualizarDatos([], []);
-        }
-      },
-      error: (err) => {
-        console.error('Error cargando indicadores:', err);
-        this.tablaDatos = [];
-        this.categoriasUnicas = [];
-        this.tablaFiltrada = [];
-        this.actualizarDatos([], []);
-      }
-    });
+        },
+      });
   }
 
   public cargarDatosByProv(ubigeo: string) {
-    this.regimenTeneciaService.getDatosIndicadoresbyProvincia(ubigeo).subscribe({
-      next: (response: IndicadoresSumatoriaResponse) => {
-        const features = response?.features ?? [];
-        if (features.length > 0) {
-          const { tabla, categorias, valores } = this.indicesUtil.procesarDatosUbigeoParcela(features);
-          this.tablaDatos = tabla;
-          this.categoriasOrdenadas =categorias.sort((a, b) =>
-            a.localeCompare(b)
-          );
-          this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
-          this.categoriasUnicas = [...new Set(this.tablaDatos.map(x => x.ddescr))];
-          this.tablaFiltrada = [...this.tablaDatos];
-          this.actualizarDatos(categorias, valores);
-          this.categoriaSeleccionada=this.categoriaSeleccionadaInit;
-          this.filtrarPorCategoria();
-        } else {
+    this.regimenTeneciaService
+      .getDatosIndicadoresbyProvincia(ubigeo)
+      .subscribe({
+        next: (response: IndicadoresSumatoriaResponse) => {
+          const features = response?.features ?? [];
+          if (features.length > 0) {
+            const { tabla, categorias, valores } =
+              this.indicesUtil.procesarDatosUbigeoParcela(features);
+            this.tablaDatos = tabla;
+            this.categoriasOrdenadas = categorias.sort((a, b) =>
+              a.localeCompare(b),
+            );
+            this.categoriaSeleccionadaInit = this.categoriasOrdenadas[0];
+            this.categoriasUnicas = [
+              ...new Set(this.tablaDatos.map((x) => x.ddescr)),
+            ];
+            this.tablaFiltrada = [...this.tablaDatos];
+            this.actualizarDatos(categorias, valores);
+            this.categoriaSeleccionada = this.categoriaSeleccionadaInit;
+            this.filtrarPorCategoria();
+          } else {
+            this.tablaDatos = [];
+            this.categoriasUnicas = [];
+            this.tablaFiltrada = [];
+            this.actualizarDatos([], []);
+          }
+        },
+        error: (err) => {
+          console.error('Error cargando indicadores:', err);
           this.tablaDatos = [];
           this.categoriasUnicas = [];
           this.tablaFiltrada = [];
           this.actualizarDatos([], []);
-        }
-      },
-      error: (err) => {
-        console.error('Error cargando indicadores:', err);
-        this.tablaDatos = [];
-        this.categoriasUnicas = [];
-        this.tablaFiltrada = [];
-        this.actualizarDatos([], []);
-      }
-    });
+        },
+      });
   }
 
   private actualizarDatos(nuevasCategorias: string[], nuevosValores: number[]) {
@@ -292,7 +313,10 @@ export class IndiceRegimenTenenComponent implements OnInit {
 
     // Actualiza el pie existente
     const serie = this.chart.series[0];
-    const puntos = nuevasCategorias.map((c, i) => ({ name: c, y: nuevosValores[i] }));
+    const puntos = nuevasCategorias.map((c, i) => ({
+      name: c,
+      y: nuevosValores[i],
+    }));
     serie.setData(puntos, true); // true => redibuja
   }
 
@@ -302,10 +326,9 @@ export class IndiceRegimenTenenComponent implements OnInit {
       return;
     }
     this.tablaFiltrada = this.tablaDatos.filter(
-      x => x.ddescr === this.categoriaSeleccionada
+      (x) => x.ddescr === this.categoriaSeleccionada,
     );
   }
-
 
   protected readonly Number = Number;
   protected readonly FormatUtil = FormatUtil;

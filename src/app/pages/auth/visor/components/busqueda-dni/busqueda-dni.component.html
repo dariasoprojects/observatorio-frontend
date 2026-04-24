@@ -31,7 +31,7 @@
   <div class="msg-error" *ngIf="formBusqueda.get('dni')?.touched && formBusqueda.get('dni')?.invalid ">
 
     <div *ngIf="formBusqueda.get('dni')?.errors?.['required']">
-      DNI no debe estar vacío.
+      DNI no debe estar vacío.-
     </div>
 
     <div *ngIf="formBusqueda.get('dni')?.errors?.['minlength'] || formBusqueda.get('dni')?.errors?.['maxlength']">

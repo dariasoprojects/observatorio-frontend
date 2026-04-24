@@ -11,7 +11,7 @@ import {AuthService} from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-mapa',
-  standalone: true,             // 👈 FALTABA ESTO
+  standalone: true,             //  FALTABA ESTO
   imports: [],
   templateUrl: './mapa.component.html',
   styleUrl: './mapa.component.css'
@@ -84,8 +84,8 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     );
 
     this.mapa.iniciar()
-      .then(() => console.log("🟢 MAPA CARGADO & READY"))
-      .catch(err => console.error("❌ ERROR mapa:", err));
+      .then(() => console.log(" MAPA CARGADO & READY"))
+      .catch(err => console.error(" ERROR mapa:", err));
 
     this.subZoom = this.comm.zoomRequestGraphic$
       .subscribe(feature => this.mapa.zoomToGraphic(feature));

@@ -211,6 +211,10 @@ export class AnalisisEspacialComponent {
   detalleVisible = false;
   filaSeleccionada: any = null;
 
+  /*TITULOS DINAMICOS*/
+  tituloProductivo: string = 'Distribución por Actividad Productiva';
+  tituloPorCultivo: string = 'Productores por cultivo';
+
   //@ViewChild('wrapScroll') wrapScroll!: ElementRef<HTMLDivElement>;
   @ViewChild('wrapScroll', { read: ElementRef }) wrapScroll!: ElementRef<HTMLElement>;
 
@@ -418,7 +422,7 @@ export class AnalisisEspacialComponent {
           },
           series: [{
             type: 'column',
-            name: 'Total',
+            name: 'Número de Productores por cultivo principal según fertilizante',
             data: this.gridFerti1.map(r => Number(r.TOTAL ?? 0))
           }]
         });
@@ -457,7 +461,7 @@ export class AnalisisEspacialComponent {
           },
           series: [{
             type: 'column',
-            name: 'Total',
+            name: 'Número de Productores por cultivo transitorio según fertilizante',
             data: this.gridFerti2.map(r => Number(r.TOTAL ?? 0))
           }]
         });
@@ -499,7 +503,7 @@ export class AnalisisEspacialComponent {
           },
           series: [{
             type: 'column',
-            name: 'Total',
+            name: 'Número de Productores por cultivo permanente según fertilizante',
             data: this.gridFerti3.map(r => Number(r.TOTAL ?? 0))
           }]
         });
@@ -689,7 +693,7 @@ export class AnalisisEspacialComponent {
       if (dataGrafico.length > 0) {
         this.chartCultivos1 = Highcharts.chart('chart-cultivos1', {
           chart: { type: 'bar', height: 320, backgroundColor: '#f8fafc' },
-          title: { text: 'Productores por cultivo' },
+          title: { text: this.tituloPorCultivo },
           credits: { enabled: false },
           xAxis: {
             categories: dataGrafico.map(r => r.DESCRIPCION),
@@ -815,7 +819,7 @@ export class AnalisisEspacialComponent {
 
           this.chartCultivos2 = Highcharts.chart('chart-cultivos2', {
           chart: { type: 'bar', height: 360,backgroundColor: '#f8fafc' },
-          title: { text: 'Productores por cultivo' },
+          title: { text: this.tituloPorCultivo },
           credits: { enabled: false },
           xAxis: {
             categories: dataGrafico.map(r => r.DESCRIPCION),
@@ -946,7 +950,7 @@ export class AnalisisEspacialComponent {
 
          this.chartCultivos3 = Highcharts.chart('chart-cultivos3', {
           chart: { type: 'bar', height: 380 , backgroundColor: '#f8fafc'},
-          title: { text: 'Productores por cultivo' },
+          title: { text: this.tituloPorCultivo },
           credits: { enabled: false },
           xAxis: {
             categories: dataGrafico.map(r => r.DESCRIPCION),
@@ -1026,6 +1030,57 @@ export class AnalisisEspacialComponent {
 
 
 
+  private toSheetWithHeaders(
+    rows: any[],
+    columns: Array<{ key: string; header: string; width?: number }>,
+    totalConfig?: { label: string; sumKeys: string[]; labelKey?: string }
+  ): XLSX.WorkSheet {
+    const data = (rows || []).map(row => {
+      const out: any = {};
+      columns.forEach(col => {
+        out[col.header] = row?.[col.key] ?? '';
+      });
+      return out;
+    });
+
+    if (totalConfig && rows?.length) {
+      const totalRow: any = {};
+      columns.forEach(col => {
+        if (col.key === (totalConfig.labelKey ?? columns[0].key)) {
+          totalRow[col.header] = totalConfig.label;
+        } else if (totalConfig.sumKeys.includes(col.key)) {
+          totalRow[col.header] = this.getSum(rows, col.key);
+        } else {
+          totalRow[col.header] = '';
+        }
+      });
+      data.push(totalRow);
+    }
+
+    const ws = XLSX.utils.json_to_sheet(data);
+
+    ws['!cols'] = columns.map(col => ({
+      wch: col.width ?? Math.max(col.header.length + 2, 16)
+    }));
+
+    return ws;
+  }
+
+  private appendSheetIfData(
+    wb: XLSX.WorkBook,
+    sheetName: string,
+    rows: any[],
+    columns: Array<{ key: string; header: string; width?: number }>,
+    totalConfig?: { label: string; sumKeys: string[]; labelKey?: string }
+  ): void {
+    if (!rows?.length) return;
+
+    const ws = this.toSheetWithHeaders(rows, columns, totalConfig);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  }
+
+
+
   private toSheet(data: any[], header?: string[]): XLSX.WorkSheet {
     // Si mandas header, fuerzas orden de columnas
     if (header?.length) {
@@ -1039,13 +1094,74 @@ export class AnalisisEspacialComponent {
     return XLSX.utils.json_to_sheet(data);
   }
 
+  // exportarExcel(): void {
+  //   // Validación básica
+  //   const tieneAlgo =
+  //     (this.gridGenero?.length ?? 0) > 0 ||
+  //     (this.gridProductivo?.length ?? 0) > 0 ||
+  //     (this.gridRiego?.length ?? 0) > 0 ||
+  //     (this.resultados?.length ?? 0) > 0;
+
+  //   if (!tieneAlgo) {
+  //     alert('No hay datos para exportar.');
+  //     return;
+  //   }
+
+  //   const wb: XLSX.WorkBook = XLSX.utils.book_new();
+
+  //   // 1) Género
+  //   if (this.gridGenero?.length) {
+  //     const ws = this.toSheet(this.gridGenero, this.colsGenero);
+  //     XLSX.utils.book_append_sheet(wb, ws, 'Genero');
+  //   }
+
+  //   // 2) Productivo
+  //   if (this.gridProductivo?.length) {
+  //     const ws = this.toSheet(this.gridProductivo, this.colsProductivo);
+  //     XLSX.utils.book_append_sheet(wb, ws, 'Productivo');
+  //   }
+
+  //   // 3) Riego
+  //   if (this.gridRiego?.length) {
+  //     const ws = this.toSheet(this.gridRiego, this.colsRiego);
+  //     XLSX.utils.book_append_sheet(wb, ws, 'Riego');
+  //   }
+
+  //   // 4) Productores (tabla principal)
+  //   if (this.resultados?.length) {
+  //     // OJO: esto exporta TODO el objeto, si quieres solo algunas columnas, define un header
+  //     // const header = ['OBJECTID','TXT_NRODOC','NOMBRES','APELLIDOPA', ...]
+  //     const ws = this.toSheet(this.resultados);
+  //     XLSX.utils.book_append_sheet(wb, ws, 'Productores');
+  //   }
+
+  //   // Nombre de archivo
+  //   const hoy = new Date();
+  //   const yyyy = hoy.getFullYear();
+  //   const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+  //   const dd = String(hoy.getDate()).padStart(2, '0');
+  //   const fileName = `analisis_espacial_${yyyy}${mm}${dd}.xlsx`;
+
+  //   // Descargar
+  //   const excelBuffer: ArrayBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  //   const blob = new Blob([excelBuffer], {
+  //     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  //   });
+  //   saveAs(blob, fileName);
+  // }
+
   exportarExcel(): void {
-    // Validación básica
     const tieneAlgo =
       (this.gridGenero?.length ?? 0) > 0 ||
       (this.gridProductivo?.length ?? 0) > 0 ||
+      (this.gridCultivos1?.length ?? 0) > 0 ||
+      (this.gridCultivos2?.length ?? 0) > 0 ||
+      (this.gridCultivos3?.length ?? 0) > 0 ||
+      (this.gridPecuario?.length ?? 0) > 0 ||
       (this.gridRiego?.length ?? 0) > 0 ||
-      (this.resultados?.length ?? 0) > 0;
+      (this.gridFerti1?.length ?? 0) > 0 ||
+      (this.gridFerti2?.length ?? 0) > 0 ||
+      (this.gridFerti3?.length ?? 0) > 0;
 
     if (!tieneAlgo) {
       alert('No hay datos para exportar.');
@@ -1054,44 +1170,128 @@ export class AnalisisEspacialComponent {
 
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
 
-    // 1) Género
-    if (this.gridGenero?.length) {
-      const ws = this.toSheet(this.gridGenero, this.colsGenero);
-      XLSX.utils.book_append_sheet(wb, ws, 'Genero');
-    }
+    this.appendSheetIfData(
+      wb,
+      'Genero',
+      this.gridGenero,
+      [
+        { key: 'DESCRIPCION', header: 'GÉNERO' },
+        { key: 'SUM_GENERO', header: 'TOTAL PRODUCTORES' }
+      ],
+      { label: 'Suma', sumKeys: ['SUM_GENERO'], labelKey: 'DESCRIPCION' }
+    );
 
-    // 2) Productivo
-    if (this.gridProductivo?.length) {
-      const ws = this.toSheet(this.gridProductivo, this.colsProductivo);
-      XLSX.utils.book_append_sheet(wb, ws, 'Productivo');
-    }
+    this.appendSheetIfData(
+      wb,
+      'Actividad Productiva',
+      this.gridProductivo,
+      [
+        { key: 'DESCRIPCION', header: 'DESCRIPCION' },
+        { key: 'TOTAL', header: 'TOTAL PRODUCTORES' }
+      ],
+      { label: 'Suma', sumKeys: ['TOTAL'], labelKey: 'DESCRIPCION' }
+    );
 
-    // 3) Riego
-    if (this.gridRiego?.length) {
-      const ws = this.toSheet(this.gridRiego, this.colsRiego);
-      XLSX.utils.book_append_sheet(wb, ws, 'Riego');
-    }
+    this.appendSheetIfData(
+      wb,
+      'Cultivos Principales',
+      this.gridCultivos1,
+      [
+        { key: 'DESCRIPCION', header: 'DESCRIPCIÓN' },
+        { key: 'TOTAL', header: 'TOTAL PRODUCTORES' }
+      ]
+    );
 
-    // 4) Productores (tabla principal)
-    if (this.resultados?.length) {
-      // OJO: esto exporta TODO el objeto, si quieres solo algunas columnas, define un header
-      // const header = ['OBJECTID','TXT_NRODOC','NOMBRES','APELLIDOPA', ...]
-      const ws = this.toSheet(this.resultados);
-      XLSX.utils.book_append_sheet(wb, ws, 'Productores');
-    }
+    this.appendSheetIfData(
+      wb,
+      'Cultivos Transitorios',
+      this.gridCultivos2,
+      [
+        { key: 'DESCRIPCION', header: 'DESCRIPCIÓN' },
+        { key: 'TOTAL', header: 'TOTAL PRODUCTORES' }
+      ]
+    );
 
-    // Nombre de archivo
+    this.appendSheetIfData(
+      wb,
+      'Cultivos Permanentes',
+      this.gridCultivos3,
+      [
+        { key: 'DESCRIPCION', header: 'DESCRIPCIÓN' },
+        { key: 'TOTAL', header: 'TOTAL PRODUCTORES' }
+      ]
+    );
+
+    this.appendSheetIfData(
+      wb,
+      'Pecuario',
+      this.gridPecuario,
+      [
+        { key: 'TXT_P29_1', header: 'ESPECIE' },
+        { key: 'SUM_CAN_P29_2', header: 'TOTAL' },
+        { key: 'SUM_CAN_P29_3_RAZA', header: 'RAZA' },
+        { key: 'SUM_CAN_P29_3_CRIOLLO', header: 'CRIOLLO' },
+        { key: 'SUM_CAN_P29_3_MEJORADO', header: 'MEJORADO' }
+      ]
+    );
+
+    this.appendSheetIfData(
+      wb,
+      'Riego',
+      this.gridRiego,
+      [
+        { key: 'DESCRIPCION', header: 'DESCRIPCION' },
+        { key: 'TOTAL', header: 'TOTAL PRODUCTORES' }
+      ],
+      { label: 'Suma', sumKeys: ['TOTAL'], labelKey: 'DESCRIPCION' }
+    );
+
+    this.appendSheetIfData(
+      wb,
+      'Fertilizacion 1',
+      this.gridFerti1,
+      [
+        { key: 'DESCRIPCION', header: 'DESCRIPCIÓN' },
+        { key: 'TOTAL', header: 'TOTAL PRODUCTORES' }
+      ],
+      { label: 'Suma', sumKeys: ['TOTAL'], labelKey: 'DESCRIPCION' }
+    );
+
+    this.appendSheetIfData(
+      wb,
+      'Fertilizacion 2',
+      this.gridFerti2,
+      [
+        { key: 'DESCRIPCION', header: 'DESCRIPCIÓN' },
+        { key: 'TOTAL', header: 'TOTAL PRODUCTORES' }
+      ],
+      { label: 'Suma', sumKeys: ['TOTAL'], labelKey: 'DESCRIPCION' }
+    );
+
+    this.appendSheetIfData(
+      wb,
+      'Fertilizacion 3',
+      this.gridFerti3,
+      [
+        { key: 'DESCRIPCION', header: 'DESCRIPCIÓN' },
+        { key: 'TOTAL', header: 'TOTAL PRODUCTORES' }
+      ],
+      { label: 'Suma', sumKeys: ['TOTAL'], labelKey: 'DESCRIPCION' }
+    );
+
+   
+
     const hoy = new Date();
     const yyyy = hoy.getFullYear();
     const mm = String(hoy.getMonth() + 1).padStart(2, '0');
     const dd = String(hoy.getDate()).padStart(2, '0');
     const fileName = `analisis_espacial_${yyyy}${mm}${dd}.xlsx`;
 
-    // Descargar
     const excelBuffer: ArrayBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
+
     saveAs(blob, fileName);
     this.analytics.trackDescargaReporte('analisis_espacial', {
       formato: 'xlsx',
@@ -1312,7 +1512,7 @@ export class AnalisisEspacialComponent {
             const g = Number(String(f.attributes.GENERO).trim());
             return {
               GENERO: g,
-              DESCRIPCION: g === 1 ? "MUJER" : g === 2 ? "HOMBRE" : "SIN DATA",
+              DESCRIPCION: g === 1 ? "MUJER" : g === 2 ? "HOMBRE" : "NO ESPECIFICA",
               SUM_GENERO: f.attributes.SUM_GENERO
             };
           });
@@ -1484,7 +1684,7 @@ export class AnalisisEspacialComponent {
 
                 const chartCreado = this.crearPie(
                   'chart-productivo',
-                  'Actividad Productiva',
+                  this.tituloProductivo,
                   dataProductivo,
                   () => this.finalizarChartPendiente()
                 );
@@ -1674,7 +1874,7 @@ export class AnalisisEspacialComponent {
                 tooltip: { pointFormat: '<b>{point.y}</b>' },
                 series: [{
                   type: 'column',
-                  name: 'Total',
+                  name: 'Cantidad de animales por tipo',
                   data: dataPecuarioChart.map(r => Number(r.SUM_CAN_P29_2 ?? 0))
                 }]
               });

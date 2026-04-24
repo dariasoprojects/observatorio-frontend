@@ -4323,6 +4323,8 @@ export class Mapa {
 
   async mostrarParcela(features: __esri.Graphic[]) {
 
+    //alert("mostrarParcela");
+
     let extent: Extent | undefined;
     features.forEach((f) => {
       if (f.geometry && f.geometry.extent) {
@@ -4330,19 +4332,31 @@ export class Mapa {
       }
     });
     if (extent) {
-      await this.mapView?.goTo(extent.expand(10));
+      await this.mapView?.goTo(extent.expand(50));
     }
 
   }
 
 
+  // async zoomToGraphic(graphic: __esri.Graphic) {
+
+  //   if (!this.mapView || !graphic.geometry) return;
+  //   // Zoom a la geometría
+  //   const target = (graphic.geometry as any).extent ?? graphic.geometry;
+  //   await this.mapView.goTo(target, { duration: 1000 });
+
+  // }
   async zoomToGraphic(graphic: __esri.Graphic) {
-
+    //alert("dsd");
     if (!this.mapView || !graphic.geometry) return;
-    // Zoom a la geometría
-    const target = (graphic.geometry as any).extent ?? graphic.geometry;
-    await this.mapView.goTo(target, { duration: 1000 });
 
+    const extent = (graphic.geometry as any).extent;
+
+    if (extent) {
+      await this.mapView.goTo(extent.expand(9), { duration: 1000 });
+    } else {
+      await this.mapView.goTo(graphic.geometry, { duration: 1000 });
+    }
   }
 
 
