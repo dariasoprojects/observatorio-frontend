@@ -1,0 +1,24 @@
+<div class="indice-tipoorg">
+  <!-- Contenedor del gráfico -->
+  <div id="container-tipoorg"></div>
+
+  <!-- Tabla con los datos -->
+  <div class="tabla-wrapper">
+    <table class="tabla-tipoorg">
+      <thead>
+        <tr>
+          <th>Tipo Organización</th>
+          <th>Productores</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td>{{ fila.productores }}</td>
+          
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

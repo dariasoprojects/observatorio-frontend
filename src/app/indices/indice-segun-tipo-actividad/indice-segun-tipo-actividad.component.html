@@ -1,0 +1,78 @@
+<div class="indice-tipoactiv">
+  <div id="container-tipoactiv"></div>
+
+  <div class="tabla-wrapper">
+    <div class="combo-tematico" [style.--color-tematico]="getColorCategoriaSeleccionada()">
+      <mat-form-field appearance="fill" style="width: 300px;">
+        <mat-label>Tipo de actividad</mat-label>
+        <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
+          <mat-option *ngFor="let cat of categoriasOrdenadas" [value]="cat">
+            {{ cat }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div
+      class="tabla-color-header"
+      [style.background-color]="getColorCategoriaSeleccionada()"
+    ></div>
+
+    <table class="tabla-tipoactiv">
+      <thead>
+        <tr>
+          <th>{{ tituloPrimeraColumna }}</th>
+          <th>Productores</th>
+          <th class="num-col">Parcelas</th>
+          <th>Datos</th>
+          <th>Ver en Mapa</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let fila of tablaFiltrada">
+          <td>{{ fila.ubigeo }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcela) }}
+          </td>
+          <td>
+            <button
+              mat-icon-button
+              color="primary"
+              class="mini-icon"
+              matTooltip="Exportar a Excel"
+              (click)="abrirDialogoExportar(fila.ddescr)"
+            >
+              <mat-icon>file_download</mat-icon>
+            </button>
+          </td>
+          <td>
+            <mat-slide-toggle
+              color="primary"
+              [checked]="activeReg === fila.ubigeo"
+              (change)="toggleCluster($event, fila)"
+              class="small-toggle"
+            ></mat-slide-toggle>
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalParcelas) }}</strong>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

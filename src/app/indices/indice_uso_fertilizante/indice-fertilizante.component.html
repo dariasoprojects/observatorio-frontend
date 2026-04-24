@@ -1,0 +1,69 @@
+<div class="indice-fertilizante">
+  <div id="container-fertilizante"></div>
+
+  <button class="btn-tematico" (click)="aplicarColoresTematico()">
+    Aplicar tematización
+  </button>
+
+  <div style="margin-bottom: 15px;">
+    <mat-form-field appearance="fill" style="width: 300px;">
+      <mat-label>Tipo de fertilizante</mat-label>
+      <mat-select [(value)]="categoriaSeleccionada" (selectionChange)="filtrarPorCategoria()">
+        <mat-option *ngFor="let cat of categoriasOrdenadas" [value]="cat">
+          {{ cat }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="tabla-wrapper">
+    <span>Uso de Fertilizantes</span>
+    <table class="tabla-fertilizante">
+      <thead>
+        <tr>
+          <th>{{ tituloPrimeraColumna }}</th>
+          <th class="num-col">Parcelas</th>
+          <th>Datos</th>
+          <th>Ver en Mapa</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let fila of tablaFiltrada">
+          <td>{{ fila.ubigeo }}</td>
+          <td class="num-col">{{ FormatUtil.formatInteger(fila.parcelas) }}</td>
+          <td>
+            <button
+              mat-icon-button
+              color="primary"
+              class="mini-icon"
+              matTooltip="Exportar a Excel"
+              (click)="abrirDialogoExportar(fila)"
+            >
+              <mat-icon>file_download</mat-icon>
+            </button>
+          </td>
+          <td>
+            <mat-slide-toggle
+              color="primary"
+              [checked]="activeReg === fila.ubigeo"
+              (change)="toggleCluster($event, fila.ubigeo)"
+              class="small-toggle"
+            ></mat-slide-toggle>
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalParcelas) }}</strong>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

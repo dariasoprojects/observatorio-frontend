@@ -1,0 +1,39 @@
+<div class="indice-supsemb">
+  <div id="container-supsemb"></div>
+
+  <div class="tabla-wrapper">
+    <table class="tabla-supsemb">
+      <thead>
+        <tr>
+          <th>{{ tituloPrimeraColumna }}</th>
+          <th class="num-col">Área Total (ha.)</th>
+          <th class="num-col">Área Sembrada (ha.)</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ fila.hectareaTotal }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.hectariaSembrada) }}
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ totalHectareaTotal }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareaSembrada) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

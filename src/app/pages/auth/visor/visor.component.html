@@ -1,0 +1,136 @@
+<div class="visor-shell">
+  <header class="visor-banner">
+    <div class="visor-banner__brand">
+      <img
+        src="assets/logo_midagri_portada.png"
+        alt="MIDAGRI"
+        class="visor-banner__midagri"
+      />
+
+      <div class="visor-banner__divider"></div>
+
+      <img src="assets/logo-siea.jpg" alt="SIEA" class="visor-banner__siea" />
+
+      <div class="visor-banner__copy">
+        <span class="visor-banner__eyebrow">Observatorio agrario</span>
+        <h1 class="visor-banner__title">
+          Sistema Integrado de Estadística Agraria
+        </h1>
+      </div>
+    </div>
+
+    <div class="visor-banner__user">
+      <p-avatar
+        [label]="inicialUsuario"
+        shape="circle"
+        styleClass="usr-avatar"
+      ></p-avatar>
+
+      <div class="visor-banner__user-copy">
+        <span class="visor-banner__user-name">{{ usuarioLogueado }}</span>
+        <span class="visor-banner__user-role">
+          {{ tipoUsuario }}
+          <ng-container *ngIf="entidadUsuario">
+            - {{ entidadUsuario }}</ng-container
+          >
+        </span>
+      </div>
+
+      <button
+        *ngIf="!esVisitante"
+        type="button"
+        class="visor-banner__logout"
+        (click)="onLogout()"
+      >
+        <i class="pi pi-sign-out"></i>
+        <span>Salir</span>
+      </button>
+      <button
+        *ngIf="esVisitante"
+        type="button"
+        class="visor-banner__logout"
+        (click)="goBack()"
+      >
+        <i class="pi pi-sign-out"></i>
+        <span>Volver al inicio</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="content-grid" [class.left-collapsed]="isCollapsed">
+    <app-sidebar
+      #sidebar
+      [(isCollapsed)]="isCollapsed"
+      [activeSection]="activeSection"
+      (sectionSelected)="onSelectSection($event)"
+    >
+    </app-sidebar>
+
+    <main class="center-map">
+      <div id="mapContainer" class="map">
+        <app-mapa></app-mapa>
+      </div>
+    </main>
+
+    <app-side-right #sideright [activeSection]="activeSection">
+    </app-side-right>
+  </div>
+
+  <p-dialog
+    header="GeoPerfil"
+    [(visible)]="dialogVisible"
+    [modal]="false"
+    [style]="{ width: '630px' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <app-analisis-espacial (close)="dialogVisible = false">
+    </app-analisis-espacial>
+  </p-dialog>
+
+  <p-dialog
+    header="GeoAnalítica"
+    [(visible)]="dialogVisibleConsultaMultiple"
+    [modal]="false"
+    [style]="{ width: '830px' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <!-- <app-consulta-multiple (cerrarModal)="mostrarGeoanalitica = false"></app-consulta-multiple> -->
+    <app-consulta-multiple
+      (cerrarModal)="dialogVisibleConsultaMultiple = false"
+    >
+    </app-consulta-multiple>
+  </p-dialog>
+
+  <p-dialog
+    header="Descargas"
+    [(visible)]="dialogVisibleDescarga"
+    [modal]="false"
+    [style]="{ width: '830px' }"
+    [contentStyle]="{ height: '80vh', overflow: 'hidden' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <app-descargas></app-descargas>
+  </p-dialog>
+
+  <p-dialog
+    [(visible)]="dialogVisibleBusquedaDni"
+    [modal]="false"
+    [style]="{ width: '430px' }"
+    [draggable]="true"
+    [resizable]="false"
+  >
+    <ng-template pTemplate="header">
+      <div class="p-dialog-title">
+        Búsqueda por DNI
+        <div class="dialog-subtitle">Localización de productores</div>
+      </div>
+    </ng-template>
+
+    <app-busqueda-dni> </app-busqueda-dni>
+  </p-dialog>
+</div>
+
+<app-loader></app-loader>

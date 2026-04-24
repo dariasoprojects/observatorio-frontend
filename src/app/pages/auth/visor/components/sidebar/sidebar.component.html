@@ -1,0 +1,106 @@
+<aside class="side-left">
+  <div class="side-left__head" [class.collapsed]="isCollapsed">
+    <button
+      class="side-left__toggle"
+      type="button"
+      (click)="toggleLeft()"
+      [attr.aria-label]="isCollapsed ? 'Expandir menú' : 'Colapsar menú'"
+    >
+      <i class="pi" [ngClass]="isCollapsed ? 'pi-chevron-right' : 'pi-chevron-left'"></i>
+    </button>
+
+    <div class="collapsed-brand" *ngIf="isCollapsed">
+      <img src="assets/logo-midagri-2.jpg" alt="MIDAGRI" class="collapsed-brand__logo" />
+      <img src="assets/logo-siea.jpg" alt="SIEA" class="collapsed-brand__logo collapsed-brand__logo--small" />
+    </div>
+  </div>
+
+  <app-busqueda-ubigeo></app-busqueda-ubigeo>
+
+  <div style="display: none;">
+    <p-panel header="" styleClass="panel-tight" *ngIf="!isCollapsed">
+      <div *ngIf="!filtrosUbigeo?.nombreDepartamento && !filtrosUbigeo?.nombreProvincia"
+           class="filter-empty clean">
+        <div class="filter-empty-line">
+          <i class="pi pi-filter-slash"></i>
+          <span>No hay filtros aplicados</span>
+        </div>
+
+        <button pButton
+                label="Seleccionar ubicación"
+                icon="pi pi-map-marker"
+                class="btn-ubigeo center"
+                (click)="onOpenUbicacionGeografica()">
+        </button>
+      </div>
+
+      <p-chip
+        *ngIf="filtrosUbigeo?.nombreDepartamento"
+        [label]="'Departamento: ' + filtrosUbigeo.nombreDepartamento"
+        styleClass="ppa-chip"
+        removable="true"
+        (onRemove)="onClearDepartamento()">
+      </p-chip>
+
+      <p-chip
+        *ngIf="filtrosUbigeo?.nombreProvincia"
+        [label]="'Provincia: ' + filtrosUbigeo.nombreProvincia"
+        styleClass="ppa-chip"
+        removable="true"
+        (onRemove)="onClearProvincia()">
+      </p-chip>
+
+      <div *ngIf="filtrosUbigeo?.nombreDepartamento && !filtrosUbigeo?.nombreProvincia"
+           class="filter-empty clean">
+        <div class="filter-empty-line">
+          <i class="pi pi-map-marker"></i>
+          <span>Selecciona una provincia</span>
+        </div>
+
+        <button pButton
+                label="Elegir provincia"
+                icon="pi pi-search"
+                class="btn-ubigeo center"
+                (click)="onOpenUbicacionGeografica()">
+        </button>
+      </div>
+    </p-panel>
+  </div>
+
+  <div class="side-left__scroll">
+    <ng-container *ngIf="!isCollapsed">
+      <p-panel *ngFor="let p of panels" [toggleable]="true" [collapsed]="p.collapsed" styleClass="panel-tight">
+        <ng-template pTemplate="header">
+          <div class="hdr">
+            <i class="pi" [ngClass]="p.icon"></i>
+            <span>{{ p.title }}</span>
+          </div>
+        </ng-template>
+
+        <ul class="list">
+          <li *ngFor="let it of p.items; trackBy: trackByItem">
+            <button
+              class="link"
+              [class.active]="it.section === activeSection"
+              [attr.aria-current]="it.section === activeSection ? 'page' : null"
+              [attr.aria-pressed]="it.section === activeSection ? 'true' : 'false'"
+              (click)="selectSection(it.section)">
+              <i *ngIf="it.icon" class="pi" [ngClass]="it.icon"></i>
+              <span>{{ it.title }}</span>
+            </button>
+          </li>
+        </ul>
+      </p-panel>
+    </ng-container>
+  </div>
+
+  <p-dialog
+    header="Ubicación geográfica"
+    [(visible)]="ubicacionGeograficaVisible"
+    [modal]="false"
+    [style]="{ width: '430px' }"
+    [draggable]="true"
+    [resizable]="false"
+    (onHide)="onCloseUbicacionGeografica()">
+  </p-dialog>
+</aside>

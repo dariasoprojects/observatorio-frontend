@@ -1,0 +1,52 @@
+<div class="indice-neducacion">
+  <div id="container-neducacion"></div>
+
+  <button (click)="aplicarColoresTematico()">Aplicar tematización</button>
+
+  <div class="tabla-wrapper">
+    <table class="tabla-neducacion">
+      <thead>
+        <tr>
+          <th>Nivel de Estudio</th>
+          <th class="num-col">Productores</th>
+          <th class="num-col">Hectárea</th>
+          <th class="num-col">Parcelas</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger(fila.productores) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.hectarea) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.parcelas) }}
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger(totalProductores) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{
+              FormatUtil.formatInteger2Digitos(totalHectarea)
+            }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{
+              FormatUtil.formatInteger2Digitos(totalParcelas)
+            }}</strong>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,266 @@
+/* =========================
+   RESET
+========================= */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* =========================
+   VARIABLES (scope componente)
+========================= */
+:host {
+  /* Anchos y espacios */
+  --panel-w: clamp(360px, 34vw, 560px);
+  --panel-pad: clamp(20px, 2.2vw, 28px);
+  --radius: 12px;
+
+  /* Alturas de controles */
+  --input-h: clamp(44px, 3.4vw, 48px);
+  --btn-h:   clamp(44px, 3.4vw, 48px);
+
+  /* Tipografías */
+  --title-fs:    clamp(32px, 4.5vw, 44px);
+  --subtitle-fs: clamp(18px, 2.2vw, 24px);
+  --label-fs:    13px;
+  --text-fs:     15px;
+
+  /* Colores */
+  --green:  #007C40;
+  --green-2:#008F49;
+  --copper: #9F5519;
+}
+
+/* =========================
+   LAYOUT GENERAL
+========================= */
+.main-content{
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;          /* mobile first */
+  align-items: center;
+  justify-content: flex-start;
+  min-height: calc(100vh - var(--landing-h));
+  color: #fff;
+  gap: clamp(24px, 5vw, 80px);
+  padding-inline: clamp(16px, 5vw, 120px);
+  max-width: 1600px;
+  margin-inline: auto;
+}
+
+.right-section {
+  display: flex;
+  justify-content: center;         /* centrado en pantallas pequeñas */
+  align-items: center;
+  width: 100%;
+  padding-top: 16px;
+}
+
+/* =========================
+   PANEL / CARD AUTH
+========================= */
+.auth-panel{
+  width: 100%;
+  max-width: var(--panel-w);
+  background: #E7E8E5;
+  color: #1b1b1b;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.28);
+  backdrop-filter: blur(2px);
+  padding: var(--panel-pad);
+}
+
+/* Encabezado con logo */
+.auth-header{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.brand-badge{ height: 32px; width: auto; object-fit: contain; }
+
+/* Títulos */
+.auth-title{
+  margin: 6px 0 4px;
+  font: var(--title-fs)/1.05 "Raleway", sans-serif;
+  color: var(--green);
+  letter-spacing: .2px;
+}
+
+.auth-subtitle{
+  margin: 0 0 16px;
+  font: 500 var(--subtitle-fs)/1.25 "Raleway", sans-serif;
+  color: var(--copper);
+}
+
+/* =========================
+   FORMULARIO
+========================= */
+.auth-form{ display: flex; flex-direction: column; gap: 12px; }
+
+.form-label{
+  font: 600 var(--label-fs)/1 "Raleway", sans-serif;
+  color: #0E0E0E;
+  margin-top: 6px;
+}
+
+.form-input{
+  width: 100%;
+  height: var(--input-h);
+  padding: 0 14px;
+  border-radius: calc(var(--radius) + 0px);
+  border: 1px solid rgba(0,0,0,.18);
+  background: #fff;
+  color: #111;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.form-input:focus{
+  border-color:#31a35a;
+  box-shadow: 0 0 0 3px rgba(49,163,90,.15);
+}
+
+/* Placeholders (color consistente) */
+.form-input::placeholder { color: #BFBFBF; font-family: "Raleway", sans-serif; font-weight: 500; letter-spacing: .2px; }
+.form-input:focus::placeholder { color: #BFBFBF; }
+.form-input::-webkit-input-placeholder { color: #BFBFBF; }
+.form-input:-moz-placeholder { color: #BFBFBF; opacity: 1; }
+.form-input::-moz-placeholder { color: #BFBFBF; opacity: 1; }
+.form-input:-ms-input-placeholder { color: #BFBFBF; }
+
+/* Password con “ojo” */
+.input-password{ position: relative; }
+.toggle-pass{
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  padding: 4px;
+  cursor: pointer;
+  color: #5c5c5c;
+}
+.toggle-pass:hover{ color: var(--green); }
+
+/* =========================
+   BOTONES
+========================= */
+.btn-auth{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--btn-h);
+  border-radius: calc(var(--radius) + 0px);
+  font: var(--text-fs)/1 "Raleway", sans-serif;
+  cursor: pointer;
+  transition: background-color .2s, color .2s, transform .15s, box-shadow .2s;
+}
+
+.btn-primary-auth{
+  background: var(--green);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 6px 14px rgba(26,127,60,.28);
+  margin-top: 14px;
+}
+.btn-primary-auth:hover{ transform: translateY(-1px); background: var(--green-2); }
+
+/* =========================
+   BREAKPOINTS
+========================= */
+
+/* === <700px: centrado total === */
+@media (max-width: 699px) {
+  .main-content {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .right-section {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+  }
+}
+
+/* === 700px–1599px: alineado a la derecha + centrado vertical === */
+@media (min-width: 700px) and (max-width: 1599px) {
+  .main-content {
+    flex-direction: row;
+    justify-content: flex-end;   /* derecha */
+    align-items: center;         /* centrado vertical */
+    min-height: 100vh;
+    gap: 0;
+  }
+
+  .right-section {
+    justify-content: flex-end;   /* empuja hacia el borde derecho */
+    align-items: center;
+    width: 50%;
+    padding: 0 6vw 0 0;
+    margin: 0;
+    transform: none;             /* sin escala en este rango */
+  }
+
+  .auth-panel { margin: 0; }
+}
+
+/* === ≥1600px: escala progresiva + ajustes de tipografías/alturas === */
+/* === FIX ≥1600px: ocupar todo el ancho y mantener derecha/centrado === */
+@media (min-width: 1600px){
+  .main-content{
+    /* Elimina el centrado por max-width */
+    max-width: none;       /* <- clave */
+    width: 100%;
+    margin-inline: 0;
+
+    /* Alineación deseada */
+    flex-direction: row;
+    justify-content: flex-end; /* derecha */
+    align-items: center;       /* centrado vertical */
+    min-height: 100vh;         /* altura estable */
+    /* si usas barras de sistema móviles, opcional: min-height: 100dvh; */
+  }
+
+  .right-section{
+    /* No uses margen negativo: causa “saltos” */
+    margin-right: 0;
+    padding-right: clamp(40px, 6vw, 120px);
+    width: 50%;
+    justify-content: flex-end;
+    align-items: center;
+
+    /* Escala suave sin empujar el layout */
+    transform: scale(1.12);
+    transform-origin: right center;
+  }
+
+  /* Ajustes de panel */
+  .auth-panel{
+    margin: 0; /* evita re-centrados accidentales */
+  }
+}
+
+/* === ≥1900px: un poco más de escala === */
+@media (min-width: 1900px){
+  .right-section{ transform: scale(1.25); padding-right: clamp(60px, 7vw, 160px); }
+}
+@media (min-width: 2300px){
+  .right-section{ transform: scale(1.38); padding-right: clamp(80px, 8vw, 200px); }
+}
+
+.form-input.ng-invalid.ng-touched {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211,47,47,.12);
+}
+
+.btn-primary-auth:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

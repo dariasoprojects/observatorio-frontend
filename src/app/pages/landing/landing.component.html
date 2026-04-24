@@ -1,0 +1,147 @@
+<div class="landing-container landing-home">
+  <header class="landing-home__header">
+    <div class="landing-home__brand">
+      <img
+        src="assets/logo_midagri_portada.png"
+        alt="MIDAGRI"
+        class="landing-home__midagri"
+      />
+
+      <div class="landing-home__divider"></div>
+
+      <img
+        src="assets/logo-siea.jpg"
+        alt="SIEA"
+        class="landing-home__siea"
+      />
+
+      <div class="landing-home__brand-copy">
+        <span class="landing-home__brand-eyebrow">Observatorio agrario</span>
+        <span class="landing-home__brand-title">Sistema Integrado de Estadística Agraria</span>
+      </div>
+    </div>
+
+    <button class="landing-home__login-top" type="button" (click)="onLogin()">
+      Iniciar sesión
+    </button>
+  </header>
+
+  <main class="landing-home__main">
+    <section class="landing-home__hero">
+      <div class="landing-home__pill">
+        <span class="landing-home__pill-dot"></span>
+        <span>Plataforma Nacional de Datos Agrarios</span>
+      </div>
+
+      <h1 class="landing-home__title">
+        Observatorio del
+        <br />
+        Padrón de Productores Agrarios
+      </h1>
+
+      <p class="landing-home__subtitle">
+        Datos georreferenciados del PPA para análisis territorial y gestión pública.
+      </p>
+
+      <div class="landing-home__video-card">
+        <div class="landing-home__video-frame">
+          <ng-container *ngIf="videoPortada; else localVideo">
+            <iframe
+              [src]="videoPortada | safeUrl"
+              title="Video institucional del Observatorio Geoespacial Agrario"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+            </iframe>
+          </ng-container>
+
+          <ng-template #localVideo>
+            <video
+              class="landing-home__video-native"
+              [attr.poster]="videoPoster"
+              autoplay
+              muted
+              loop
+              playsinline
+              controls>
+              <source [src]="videoPortadaLocal" type="video/mp4" />
+              Tu navegador no soporta la reproducción de video.
+            </video>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="landing-home__actions">
+        <button class="landing-home__cta landing-home__cta--primary" type="button" (click)="onVisitor()">
+          <span class="landing-home__cta-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7"></path>
+            </svg>
+          </span>
+          <span>Ingreso como visitante</span>
+        </button>
+      </div>
+
+      <div class="landing-home__stats">
+        <article class="landing-home__stat-card">
+          <div class="landing-home__stat-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3ZM8 11c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3Zm0 2c-2.7 0-5 1.8-5 4v1h10v-1c0-2.2-2.3-4-5-4Zm8 0c-.3 0-.7 0-1 .1 1.2.9 2 2.3 2 3.9v1h4v-1c0-2.2-2.3-4-5-4Z"></path>
+            </svg>
+          </div>
+
+          <div class="landing-home__stat-copy">
+            <span class="landing-home__stat-value">{{ nroProductores }}</span>
+            <span class="landing-home__stat-label">Productores</span>
+          </div>
+        </article>
+
+        <article class="landing-home__stat-card">
+          <div class="landing-home__stat-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6h16v12H4zM9 6v12M15 6v12M4 11h16M4 16h16"></path>
+            </svg>
+          </div>
+
+          <div class="landing-home__stat-copy">
+            <span class="landing-home__stat-value">{{ nroParcelas }}</span>
+            <span class="landing-home__stat-label">Parcelas</span>
+          </div>
+        </article>
+
+        <article class="landing-home__stat-card">
+          <div class="landing-home__stat-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3c2.7 0 4.5 2.1 4.5 4.7 0 3.6-4.5 8.3-4.5 8.3S7.5 11.3 7.5 7.7C7.5 5.1 9.3 3 12 3Zm0 2.3c-1.2 0-2.1 1-2.1 2.3S10.8 10 12 10s2.1-1 2.1-2.4-.9-2.3-2.1-2.3ZM5 20c1.5-2.4 4.1-3.8 7-3.8s5.5 1.4 7 3.8"></path>
+            </svg>
+          </div>
+
+          <div class="landing-home__stat-copy">
+            <span class="landing-home__stat-value">{{ nroHectareas }}</span>
+            <span class="landing-home__stat-label">Hectáreas</span>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <a
+    href="https://wa.me/51999999999"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="agrochatea-link"
+    aria-label="Agrochatea por WhatsApp">
+    <svg width="88" height="99" viewBox="0 0 88 99" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <rect width="88" height="99" fill="url(#pattern0_147_749)"/>
+      <defs>
+        <pattern id="pattern0_147_749" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlink:href="#image0_147_749" transform="matrix(0.00307692 0 0 0.00273504 0 -0.00188034)"/>
+        </pattern>
+        <image id="image0_147_749" width="325" height="367" preserveAspectRatio="none" xlink:href="data:image/png;base64,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" />
+      </defs>
+    </svg>
+  </a>
+</div>
+
+<app-loader></app-loader>

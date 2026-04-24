@@ -1,0 +1,76 @@
+<div class="landing-container">
+  <main class="main-content">
+    <!-- DERECHA -->
+    <section class="right-section">
+      <div class="auth-panel">
+
+        <!-- Encabezado con logos (opcional) -->
+        <div class="auth-header">
+          <img src="assets/logo_midagri_portada.png" alt="MIDAGRI" class="brand-badge">
+        </div>
+
+        <!-- Títulos -->
+        <h1 class="auth-title">SIEA</h1>
+        <p class="auth-subtitle">Sistema de información geoespacial agrícola</p>
+
+        <!-- ÚNICO FORM -->
+        <form class="auth-form" [formGroup]="formularioLogin" (ngSubmit)="iniciarSesion()" novalidate>
+
+          <!-- Campo: Usuario o correo -->
+          <label class="form-label" for="usuario">Usuario o correo</label>
+          <input
+            id="usuario"
+            type="text"
+            class="form-input"
+            placeholder="Ingresa tu usuario o correo electrónico"
+            autocomplete="username"
+            formControlName="usuario"
+          />
+
+          <!-- Mensaje de error -->
+          <small *ngIf="usuarioInvalido" style="color:#d32f2f">
+            El usuario o correo es obligatorio.
+          </small>
+
+          <!-- Campo: Contraseña -->
+          <label class="form-label" for="contrasena">Contraseña</label>
+          <div class="input-password">
+            <input
+              id="contrasena"
+              [type]="mostrarContrasena ? 'text' : 'password'"
+              class="form-input"
+              placeholder="Ingresa tu contraseña"
+              autocomplete="current-password"
+              formControlName="contrasena"
+            />
+            <button type="button" class="toggle-pass" (click)="mostrarContrasena = !mostrarContrasena">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+                <circle [attr.fill]="mostrarContrasena ? 'currentColor' : 'none'" cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Mensaje de error -->
+          <small *ngIf="contrasenaInvalida" style="color:#d32f2f">
+            La contraseña es obligatoria.
+          </small>
+
+
+
+          <small *ngIf="mensajeError" style="color:#d32f2f; display:block; margin-top:8px;">
+            {{ mensajeError }}
+          </small>
+
+          <!-- Botones -->
+          <button type="submit" class="btn-auth btn-primary-auth" [disabled]="formularioLogin.invalid || cargando">
+            {{ cargando ? 'Ingresando...' : 'Iniciar sesión' }}
+          </button>
+
+        </form>
+
+
+      </div>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,684 @@
+
+<div class="wrap-scroll" #wrapScroll>
+  <div class="p-fluid analisis-espacial" [style.display]="detalleVisible ? 'none' : 'block'">
+
+     
+
+      <!-- DEFINIR COBERTURA EN TABS -->
+      <p-card class="card-compact">
+        <ng-template pTemplate="title">
+          <span class="card-title-sm">Definir cobertura</span>
+        </ng-template>
+
+        <p-tabView class="tabs-compact">
+          <!-- TAB 1: CAPA -->
+          <p-tabPanel header="Seleccionar capa">
+            <div class="tab-body">
+              <label class="field-title mr-2">Seleccionar capa</label>
+              <p-dropdown
+                [options]="capas"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Capas"
+                [filter]="true"
+                filterPlaceholder="Buscar capas"
+                filterBy="label"
+                [showClear]="true"
+                appendTo="body"
+                panelStyleClass="dep-panel"
+                (onChange)="onCapaChange($event)"
+              ></p-dropdown>
+            </div>
+          </p-tabPanel>
+
+          <!-- TAB 2: DIBUJO -->
+          <p-tabPanel header="Dibujar un polígono">
+            <div class="tab-body">
+              <div class="row-inline">
+                <div class="row-text">
+                  <div class="field-title">Dibujo a mano alzada</div>
+                  <div class="hint">Activa el modo dibujo en el mapa.</div>
+                </div>
+
+                <button
+                  pButton
+                  type="button"
+                  class="btn-mini"
+                  icon="pi pi-pencil"
+                  pTooltip="Dibujar polígono"
+                  tooltipPosition="left"
+                  (click)="onDibujar()"
+                ></button>
+              </div>
+            </div>
+          </p-tabPanel>
+
+          <!-- TAB 3: KML -->
+          <p-tabPanel header="Cargar KML">
+            <div class="tab-body">
+              <div class="row-inline">
+                <div class="row-text">
+                  <div class="field-title">Cargar archivo KML</div>
+                  <div class="hint">Usa un polígono simple (una geometría).</div>
+                </div>
+
+                <label class="btn-mini file-btn" pTooltip="Seleccionar KML" tooltipPosition="left">
+                  <i class="pi pi-upload"></i>
+                  <input type="file" (change)="onFileSelect($event, 'kml')" accept=".kml" hidden>
+                </label>
+              </div>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+
+         <!-- HEADER COMPACTO -->
+      
+        <div class="toolbar-left" style="background-color: #FEEBE7; width: 280px; padding: 5px 5px 5px 5px; border: 1px solid #ccc;border-radius: 12px;">
+          <span class="toolbar-title">GeoPerfil&nbsp;</span>
+          <span class="toolbar-sub" *ngIf="coberturaPolygon">Cobertura de análisis lista&nbsp;&nbsp;</span>
+          <span class="toolbar-sub warn" *ngIf="!coberturaPolygon">Sin cobertura definida&nbsp;&nbsp;</span>
+          <button
+            pButton
+            type="button"
+            class="btn-play"
+            icon="pi pi-play"
+            pTooltip="Ejecutar superposición"
+            tooltipPosition="left"
+            (click)="onAnalizar()"
+            [disabled]="!coberturaPolygon || ejecutandoAnalisis"
+          ></button>
+
+        </div>
+
+        <div class="toolbar-left">
+          <!-- PLAY -->
+         
+        </div>
+      
+      </p-card>
+
+
+
+    
+
+      <!-- RESULTADOS -->
+      <p-card class="card-compact" #resultadosCard>
+        <ng-template pTemplate="title">
+          <span class="card-title-sm">Resultados</span>
+        </ng-template>
+
+        <!-- <div  *ngIf="resultados?.length || gridGenero?.length || gridProductivo?.length || gridRiego?.length"> -->
+        <!-- <div class="result-actions" *ngIf="resultados?.length || loadingGenero || loadingProductivo || loadingRiego || loadingPecuario || loadingPecuarioDetalle || gridGenero?.length || gridProductivo?.length || gridRiego?.length || gridPecuario?.length"> -->
+        <div class="result-actions" *ngIf="hayResultadosEstadisticos">
+          <button
+            pButton
+            type="button"
+            label="Exportar en Excel"
+            icon="pi pi-file-excel"
+            class="p-button-sm p-button-outlined"
+            (click)="exportarExcel()"
+          ></button>
+
+
+          <button pButton
+                    label="Activar GeoAnalítica"
+                    icon="pi pi-external-link"
+                    (click)="cargaGeoAnalitica()"
+                    *ngIf="resultados.length > 0">
+          </button>
+          
+      </div>
+
+        <!-- Mantienes tus cards internas pero con clases compactas -->
+        <div class="grid-compact">
+
+          <p-card class="card-mini" *ngIf="mostrarGenero">
+            <!-- <ng-template pTemplate="title">
+              <span class="mini-title">Género</span>
+            </ng-template> -->
+            <div class="chart-wrap" *ngIf="mostrarGenero">
+              <div *ngIf="loadingGenero" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-genero" [style.display]="loadingGenero ? 'none' : 'block'"></div>
+            </div>
+            <br>
+            <p-table [value]="gridGenero" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  
+                  <th width="50%">GÉNERO</th>
+                  <th width="50%">PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <!-- <td>{{ row.GENERO }}</td> -->
+                   
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.SUM_GENERO }}</td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="footer">
+                <tr>
+                 
+                  <td><strong>TOTAL</strong></td>
+                  <td><strong>{{ getSum(gridGenero, 'SUM_GENERO') }}</strong></td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-card>
+
+          <p-card class="card-mini" *ngIf="mostrarProductivo">
+            <!-- <ng-template pTemplate="title">
+              <span class="mini-title">Actividad</span>
+            </ng-template> -->
+            <div class="chart-wrap" *ngIf="mostrarProductivo">
+              <div *ngIf="loadingProductivo" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-productivo" [style.display]="loadingProductivo ? 'none' : 'block'"></div>
+            </div>
+            <br>
+            <p-table [value]="gridProductivo" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th width="50%">ACTIVIDAD PRODUCTIVA</th>
+                  <th width="50%">PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.TOTAL }}</td>
+                </tr>
+              </ng-template>
+
+              <!-- <ng-template pTemplate="footer">
+                <tr>
+                  <td><strong>Suma</strong></td>
+                  <td><strong>{{ getSum(gridProductivo, 'TOTAL') }}</strong></td>
+                </tr>
+              </ng-template> -->
+
+            </p-table>
+          </p-card>
+
+
+
+          <p-card class="card-mini" *ngIf="mostrarCultivos1">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Distribución por Cultivos principales</span>
+            </ng-template>
+
+            <div class="chart-wrap" *ngIf="mostrarCultivos1">
+              <div *ngIf="loadingCultivos1" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-cultivos1" [style.display]="loadingCultivos1 ? 'none' : 'block'"></div>
+            </div>
+            <br>
+            <p-table [value]="gridCultivos1" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>CULTIVOS PRINCIPALES</th>
+                  <th>PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.TOTAL }}</td>
+                </tr>
+              </ng-template>
+
+             <!--  <ng-template pTemplate="footer">
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td><strong>{{ getSum(gridCultivos1, 'TOTAL') }}</strong></td>
+                </tr>
+              </ng-template> -->
+
+            </p-table>
+          </p-card>
+
+
+
+          <p-card class="card-mini" *ngIf="mostrarCultivos2">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Distribución por Cultivos transitorios</span>
+            </ng-template>
+
+            <div class="chart-wrap" *ngIf="mostrarCultivos2">
+              <div *ngIf="loadingCultivos2" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-cultivos2" [style.display]="loadingCultivos2 ? 'none' : 'block'"></div>
+            </div>
+            <br>
+            <p-table [value]="gridCultivos2" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>CULTIVOS TRANSITORIOS</th>
+                  <th>PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.TOTAL }}</td>
+                </tr>
+              </ng-template>
+              <!-- <ng-template pTemplate="footer">
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td><strong>{{ getSum(gridCultivos2, 'TOTAL') }}</strong></td>
+                </tr>
+              </ng-template> -->
+            </p-table>
+          </p-card>
+
+
+
+          <p-card class="card-mini" *ngIf="mostrarCultivos3">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Distribución por Cultivos permanentes</span>
+            </ng-template>
+
+            <div class="chart-wrap" *ngIf="mostrarCultivos3">
+              <div *ngIf="loadingCultivos3" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-cultivos3" [style.display]="loadingCultivos3 ? 'none' : 'block'"></div>
+            </div>
+<br>
+            <p-table [value]="gridCultivos3" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>CULTIVOS PERMANENTES</th>
+                  <th>PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.TOTAL }}</td>
+                </tr>
+              </ng-template>
+               <!-- <ng-template pTemplate="footer">
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td><strong>{{ getSum(gridCultivos3, 'TOTAL') }}</strong></td>
+                </tr>
+              </ng-template> -->
+            </p-table>
+          </p-card>
+
+
+
+
+          <!-- <p-card class="card-mini" *ngIf="mostrarPecuario">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Estructura Productiva Pecuaria</span>
+            </ng-template>
+
+            <div class="chart-wrap" *ngIf="mostrarPecuario">
+              <div *ngIf="loadingPecuario" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-pecuario" [style.display]="loadingPecuario ? 'none' : 'block'"></div>
+            </div>
+            <div class="chart-wrap" *ngIf="loadingPecuarioDetalle || gridPecuario?.length">
+              <div *ngIf="loadingPecuarioDetalle" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-pecuario-detalle" [style.display]="loadingPecuarioDetalle ? 'none' : 'block'"></div>
+            </div>
+
+
+            <p-table [value]="gridPecuario" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>ESPECIE</th>
+                  <th>TOTAL</th>
+                  <th>RAZA</th>
+                  <th>CRIOLLO</th>
+                  <th>MEJORADO</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.TXT_P29_1 }}</td>
+                  <td>{{ row.SUM_CAN_P29_2 }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_RAZA }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_CRIOLLO }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_MEJORADO }}</td>
+                </tr>
+              </ng-template>
+
+             
+
+
+            </p-table>
+
+            
+
+          </p-card>
+ -->
+
+          <p-card class="card-mini" *ngIf="mostrarPecuario">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Distribución por Estructura Productiva Pecuaria</span>
+            </ng-template>
+
+            <div class="chart-wrap" *ngIf="mostrarPecuarioGeneral">
+              <div *ngIf="loadingPecuario" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-pecuario" [style.display]="loadingPecuario ? 'none' : 'block'"></div>
+            </div>
+
+            <div class="chart-wrap" *ngIf="mostrarPecuarioDetalle">
+              <div *ngIf="loadingPecuarioDetalle" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-pecuario-detalle" [style.display]="loadingPecuarioDetalle ? 'none' : 'block'"></div>
+            </div>
+
+            <p-table [value]="gridPecuario" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>ESPECIE</th>
+                  <th>TOTAL</th>
+                  <th>RAZA</th>
+                  <th>CRIOLLO</th>
+                  <th>MEJORADO</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.TXT_P29_1 }}</td>
+                  <td>{{ row.SUM_CAN_P29_2 }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_RAZA }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_CRIOLLO }}</td>
+                  <td>{{ row.SUM_CAN_P29_3_MEJORADO }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-card>
+
+          <p-card class="card-mini" *ngIf="mostrarRiego">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Distribución por Riego</span>
+            </ng-template>
+            <div class="chart-wrap" *ngIf="mostrarRiego">
+              <div *ngIf="loadingRiego" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-riego" [style.display]="loadingRiego ? 'none' : 'block'"></div>
+            </div>
+            <p-table [value]="gridRiego" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>METODO DE RIEGO</th>
+                  <th>PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.TOTAL }}</td>
+                </tr>
+              </ng-template>
+               <!-- <ng-template pTemplate="footer">
+                  <tr>
+                    <td><strong>Suma</strong></td>
+                    <td><strong>{{ getSum(gridRiego, 'TOTAL') }}</strong></td>
+                  </tr>
+                </ng-template> -->
+
+
+            </p-table>
+          </p-card>
+
+
+
+
+          <p-card class="card-mini" *ngIf="mostrarFerti1">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Distribución por Fertilización </span>
+            </ng-template>
+
+            <div class="chart-wrap" *ngIf="mostrarFerti1">
+              <div *ngIf="loadingFerti1" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-ferti1" [style.display]="loadingFerti1 ? 'none' : 'block'"></div>
+            </div>
+
+            <p-table [value]="gridFerti1" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>FERTILIZANTES</th>
+                  <th>PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.TOTAL }}</td>
+                </tr>
+              </ng-template>
+              <!-- <ng-template pTemplate="footer">
+                <tr>
+                  <td><strong>Suma</strong></td>
+                  <td><strong>{{ getSum(gridFerti1, 'TOTAL') }}</strong></td>
+                </tr>
+              </ng-template> -->
+            </p-table>
+          <!-- </p-card>
+
+
+
+          <p-card class="card-mini" *ngIf="loadingFerti2 || gridFerti2?.length">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Fertilización cultivo transitorio</span>
+            </ng-template> --><br><br>
+
+            <div class="chart-wrap" *ngIf="mostrarFerti2">
+              <div *ngIf="loadingFerti2" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-ferti2" [style.display]="loadingFerti2 ? 'none' : 'block'"></div>
+            </div>
+
+            <p-table [value]="gridFerti2" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>FERTILIZANTES</th>
+                  <th>PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.TOTAL }}</td>
+                </tr>
+              </ng-template>
+              <!-- <ng-template pTemplate="footer">
+                <tr>
+                  <td><strong>Suma</strong></td>
+                  <td><strong>{{ getSum(gridFerti2, 'TOTAL') }}</strong></td>
+                </tr>
+              </ng-template> -->
+            </p-table>
+          <!-- </p-card>
+
+
+          <p-card class="card-mini" *ngIf="loadingFerti3 || gridFerti3?.length">
+            <ng-template pTemplate="title">
+              <span class="mini-title">Fertilización cultivo permanente</span>
+            </ng-template> --><br><br>
+
+            <div class="chart-wrap" *ngIf="mostrarFerti3">
+              <div *ngIf="loadingFerti3" class="chart-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando gráfico...</span>
+              </div>
+              <div id="chart-ferti3" [style.display]="loadingFerti3 ? 'none' : 'block'"></div>
+            </div>
+
+            <p-table [value]="gridFerti3" styleClass="p-datatable-sm mini-table">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>FERTILIZANTES</th>
+                  <th>PRODUCTORES</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>{{ row.DESCRIPCION }}</td>
+                  <td>{{ row.TOTAL }}</td>
+                </tr>
+              </ng-template>
+               <!-- <ng-template pTemplate="footer">
+                  <tr>
+                    <td><strong>Suma</strong></td>
+                    <td><strong>{{ getSum(gridFerti3, 'TOTAL') }}</strong></td>
+                  </tr>
+                </ng-template> -->
+            </p-table>
+          </p-card>
+
+
+
+        </div>
+
+       <!--  <div class="text-center mb-3" *ngIf="resultados?.length">
+          <button
+            pButton
+            type="button"
+            [label]="mostrarTablaResultados ? 'Ocultar tabla de resultados' : 'Mas detalles ...'"
+            [icon]="mostrarTablaResultados ? 'pi pi-eye-slash' : 'pi pi-table'"
+            class="p-button-sm p-button-outlined"
+            (click)="toggleTablaResultados()"
+          ></button>
+        </div> -->
+
+        <!-- Tabla principal -->
+        <p-table
+           *ngIf="resultados?.length && mostrarTablaResultados"
+          [value]="resultados"
+          [paginator]="true"
+          [rows]="100"
+          styleClass="p-datatable-sm resultados-table compact-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>ID</th>
+              <th>NRO DOCUMENTO</th>
+              <th>NOMBRES</th>
+              <th>APELLIDOS</th>
+              <th style="width: 3rem;"></th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.OBJECTID }}</td>
+              <td>{{ row.TXT_NRODOC }}</td>
+              <td>{{ row.NOMBRES }}</td>
+              <td>{{ row.APELLIDOPA }}</td>
+              <td class="text-center">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-ellipsis-v"
+                  class="p-button-text p-button-rounded p-button-sm"
+                  (click)="onAbrirDetalle(row)"
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <div class="p-text-center p-text-secondary" *ngIf="!resultados?.length">
+          No hay resultados para mostrar.
+        </div>
+
+        <!-- PAGINADO REAL -->
+        <div class="acciones-paginacion"  *ngIf="resultados?.length && mostrarTablaResultados">
+          <button
+            pButton
+            icon="pi pi-angle-left"
+            label="Anterior"
+            class="p-button-outlined p-button-sm"
+            [disabled]="paginaActual <= 1 || cargando"
+            (click)="anteriorPagina()"
+          ></button>
+
+          <span class="pagina-info">
+            Página {{ paginaActual }} <span *ngIf="cargando"> (cargando...)</span>
+          </span>
+
+          <button
+            pButton
+            icon="pi pi-angle-right"
+            label="Siguiente"
+            class="p-button-outlined p-button-sm"
+            [disabled]="fin || cargando"
+            (click)="siguientePagina()"
+          ></button>
+        </div>
+
+      </p-card>
+
+    
+
+  </div>
+
+  <div class="p-fluid analisis-espacial" [style.display]="detalleVisible ? 'block' : 'none'">
+      <p-card class="step-card">
+        <ng-template pTemplate="title">
+          <span class="step-title">Detalle del registro</span>
+        </ng-template>
+
+        <ng-template pTemplate="subtitle">
+          <span class="step-subtitle">Información completa de productor</span>
+        </ng-template>
+
+        <div class="detalle-grid">
+          <div *ngFor="let item of filaSeleccionada | keyvalue">
+            <strong>{{ item.key }}:</strong>
+            <span>{{ item.value }}</span>
+          </div>
+        </div>
+
+        <div class="text-right mt-3">
+          <button
+            pButton
+            label="Volver"
+            class="w-full btn-analisis"
+            (click)="cerrarDetalle()"
+          ></button>
+        </div>
+      </p-card>
+    </div>
+
+</div>
+

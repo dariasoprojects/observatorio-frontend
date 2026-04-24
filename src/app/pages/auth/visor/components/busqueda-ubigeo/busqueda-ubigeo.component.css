@@ -1,0 +1,58 @@
+/* Textos y labels locales del panel */
+.muted{ color:#6b7280; display:block; margin-bottom:6px; }
+:host ::ng-deep .p-dropdown,
+:host label{
+  font-size: 12px;
+}
+:host label{
+  display:block; color:#6b7280; margin:8px 0 4px;
+}
+
+/* Dropdown: ocupa todo el ancho y se ve compacto */
+:host ::ng-deep .p-dropdown {
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* Texto seleccionado, sin desbordes */
+:host ::ng-deep .p-dropdown-label {
+  padding: 6px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Panel del dropdown */
+:host ::ng-deep .p-dropdown-panel {
+  min-width: 220px;        /* o 100% si prefieres igual al control */
+  border-radius: 8px;
+  max-height: 280px;       /* scroll interno del panel */
+}
+
+/* Header del filtro */
+:host ::ng-deep .p-dropdown-header {
+  padding: 8px 10px;
+}
+
+/* Input de filtro (buscador) */
+:host ::ng-deep .p-dropdown-filter {
+  border-radius: 6px;
+  padding: 6px 10px 6px 28px; /* espacio para ícono */
+  font-size: 12px;            /* consistente con tu tipografía */
+}
+
+/* Ícono de búsqueda dentro del header */
+:host ::ng-deep .p-dropdown-filter-icon {
+  left: 10px;
+}
+
+/* Ítems compactos */
+:host ::ng-deep .p-dropdown-items .p-dropdown-item {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+/* Placeholder de tu control */
+:host ::ng-deep .p-dropdown .p-placeholder {
+  color: #6b7280;
+}

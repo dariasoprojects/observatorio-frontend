@@ -1,0 +1,39 @@
+<div class="indice-supagri">
+  <div id="container-supagri"></div>
+
+  <div class="tabla-wrapper">
+    <table class="tabla-supagri">
+      <thead>
+        <tr>
+          <th>{{ tituloPrimeraColumna }}</th>
+          <th class="num-col">Área Total (ha.)</th>
+          <th class="num-col">Área Bajo Riego (ha.)</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let fila of tablaDatos">
+          <td>{{ fila.ddescr }}</td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.hectareaTotal) }}
+          </td>
+          <td class="num-col">
+            {{ FormatUtil.formatInteger2Digitos(fila.hectariaBajoRiego) }}
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="fila-total">
+          <td><strong>Total</strong></td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareaTotal) }}</strong>
+          </td>
+          <td class="num-col">
+            <strong>{{ FormatUtil.formatInteger2Digitos(totalHectareaBajoRiego) }}</strong>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,195 @@
+.analisis-panel {
+  position: absolute;
+  top: 110px;
+  left: 400px;
+  width: 330px;
+  background: #ffffff;
+  border-radius: 8px;
+  z-index: 50;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  font-family: "Segoe UI", Arial, sans-serif;
+  padding-bottom: 10px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #004a8d;
+  color: white;
+  padding: 8px 10px;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.panel-body {
+  padding: 10px;
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 13px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.input-group {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+input[type="file"] {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+hr {
+  margin: 8px 0;
+}
+
+.btn-primary,
+.btn-analyze {
+  width: 100%;
+  padding: 6px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.btn-primary {
+  background: #0a84d0;
+}
+
+.btn-primary:hover {
+  background: #0569a2;
+}
+
+.btn-analyze {
+  background: #2ca02c;
+  font-weight: bold;
+}
+
+.btn-analyze:hover {
+  background: #1e771e;
+}
+
+.table-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background: #f0f0f0;
+  font-weight: bold;
+  padding: 4px;
+  border-bottom: 1px solid #ccc;
+}
+
+td {
+  padding: 4px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.empty-msg {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  padding: 5px;
+}
+
+
+
+
+.legend-title2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: green;
+  color: #fff;
+  padding: 6px 12px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Botón de cierre */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #f87171; /* rojo claro al pasar el mouse */
+}
+
+
+
+.cd-acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Estilo base */
+.cd-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Botones verdes */
+.cd-success {
+  background-color: #22c55e; /* verde */
+  color: #fff;
+}
+
+.cd-success:hover {
+  background-color: #16a34a; /* verde más oscuro */
+}
+
+/* Botón blanco */
+.cd-light {
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.cd-light:hover {
+  background-color: #f9fafb;
+}
+
+
